@@ -1,0 +1,422 @@
+Command: /home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python /home/muthuselvan/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /home/muthuselvan/esp/build/wifi_ap_project.elf /home/muthuselvan/esp/build/bootloader/bootloader.elf -m '/home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python' '/home/muthuselvan/esp/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+ WIFI_CONNECTING
+[0;32mI (574839) main: State: WIFI_CONNECTING[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21ec4h (138948) map[0m
+[0;32mI (113) esp_image: segment 1: paddr=00031eec vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117) esp_image: segment 2: paddr=00036af0 vaddr=40374000 size=09528h ( 38184) load[0m
+[0;32mI (126) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ab23ch (700988) map[0m
+[0;32mI (252) esp_image: segment 4: paddr=000eb264 vaddr=4037d528 size=0a478h ( 42104) load[0m
+[0;32mI (261) esp_image: segment 5: paddr=000f56e4 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (270) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (270) boot: Disabling RNG early entropy source...[0m
+[0;32mI (280) cpu_start: Multicore app[0m
+[0;32mI (289) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (290) cpu_start: Pro cpu start user code[0m
+[0;32mI (290) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (291) app_init: Application information:[0m
+[0;32mI (295) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (300) app_init: App version:      1[0m
+[0;32mI (303) app_init: Compile time:     Nov 20 2025 13:43:29[0m
+[0;32mI (308) app_init: ELF file SHA256:  fbeacab0a...[0m
+[0;32mI (312) app_init: ESP-IDF:          v6.1-dev-724-ga6e7046c30[0m
+[0;32mI (318) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (322) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (326) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (329) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (336) heap_init: At 3FCA0A08 len 00048D08 (291 KiB): RAM[0m
+[0;32mI (341) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (346) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (351) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (358) spi_flash: detected chip: boya[0m
+[0;32mI (360) spi_flash: flash io: dio[0m
+[0;33mW (363) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (376) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (382) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (389) main_task: Started on CPU0[0m
+[0;32mI (409) main_task: Calling app_main()[0m
+[0;32mI (409) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (409) main: Device ID: device_0070[0m
+[0;32mI (429) main: NVS initialized[0m
+[0;32mI (429) main: Network interface initialized[0m
+[0;32mI (429) main: Event loop created[0m
+[0;32mI (429) main: Event handlers registered[0m
+[0;32mI (429) main: Application state machine started[0m
+[0;32mI (439) main: State: INIT[0m
+[0;32mI (439) main: State machine task started[0m
+[0;32mI (439) main: Application initialization complete[0m
+[0;32mI (449) main_task: Returned from app_main()[0m
+[0;32mI (539) main: State: CHECK_PROVISIONING[0m
+[0;32mI (539) main: Device is provisioned, connecting to WiFi...[0m
+[0;32mI (639) main: State: WIFI_CONNECTING[0m
+[0;32mI (1739) main: State: WIFI_CONNECTING[0m
+[0;32mI (2839) main: State: WIFI_CONNECTING[0m
+[0;32mI (3939) main: State: WIFI_CONNECTING[0m
+[0;32mI (5039) main: State: WIFI_CONNECTING[0m
+[0;32mI (6139) main: State: WIFI_CONNECTING[0m
+[0;32mI (7239) main: State: WIFI_CONNECTING[0m
+[0;32mI (8339) main: State: WIFI_CONNECTING[0m
+[0;32mI (9439) main: State: WIFI_CONNECTING[0m
+[0;32mI (10539) main: State: WIFI_CONNECTING[0m
+[0;32mI (11639) main: State: WIFI_CONNECTING[0m
+[0;32mI (12739) main: State: WIFI_CONNECTING[0m
+[0;32mI (13839) main: State: WIFI_CONNECTING[0m
+[0;32mI (14939) main: State: WIFI_CONNECTING[0m
+[0;32mI (16039) main: State: WIFI_CONNECTING[0m
+[0;32mI (17139) main: State: WIFI_CONNECTING[0m
+[0;32mI (18239) main: State: WIFI_CONNECTING[0m
+[0;32mI (19339) main: State: WIFI_CONNECTING[0m
+[0;32mI (20439) main: State: WIFI_CONNECTING[0m
+[0;32mI (21539) main: State: WIFI_CONNECTING[0m
+[0;32mI (22639) main: State: WIFI_CONNECTING[0m
+[0;32mI (23739) main: State: WIFI_CONNECTING[0m
+[0;32mI (24839) main: State: WIFI_CONNECTING[0m
+[0;32mI (25939) main: State: WIFI_CONNECTING[0m
+[0;32mI (27039) main: State: WIFI_CONNECTING[0m
+[0;32mI (28139) main: State: WIFI_CONNECTING[0m
+[0;32mI (29239) main: State: WIFI_CONNECTING[0m
+[0;32mI (30339) main: State: WIFI_CONNECTING[0m
+[0;32mI (31439) main: State: WIFI_CONNECTING[0m
+[0;32mI (32539) main: State: WIFI_CONNECTING[0m
+[0;32mI (33639) main: State: WIFI_CONNECTING[0m
+[0;32mI (34739) main: State: WIFI_CONNECTING[0m
+[0;32mI (35839) main: State: WIFI_CONNECTING[0m
+[0;32mI (36939) main: State: WIFI_CONNECTING[0m
+[0;32mI (38039) main: State: WIFI_CONNECTING[0m
+[0;32mI (39139) main: State: WIFI_CONNECTING[0m
+[0;32mI (40239) main: State: WIFI_CONNECTING[0m
+[0;32mI (41339) main: State: WIFI_CONNECTING[0m
+[0;32mI (42439) main: State: WIFI_CONNECTING[0m
+[0;32mI (43539) main: State: WIFI_CONNECTING[0m
+[0;32mI (44639) main: State: WIFI_CONNECTING[0m
+[0;32mI (45739) main: State: WIFI_CONNECTING[0m
+[0;32mI (46839) main: State: WIFI_CONNECTING[0m
+[0;32mI (47939) main: State: WIFI_CONNECTING[0m
+[0;32mI (49039) main: State: WIFI_CONNECTING[0m
+[0;32mI (50139) main: State: WIFI_CONNECTING[0m
+[0;32mI (51239) main: State: WIFI_CONNECTING[0m
+[0;32mI (52339) main: State: WIFI_CONNECTING[0m
+[0;32mI (53439) main: State: WIFI_CONNECTING[0m
+[0;32mI (54539) main: State: WIFI_CONNECTING[0m
+[0;32mI (55639) main: State: WIFI_CONNECTING[0m
+[0;32mI (56739) main: State: WIFI_CONNECTING[0m
+[0;32mI (57839) main: State: WIFI_CONNECTING[0m
+[0;32mI (58939) main: State: WIFI_CONNECTING[0m
+[0;32mI (60039) main: State: WIFI_CONNECTING[0m
+[0;32mI (61139) main: State: WIFI_CONNECTING[0m
+[0;32mI (62239) main: State: WIFI_CONNECTING[0m
+[0;32mI (63339) main: State: WIFI_CONNECTING[0m
+[0;32mI (64439) main: State: WIFI_CONNECTING[0m
+[0;32mI (65539) main: State: WIFI_CONNECTING[0m
+[0;32mI (66639) main: State: WIFI_CONNECTING[0m
+[0;32mI (67739) main: State: WIFI_CONNECTING[0m
+[0;32mI (68839) main: State: WIFI_CONNECTING[0m
+[0;32mI (69939) main: State: WIFI_CONNECTING[0m
+[0;32mI (71039) main: State: WIFI_CONNECTING[0m
+[0;32mI (72139) main: State: WIFI_CONNECTING[0m
+[0;32mI (73239) main: State: WIFI_CONNECTING[0m
+[0;32mI (74339) main: State: WIFI_CONNECTING[0m
+[0;32mI (75439) main: State: WIFI_CONNECTING[0m
+[0;32mI (76539) main: State: WIFI_CONNECTING[0m
+[0;32mI (77639) main: State: WIFI_CONNECTING[0m
+[0;32mI (78739) main: State: WIFI_CONNECTING[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21ec4h (138948) map[0m
+[0;32mI (113) esp_image: segment 1: paddr=00031eec vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117) esp_image: segment 2: paddr=00036af0 vaddr=40374000 size=09528h ( 38184) load[0m
+[0;32mI (126) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ab23ch (700988) map[0m
+[0;32mI (252) esp_image: segment 4: paddr=000eb264 vaddr=4037d528 size=0a478h ( 42104) load[0m
+[0;32mI (261) esp_image: segment 5: paddr=000f56e4 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (270) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (270) boot: Disabling RNG early entropy source...[0m
+[0;32mI (280) cpu_start: Multicore app[0m
+[0;32mI (289) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (290) cpu_start: Pro cpu start user code[0m
+[0;32mI (290) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (291) app_init: Application information:[0m
+[0;32mI (295) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (300) app_init: App version:      1[0m
+[0;32mI (303) app_init: Compile time:     Nov 20 2025 13:43:29[0m
+[0;32mI (308) app_init: ELF file SHA256:  fbeacab0a...[0m
+[0;32mI (312) app_init: ESP-IDF:          v6.1-dev-724-ga6e7046c30[0m
+[0;32mI (318) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (322) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (326) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (329) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (336) heap_init: At 3FCA0A08 len 00048D08 (291 KiB): RAM[0m
+[0;32mI (341) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (346) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (351) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (358) spi_flash: detected chip: boya[0m
+[0;32mI (360) spi_flash: flash io: dio[0m
+[0;33mW (363) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (376) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (382) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (389) main_task: Started on CPU0[0m
+[0;32mI (409) main_task: Calling app_main()[0m
+[0;32mI (409) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (409) main: Device ID: device_0070[0m
+[0;32mI (429) main: NVS initialized[0m
+[0;32mI (429) main: Network interface initialized[0m
+[0;32mI (429) main: Event loop created[0m
+[0;32mI (429) main: Event handlers registered[0m
+[0;32mI (429) main: Application state machine started[0m
+[0;32mI (439) main: State: INIT[0m
+[0;32mI (439) main: State machine task started[0m
+[0;32mI (439) main: Application initialization complete[0m
+[0;32mI (449) main_task: Returned from app_main()[0m
+[0;32mI (539) main: State: CHECK_PROVISIONING[0m
+[0;32mI (539) main: Device is provisioned, connecting to WiFi...[0m
+[0;32mI (639) main: State: WIFI_CONNECTING[0m
+[0;32mI (1739) main: State: WIFI_CONNECTING[0m
+[0;32mI (2839) main: State: WIFI_CONNECTING[0m
+[0;32mI (3939) main: State: WIFI_CONNECTING[0m
+[0;32mI (5039) main: State: WIFI_CONNECTING[0m
+[0;32mI (6139) main: State: WIFI_CONNECTING[0m
+[0;32mI (7239) main: State: WIFI_CONNECTING[0m
+[0;32mI (8339) main: State: WIFI_CONNECTING[0m
+[0;32mI (9439) main: State: WIFI_CONNECTING[0m
+[0;32mI (10539) main: State: WIFI_CONNECTING[0m
+[0;32mI (11639) main: State: WIFI_CONNECTING[0m
+[0;32mI (12739) main: State: WIFI_CONNECTING[0m
+[0;32mI (13839) main: State: WIFI_CONNECTING[0m
+[0;32mI (14939) main: State: WIFI_CONNECTING[0m
+[0;32mI (16039) main: State: WIFI_CONNECTING[0m
+[0;32mI (17139) main: State: WIFI_CONNECTING[0m
+[0;32mI (18239) main: State: WIFI_CONNECTING[0m
+[0;32mI (19339) main: State: WIFI_CONNECTING[0m
+[0;32mI (20439) main: State: WIFI_CONNECTING[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21ec4h (138948) map[0m
+[0;32mI (113) esp_image: segment 1: paddr=00031eec vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117) esp_image: segment 2: paddr=00036af0 vaddr=40374000 size=09528h ( 38184) load[0m
+[0;32mI (126) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ab23ch (700988) map[0m
+[0;32mI (252) esp_image: segment 4: paddr=000eb264 vaddr=4037d528 size=0a478h ( 42104) load[0m
+[0;32mI (261) esp_image: segment 5: paddr=000f56e4 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (270) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (270) boot: Disabling RNG early entropy source...[0m
+[0;32mI (280) cpu_start: Multicore app[0m
+[0;32mI (289) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (290) cpu_start: Pro cpu start user code[0m
+[0;32mI (290) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (291) app_init: Application information:[0m
+[0;32mI (295) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (300) app_init: App version:      1[0m
+[0;32mI (303) app_init: Compile time:     Nov 20 2025 13:43:29[0m
+[0;32mI (308) app_init: ELF file SHA256:  fbeacab0a...[0m
+[0;32mI (312) app_init: ESP-IDF:          v6.1-dev-724-ga6e7046c30[0m
+[0;32mI (318) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (322) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (326) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (329) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (336) heap_init: At 3FCA0A08 len 00048D08 (291 KiB): RAM[0m
+[0;32mI (341) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (346) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (351) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (358) spi_flash: detected chip: boya[0m
+[0;32mI (360) spi_flash: flash io: dio[0m
+[0;33mW (363) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (376) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (382) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (389) main_task: Started on CPU0[0m
+[0;32mI (409) main_task: Calling app_main()[0m
+[0;32mI (409) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (409) main: Device ID: device_0070[0m
+[0;32mI (429) main: NVS initialized[0m
+[0;32mI (429) main: Network interface initialized[0m
+[0;32mI (429) main: Event loop created[0m
+[0;32mI (429) main: Event handlers registered[0m
+[0;32mI (429) main: Application state machine started[0m
+[0;32mI (439) main: State: INIT[0m
+[0;32mI (439) main: State machine task started[0m
+[0;32mI (439) main: Application initialization complete[0m
+[0;32mI (449) main_task: Returned from app_main()[0m
+[0;32mI (539) main: State: CHECK_PROVISIONING[0m
+[0;32mI (539) main: Device is provisioned, connecting to WiFi...[0m
+[0;32mI (639) main: State: WIFI_CONNECTING[0m
+[0;32mI (1739) main: State: WIFI_CONNECTING[0m
+[0;32mI (2839) main: State: WIFI_CONNECTING[0m
+[0;32mI (3939) main: State: WIFI_CONNECTING[0m
+[0;32mI (5039) main: State: WIFI_CONNECTING[0m
+[0;32mI (6139) main: State: WIFI_CONNECTING[0m
+[0;32mI (7239) main: State: WIFI_CONNECTING[0m
+[0;32mI (8339) main: State: WIFI_CONNECTING[0m
+[0;32mI (9439) main: State: WIFI_CONNECTING[0m
+[0;32mI (10539) main: State: WIFI_CONNECTING[0m
+[0;32mI (11639) main: State: WIFI_CONNECTING[0m
+[0;32mI (12739) main: State: WIFI_CONNECTING[0m
+[0;32mI (13839) main: State: WIFI_CONNECTING[0m
+[0;32mI (14939) main: State: WIFI_CONNECTING[0m
+[0;32mI (16039) main: State: WIFI_CONNECTING[0m
+[0;32mI (17139) main: State: WIFI_CONNECTING[0m
+[0;32mI (18239) main: State: WIFI_CONNECTING[0m
+[0;32mI (19339) main: State: WIFI_CONNECTING[0m
+[0;32mI (20439) main: State: WIFI_CONNECTING[0m
+[0;32mI (21539) main: State: WIFI_CONNECTING[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21ec4h (138948) map[0m
+[0;32mI (113) esp_image: segment 1: paddr=00031eec vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117) esp_image: segment 2: paddr=00036af0 vaddr=40374000 size=09528h ( 38184) load[0m
+[0;32mI (126) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=ab23ch (700988) map[0m
+[0;32mI (252) esp_image: segment 4: paddr=000eb264 vaddr=4037d528 size=0a478h ( 42104) load[0m
+[0;32mI (261) esp_image: segment 5: paddr=000f56e4 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (270) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (270) boot: Disabling RNG early entropy source...[0m
+[0;32mI (280) cpu_start: Multicore app[0m
+[0;32mI (289) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (290) cpu_start: Pro cpu start user code[0m
+[0;32mI (290) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (291) app_init: Application information:[0m
+[0;32mI (295) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (300) app_init: App version:      1[0m
+[0;32mI (303) app_init: Compile time:     Nov 20 2025 13:43:29[0m
+[0;32mI (308) app_init: ELF file SHA256:  fbeacab0a...[0m
+[0;32mI (312) app_init: ESP-IDF:          v6.1-dev-724-ga6e7046c30[0m
+[0;32mI (318) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (322) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (326) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (329) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (336) heap_init: At 3FCA0A08 len 00048D08 (291 KiB): RAM[0m
+[0;32mI (341) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (346) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (351) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (358) spi_flash: detected chip: boya[0m
+[0;32mI (360) spi_flash: flash io: dio[0m
+[0;33mW (363) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (376) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (382) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (389) main_task: Started on CPU0[0m
+[0;32mI (409) main_task: Calling app_main()[0m
+[0;32mI (409) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (409) main: Device ID: device_0070[0m
+[0;32mI (429) main: NVS initialized[0m
+[0;32mI (429) main: Network interface initialized[0m
+[0;32mI (429) main: Event loop created[0m
+[0;32mI (429) main: Event handlers registered[0m
+[0;32mI (429) main: Application state machine started[0m
+[0;32mI (439) main: State: INIT[0m
+[0;32mI (439) main: State machine task started[0m
+[0;32mI (439) main: Application initialization complete[0m
+[0;32mI (449) main_task: Returned from app_main()[0m
+[0;32mI (539) main: State: CHECK_PROVISIONING[0m
+[0;32mI (539) main: Device is provisioned, connecting to WiFi...[0m
+[0;32mI (639) main: State: WIFI_CONNECTING[0m
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21ec4h (138948) map[0m
+[0;32mI (113) esp_image: segment 1: paddr=00031eec vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117

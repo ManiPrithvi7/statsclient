@@ -1,0 +1,1011 @@
+Command: /home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python /home/muthuselvan/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /home/muthuselvan/esp/build/wifi_ap_project.elf /home/muthuselvan/esp/build/bootloader/bootloader.elf -m '/home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python' '/home/muthuselvan/esp/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-724-ga6e7046c30 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 20 2025 13:43:15[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (58) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0b0020 size=21434h (136244) map[0m
+[0;32mI (112) esp_image: segment 1: paddr=0003145c vaddr=3fc97a00 size=04bfch ( 19452) load[0m
+[0;32mI (117) esp_image: segment 2: paddr=00036060 vaddr=40374000 size=09fb8h ( 40888) load[0m
+[0;32mI (126) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=aa9c8h (698824) map[0m
+[0;32mI (252) esp_image: segment 4: paddr=000ea9f0 vaddr=4037dfb8 size=099e8h ( 39400) load[0m
+[0;32mI (261) esp_image: segment 5: paddr=000f43e0 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (269) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (269) boot: Disabling RNG early entropy source...[0m
+[0;32mI (280) cpu_start: Multicore app[0m
+[0;32mI (288) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (289) cpu_start: Pro cpu start user code[0m
+[0;32mI (289) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (290) app_init: Application information:[0m
+[0;32mI (294) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (299) app_init: App version:      1[0m
+[0;32mI (302) app_init: Compile time:     Nov 20 2025 13:43:29[0m
+[0;32mI (307) app_init: ELF file SHA256:  99058249f...[0m
+[0;32mI (311) app_init: ESP-IDF:          v6.1-dev-724-ga6e7046c30[0m
+[0;32mI (317) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (321) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (325) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (329) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (335) heap_init: At 3FCA0A00 len 00048D10 (291 KiB): RAM[0m
+[0;32mI (340) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (345) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (350) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (357) spi_flash: detected chip: boya[0m
+[0;32mI (359) spi_flash: flash io: dio[0m
+[0;33mW (362) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (375) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (381) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (388) main_task: Started on CPU0[0m
+[0;32mI (408) main_task: Calling app_main()[0m
+[0;32mI (408) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (408) main: Device ID: device_0070[0m
+[0;32mI (418) main: NVS initialized[0m
+[0;32mI (418) main: Network interface initialized[0m
+[0;32mI (418) main: Event loop created[0m
+[0;32mI (418) main: Event handlers registered[0m
+[0;32mI (418) main: Application state machine started[0m
+[0;32mI (428) main: State: INIT[0m
+[0;32mI (428) main: State machine task started[0m
+[0;32mI (428) main: Application initialization complete[0m
+[0;32mI (438) main_task: Returned from app_main()[0m
+[0;32mI (528) main: State: CHECK_PROVISIONING[0m
+[0;32mI (528) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (628) main: State: AP_MODE[0m
+[0;32mI (628) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (628) pp: pp rom version: e7ae62f[0m
+[0;32mI (628) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (638) wifi:wifi driver task: 3fca3da0, prio:23, stack:6656, core=0[0m
+[0;32mI (638) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (638) wifi:wifi certification version: v7.0[0m
+[0;32mI (638) wifi:config NVS flash: enabled[0m
+[0;32mI (648) wifi:config nano formatting: disabled[0m
+[0;32mI (648) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (648) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (658) wifi:Init management short buffer num: 32[0m
+[0;32mI (658) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (668) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (668) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (678) wifi:Init static rx buffer num: 10[0m
+[0;32mI (678) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (678) wifi_init: rx ba win: 6[0m
+[0;32mI (688) wifi_init: accept mbox: 6[0m
+[0;32mI (688) wifi_init: tcpip mbox: 32[0m
+[0;32mI (688) wifi_init: udp mbox: 6[0m
+[0;32mI (688) wifi_init: tcp mbox: 6[0m
+[0;32mI (698) wifi_init: tcp tx win: 5760[0m
+[0;32mI (698) wifi_init: tcp rx win: 5760[0m
+[0;32mI (698) wifi_init: tcp mss: 1440[0m
+[0;32mI (708) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (708) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (808) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;33mW (818) phy_init: failed to load RF calibration data (0x1102), falling back to full calibration[0m
+[0;32mI (848) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(2)[0m
+[0;32mI (858) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (868) wifi:Total power save buffer number: 16[0m
+[0;32mI (868) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (868) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (868) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (868) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (878) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (888) wifi_prov: HTTP server started[0m
+[0;32mI (888) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (5998) main: State: AP_MODE[0m
+[0;33mW (5998) wifi_prov: Provisioning already active[0m
+[0;32mI (5998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (11098) main: State: AP_MODE[0m
+[0;33mW (11098) wifi_prov: Provisioning already active[0m
+[0;32mI (11098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (16198) main: State: AP_MODE[0m
+[0;33mW (16198) wifi_prov: Provisioning already active[0m
+[0;32mI (16198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (21298) main: State: AP_MODE[0m
+[0;33mW (21298) wifi_prov: Provisioning already active[0m
+[0;32mI (21298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (26398) main: State: AP_MODE[0m
+[0;33mW (26398) wifi_prov: Provisioning already active[0m
+[0;32mI (26398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (31498) main: State: AP_MODE[0m
+[0;33mW (31498) wifi_prov: Provisioning already active[0m
+[0;32mI (31498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (36598) main: State: AP_MODE[0m
+[0;33mW (36598) wifi_prov: Provisioning already active[0m
+[0;32mI (36598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (41698) main: State: AP_MODE[0m
+[0;33mW (41698) wifi_prov: Provisioning already active[0m
+[0;32mI (41698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (46798) main: State: AP_MODE[0m
+[0;33mW (46798) wifi_prov: Provisioning already active[0m
+[0;32mI (46798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (51898) main: State: AP_MODE[0m
+[0;33mW (51898) wifi_prov: Provisioning already active[0m
+[0;32mI (51898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (56998) main: State: AP_MODE[0m
+[0;33mW (56998) wifi_prov: Provisioning already active[0m
+[0;32mI (56998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (62098) main: State: AP_MODE[0m
+[0;33mW (62098) wifi_prov: Provisioning already active[0m
+[0;32mI (62098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (67198) main: State: AP_MODE[0m
+[0;33mW (67198) wifi_prov: Provisioning already active[0m
+[0;32mI (67198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (72298) main: State: AP_MODE[0m
+[0;33mW (72298) wifi_prov: Provisioning already active[0m
+[0;32mI (72298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (77398) main: State: AP_MODE[0m
+[0;33mW (77398) wifi_prov: Provisioning already active[0m
+[0;32mI (77398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (82498) main: State: AP_MODE[0m
+[0;33mW (82498) wifi_prov: Provisioning already active[0m
+[0;32mI (82498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (87598) main: State: AP_MODE[0m
+[0;33mW (87598) wifi_prov: Provisioning already active[0m
+[0;32mI (87598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (92698) main: State: AP_MODE[0m
+[0;33mW (92698) wifi_prov: Provisioning already active[0m
+[0;32mI (92698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (97798) main: State: AP_MODE[0m
+[0;33mW (97798) wifi_prov: Provisioning already active[0m
+[0;32mI (97798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (102898) main: State: AP_MODE[0m
+[0;33mW (102898) wifi_prov: Provisioning already active[0m
+[0;32mI (102898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (107998) main: State: AP_MODE[0m
+[0;33mW (107998) wifi_prov: Provisioning already active[0m
+[0;32mI (107998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (113098) main: State: AP_MODE[0m
+[0;33mW (113098) wifi_prov: Provisioning already active[0m
+[0;32mI (113098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (118198) main: State: AP_MODE[0m
+[0;33mW (118198) wifi_prov: Provisioning already active[0m
+[0;32mI (118198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (123298) main: State: AP_MODE[0m
+[0;33mW (123298) wifi_prov: Provisioning already active[0m
+[0;32mI (123298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (128398) main: State: AP_MODE[0m
+[0;33mW (128398) wifi_prov: Provisioning already active[0m
+[0;32mI (128398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (133498) main: State: AP_MODE[0m
+[0;33mW (133498) wifi_prov: Provisioning already active[0m
+[0;32mI (133498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (138598) main: State: AP_MODE[0m
+[0;33mW (138598) wifi_prov: Provisioning already active[0m
+[0;32mI (138598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (143698) main: State: AP_MODE[0m
+[0;33mW (143698) wifi_prov: Provisioning already active[0m
+[0;32mI (143698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (148798) main: State: AP_MODE[0m
+[0;33mW (148798) wifi_prov: Provisioning already active[0m
+[0;32mI (148798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (153898) main: State: AP_MODE[0m
+[0;33mW (153898) wifi_prov: Provisioning already active[0m
+[0;32mI (153898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (158998) main: State: AP_MODE[0m
+[0;33mW (158998) wifi_prov: Provisioning already active[0m
+[0;32mI (158998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (164098) main: State: AP_MODE[0m
+[0;33mW (164098) wifi_prov: Provisioning already active[0m
+[0;32mI (164098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (169198) main: State: AP_MODE[0m
+[0;33mW (169198) wifi_prov: Provisioning already active[0m
+[0;32mI (169198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (174298) main: State: AP_MODE[0m
+[0;33mW (174298) wifi_prov: Provisioning already active[0m
+[0;32mI (174298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (179398) main: State: AP_MODE[0m
+[0;33mW (179398) wifi_prov: Provisioning already active[0m
+[0;32mI (179398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (184498) main: State: AP_MODE[0m
+[0;33mW (184498) wifi_prov: Provisioning already active[0m
+[0;32mI (184498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (189598) main: State: AP_MODE[0m
+[0;33mW (189598) wifi_prov: Provisioning already active[0m
+[0;32mI (189598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (194698) main: State: AP_MODE[0m
+[0;33mW (194698) wifi_prov: Provisioning already active[0m
+[0;32mI (194698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (199798) main: State: AP_MODE[0m
+[0;33mW (199798) wifi_prov: Provisioning already active[0m
+[0;32mI (199798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (204898) main: State: AP_MODE[0m
+[0;33mW (204898) wifi_prov: Provisioning already active[0m
+[0;32mI (204898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (209998) main: State: AP_MODE[0m
+[0;33mW (209998) wifi_prov: Provisioning already active[0m
+[0;32mI (209998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (215098) main: State: AP_MODE[0m
+[0;33mW (215098) wifi_prov: Provisioning already active[0m
+[0;32mI (215098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (220198) main: State: AP_MODE[0m
+[0;33mW (220198) wifi_prov: Provisioning already active[0m
+[0;32mI (220198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (225298) main: State: AP_MODE[0m
+[0;33mW (225298) wifi_prov: Provisioning already active[0m
+[0;32mI (225298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (230398) main: State: AP_MODE[0m
+[0;33mW (230398) wifi_prov: Provisioning already active[0m
+[0;32mI (230398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (235498) main: State: AP_MODE[0m
+[0;33mW (235498) wifi_prov: Provisioning already active[0m
+[0;32mI (235498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (240598) main: State: AP_MODE[0m
+[0;33mW (240598) wifi_prov: Provisioning already active[0m
+[0;32mI (240598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (245698) main: State: AP_MODE[0m
+[0;33mW (245698) wifi_prov: Provisioning already active[0m
+[0;32mI (245698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (250798) main: State: AP_MODE[0m
+[0;33mW (250798) wifi_prov: Provisioning already active[0m
+[0;32mI (250798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (255898) main: State: AP_MODE[0m
+[0;33mW (255898) wifi_prov: Provisioning already active[0m
+[0;32mI (255898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (260998) main: State: AP_MODE[0m
+[0;33mW (260998) wifi_prov: Provisioning already active[0m
+[0;32mI (260998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (266098) main: State: AP_MODE[0m
+[0;33mW (266098) wifi_prov: Provisioning already active[0m
+[0;32mI (266098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (271198) main: State: AP_MODE[0m
+[0;33mW (271198) wifi_prov: Provisioning already active[0m
+[0;32mI (271198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (276298) main: State: AP_MODE[0m
+[0;33mW (276298) wifi_prov: Provisioning already active[0m
+[0;32mI (276298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (281398) main: State: AP_MODE[0m
+[0;33mW (281398) wifi_prov: Provisioning already active[0m
+[0;32mI (281398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (286498) main: State: AP_MODE[0m
+[0;33mW (286498) wifi_prov: Provisioning already active[0m
+[0;32mI (286498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (291598) main: State: AP_MODE[0m
+[0;33mW (291598) wifi_prov: Provisioning already active[0m
+[0;32mI (291598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (296698) main: State: AP_MODE[0m
+[0;33mW (296698) wifi_prov: Provisioning already active[0m
+[0;32mI (296698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (301258) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (301258) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (301278) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (301328) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (301448) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:14, winSize:64[0m
+[0;32mI (301798) main: State: AP_MODE[0m
+[0;33mW (301798) wifi_prov: Provisioning already active[0m
+[0;32mI (301798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (306898) main: State: AP_MODE[0m
+[0;33mW (306898) wifi_prov: Provisioning already active[0m
+[0;32mI (306898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (311998) main: State: AP_MODE[0m
+[0;33mW (311998) wifi_prov: Provisioning already active[0m
+[0;32mI (311998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (317098) main: State: AP_MODE[0m
+[0;33mW (317098) wifi_prov: Provisioning already active[0m
+[0;32mI (317098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (322198) main: State: AP_MODE[0m
+[0;33mW (322198) wifi_prov: Provisioning already active[0m
+[0;32mI (322198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (322348) wifi_prov: WiFi scan requested[0m
+[0;32mI (322348) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 2, bss_flags is 756835, bss:0x3fcb0998[0m
+[0;32mI (322348) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (322358) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (322358) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (322368) wifi:mode : sta (80:b5:4e:c5:10:8c)[0m
+[0;32mI (322368) wifi:enable tsf[0m
+[0;32mI (322378) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=2[0m
+[0;32mI (322378) wifi_prov: WiFi STA started[0m
+[0;33mW (325178) httpd_txrx: httpd_sock_err: error in send : 113[0m
+[0;32mI (325178) wifi:flush txq[0m
+[0;32mI (325178) wifi:stop sw txq[0m
+[0;32mI (325178) wifi:lmac stop hw txq[0m
+[0;32mI (325188) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (325188) wifi:Total power save buffer number: 16[0m
+[0;32mI (325188) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (325188) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (325198) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;33mW (325198) httpd_txrx: httpd_sock_err: error in recv : 113[0m
+[0;32mI (327298) main: State: AP_MODE[0m
+[0;33mW (327298) wifi_prov: Provisioning already active[0m
+[0;32mI (327298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (332398) main: State: AP_MODE[0m
+[0;33mW (332398) wifi_prov: Provisioning already active[0m
+[0;32mI (332398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (333738) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (333738) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (333758) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (334378) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:20, winSize:64[0m
+[0;32mI (335768) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (337498) main: State: AP_MODE[0m
+[0;33mW (337498) wifi_prov: Provisioning already active[0m
+[0;32mI (337498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (342598) main: State: AP_MODE[0m
+[0;33mW (342598) wifi_prov: Provisioning already active[0m
+[0;32mI (342598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (344428) wifi_prov: WiFi scan requested[0m
+[0;32mI (344428) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 2, bss_flags is 756835, bss:0x3fcb1230[0m
+[0;32mI (344428) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (344438) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (344438) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (344448) wifi:mode : sta (80:b5:4e:c5:10:8c)[0m
+[0;32mI (344458) wifi:enable tsf[0m
+[0;32mI (344458) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=2[0m
+[0;32mI (344468) wifi_prov: WiFi STA started[0m
+[0;33mW (347268) httpd_txrx: httpd_sock_err: error in send : 113[0m
+[0;32mI (347268) wifi:flush txq[0m
+[0;32mI (347268) wifi:stop sw txq[0m
+[0;32mI (347268) wifi:lmac stop hw txq[0m
+[0;32mI (347278) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (347278) wifi:Total power save buffer number: 16[0m
+[0;32mI (347278) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (347278) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (347288) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;33mW (347288) httpd_txrx: httpd_sock_err: error in recv : 113[0m
+[0;32mI (347698) main: State: AP_MODE[0m
+[0;33mW (347698) wifi_prov: Provisioning already active[0m
+[0;32mI (347698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (348328) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (348338) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (348348) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (349048) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:17, winSize:64[0m
+[0;32mI (350368) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (352798) main: State: AP_MODE[0m
+[0;33mW (352798) wifi_prov: Provisioning already active[0m
+[0;32mI (352798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (357898) main: State: AP_MODE[0m
+[0;33mW (357898) wifi_prov: Provisioning already active[0m
+[0;32mI (357898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (362998) main: State: AP_MODE[0m
+[0;33mW (362998) wifi_prov: Provisioning already active[0m
+[0;32mI (362998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (364778) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 3, bss_flags is 756835, bss:0x3fcae3a4[0m
+[0;32mI (364778) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (364788) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (364788) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (364798) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=3[0m
+[0;32mI (368098) main: State: AP_MODE[0m
+[0;33mW (368098) wifi_prov: Provisioning already active[0m
+[0;32mI (368098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (373198) main: State: AP_MODE[0m
+[0;33mW (373198) wifi_prov: Provisioning already active[0m
+[0;32mI (373198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (378298) main: State: AP_MODE[0m
+[0;33mW (378298) wifi_prov: Provisioning already active[0m
+[0;32mI (378298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (383398) main: State: AP_MODE[0m
+[0;33mW (383398) wifi_prov: Provisioning already active[0m
+[0;32mI (383398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (388498) main: State: AP_MODE[0m
+[0;33mW (388498) wifi_prov: Provisioning already active[0m
+[0;32mI (388498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (393598) main: State: AP_MODE[0m
+[0;33mW (393598) wifi_prov: Provisioning already active[0m
+[0;32mI (393598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (398698) main: State: AP_MODE[0m
+[0;33mW (398698) wifi_prov: Provisioning already active[0m
+[0;32mI (398698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (403798) main: State: AP_MODE[0m
+[0;33mW (403798) wifi_prov: Provisioning already active[0m
+[0;32mI (403798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (408898) main: State: AP_MODE[0m
+[0;33mW (408898) wifi_prov: Provisioning already active[0m
+[0;32mI (408898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (413998) main: State: AP_MODE[0m
+[0;33mW (413998) wifi_prov: Provisioning already active[0m
+[0;32mI (413998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (419098) main: State: AP_MODE[0m
+[0;33mW (419098) wifi_prov: Provisioning already active[0m
+[0;32mI (419098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (424198) main: State: AP_MODE[0m
+[0;33mW (424198) wifi_prov: Provisioning already active[0m
+[0;32mI (424198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (429298) main: State: AP_MODE[0m
+[0;33mW (429298) wifi_prov: Provisioning already active[0m
+[0;32mI (429298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (434398) main: State: AP_MODE[0m
+[0;33mW (434398) wifi_prov: Provisioning already active[0m
+[0;32mI (434398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (439498) main: State: AP_MODE[0m
+[0;33mW (439498) wifi_prov: Provisioning already active[0m
+[0;32mI (439498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (444598) main: State: AP_MODE[0m
+[0;33mW (444598) wifi_prov: Provisioning already active[0m
+[0;32mI (444598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (449518) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (449518) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (449528) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (449538) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (449698) main: State: AP_MODE[0m
+[0;33mW (449698) wifi_prov: Provisioning already active[0m
+[0;32mI (449698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (450018) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:15, winSize:64[0m
+[0;32mI (454798) main: State: AP_MODE[0m
+[0;33mW (454798) wifi_prov: Provisioning already active[0m
+[0;32mI (454798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (459898) main: State: AP_MODE[0m
+[0;33mW (459898) wifi_prov: Provisioning already active[0m
+[0;32mI (459898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (464998) main: State: AP_MODE[0m
+[0;33mW (464998) wifi_prov: Provisioning already active[0m
+[0;32mI (464998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (470098) main: State: AP_MODE[0m
+[0;33mW (470098) wifi_prov: Provisioning already active[0m
+[0;32mI (470098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (475198) main: State: AP_MODE[0m
+[0;33mW (475198) wifi_prov: Provisioning already active[0m
+[0;32mI (475198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (480298) main: State: AP_MODE[0m
+[0;33mW (480298) wifi_prov: Provisioning already active[0m
+[0;32mI (480298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (485398) main: State: AP_MODE[0m
+[0;33mW (485398) wifi_prov: Provisioning already active[0m
+[0;32mI (485398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (490498) main: State: AP_MODE[0m
+[0;33mW (490498) wifi_prov: Provisioning already active[0m
+[0;32mI (490498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (495598) main: State: AP_MODE[0m
+[0;33mW (495598) wifi_prov: Provisioning already active[0m
+[0;32mI (495598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (499758) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 3, bss_flags is 756835, bss:0x3fcae3a4[0m
+[0;32mI (499758) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (499758) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (499768) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (499768) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=3[0m
+[0;32mI (500698) main: State: AP_MODE[0m
+[0;33mW (500698) wifi_prov: Provisioning already active[0m
+[0;32mI (500698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (505798) main: State: AP_MODE[0m
+[0;33mW (505798) wifi_prov: Provisioning already active[0m
+[0;32mI (505798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (510898) main: State: AP_MODE[0m
+[0;33mW (510898) wifi_prov: Provisioning already active[0m
+[0;32mI (510898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (515998) main: State: AP_MODE[0m
+[0;33mW (515998) wifi_prov: Provisioning already active[0m
+[0;32mI (515998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (521098) main: State: AP_MODE[0m
+[0;33mW (521098) wifi_prov: Provisioning already active[0m
+[0;32mI (521098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (526198) main: State: AP_MODE[0m
+[0;33mW (526198) wifi_prov: Provisioning already active[0m
+[0;32mI (526198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (531298) main: State: AP_MODE[0m
+[0;33mW (531298) wifi_prov: Provisioning already active[0m
+[0;32mI (531298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (536398) main: State: AP_MODE[0m
+[0;33mW (536398) wifi_prov: Provisioning already active[0m
+[0;32mI (536398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (541498) main: State: AP_MODE[0m
+[0;33mW (541498) wifi_prov: Provisioning already active[0m
+[0;32mI (541498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (546598) main: State: AP_MODE[0m
+[0;33mW (546598) wifi_prov: Provisioning already active[0m
+[0;32mI (546598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (551698) main: State: AP_MODE[0m
+[0;33mW (551698) wifi_prov: Provisioning already active[0m
+[0;32mI (551698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (556798) main: State: AP_MODE[0m
+[0;33mW (556798) wifi_prov: Provisioning already active[0m
+[0;32mI (556798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (561898) main: State: AP_MODE[0m
+[0;33mW (561898) wifi_prov: Provisioning already active[0m
+[0;32mI (561898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (566998) main: State: AP_MODE[0m
+[0;33mW (566998) wifi_prov: Provisioning already active[0m
+[0;32mI (566998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (572098) main: State: AP_MODE[0m
+[0;33mW (572098) wifi_prov: Provisioning already active[0m
+[0;32mI (572098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (577198) main: State: AP_MODE[0m
+[0;33mW (577198) wifi_prov: Provisioning already active[0m
+[0;32mI (577198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (582298) main: State: AP_MODE[0m
+[0;33mW (582298) wifi_prov: Provisioning already active[0m
+[0;32mI (582298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (587398) main: State: AP_MODE[0m
+[0;33mW (587398) wifi_prov: Provisioning already active[0m
+[0;32mI (587398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (592158) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (592168) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (592178) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (592218) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (592498) main: State: AP_MODE[0m
+[0;33mW (592498) wifi_prov: Provisioning already active[0m
+[0;32mI (592498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (592778) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:17, winSize:64[0m
+[0;32mI (597598) main: State: AP_MODE[0m
+[0;33mW (597598) wifi_prov: Provisioning already active[0m
+[0;32mI (597598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (602698) main: State: AP_MODE[0m
+[0;33mW (602698) wifi_prov: Provisioning already active[0m
+[0;32mI (602698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (607798) main: State: AP_MODE[0m
+[0;33mW (607798) wifi_prov: Provisioning already active[0m
+[0;32mI (607798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (612898) main: State: AP_MODE[0m
+[0;33mW (612898) wifi_prov: Provisioning already active[0m
+[0;32mI (612898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (617998) main: State: AP_MODE[0m
+[0;33mW (617998) wifi_prov: Provisioning already active[0m
+[0;32mI (617998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (623098) main: State: AP_MODE[0m
+[0;33mW (623098) wifi_prov: Provisioning already active[0m
+[0;32mI (623098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (628198) main: State: AP_MODE[0m
+[0;33mW (628198) wifi_prov: Provisioning already active[0m
+[0;32mI (628198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (633298) main: State: AP_MODE[0m
+[0;33mW (633298) wifi_prov: Provisioning already active[0m
+[0;32mI (633298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (638398) main: State: AP_MODE[0m
+[0;33mW (638398) wifi_prov: Provisioning already active[0m
+[0;32mI (638398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (643498) main: State: AP_MODE[0m
+[0;33mW (643498) wifi_prov: Provisioning already active[0m
+[0;32mI (643498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (648598) main: State: AP_MODE[0m
+[0;33mW (648598) wifi_prov: Provisioning already active[0m
+[0;32mI (648598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (653698) main: State: AP_MODE[0m
+[0;33mW (653698) wifi_prov: Provisioning already active[0m
+[0;32mI (653698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (658198) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 3, bss_flags is 756835, bss:0x3fcae3a4[0m
+[0;32mI (658198) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (658198) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (658208) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (658208) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=3[0m
+[0;32mI (658798) main: State: AP_MODE[0m
+[0;33mW (658798) wifi_prov: Provisioning already active[0m
+[0;32mI (658798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (663898) main: State: AP_MODE[0m
+[0;33mW (663898) wifi_prov: Provisioning already active[0m
+[0;32mI (663898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (668998) main: State: AP_MODE[0m
+[0;33mW (668998) wifi_prov: Provisioning already active[0m
+[0;32mI (668998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (674098) main: State: AP_MODE[0m
+[0;33mW (674098) wifi_prov: Provisioning already active[0m
+[0;32mI (674098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (679198) main: State: AP_MODE[0m
+[0;33mW (679198) wifi_prov: Provisioning already active[0m
+[0;32mI (679198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (684298) main: State: AP_MODE[0m
+[0;33mW (684298) wifi_prov: Provisioning already active[0m
+[0;32mI (684298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (689398) main: State: AP_MODE[0m
+[0;33mW (689398) wifi_prov: Provisioning already active[0m
+[0;32mI (689398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (694498) main: State: AP_MODE[0m
+[0;33mW (694498) wifi_prov: Provisioning already active[0m
+[0;32mI (694498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (699598) main: State: AP_MODE[0m
+[0;33mW (699598) wifi_prov: Provisioning already active[0m
+[0;32mI (699598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (704698) main: State: AP_MODE[0m
+[0;33mW (704698) wifi_prov: Provisioning already active[0m
+[0;32mI (704698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (709798) main: State: AP_MODE[0m
+[0;33mW (709798) wifi_prov: Provisioning already active[0m
+[0;32mI (709798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (714898) main: State: AP_MODE[0m
+[0;33mW (714898) wifi_prov: Provisioning already active[0m
+[0;32mI (714898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (719998) main: State: AP_MODE[0m
+[0;33mW (719998) wifi_prov: Provisioning already active[0m
+[0;32mI (719998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (725098) main: State: AP_MODE[0m
+[0;33mW (725098) wifi_prov: Provisioning already active[0m
+[0;32mI (725098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (730198) main: State: AP_MODE[0m
+[0;33mW (730198) wifi_prov: Provisioning already active[0m
+[0;32mI (730198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (735298) main: State: AP_MODE[0m
+[0;33mW (735298) wifi_prov: Provisioning already active[0m
+[0;32mI (735298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (740398) main: State: AP_MODE[0m
+[0;33mW (740398) wifi_prov: Provisioning already active[0m
+[0;32mI (740398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (745498) main: State: AP_MODE[0m
+[0;33mW (745498) wifi_prov: Provisioning already active[0m
+[0;32mI (745498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (750598) main: State: AP_MODE[0m
+[0;33mW (750598) wifi_prov: Provisioning already active[0m
+[0;32mI (750598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (755698) main: State: AP_MODE[0m
+[0;33mW (755698) wifi_prov: Provisioning already active[0m
+[0;32mI (755698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (760798) main: State: AP_MODE[0m
+[0;33mW (760798) wifi_prov: Provisioning already active[0m
+[0;32mI (760798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (765898) main: State: AP_MODE[0m
+[0;33mW (765898) wifi_prov: Provisioning already active[0m
+[0;32mI (765898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (770998) main: State: AP_MODE[0m
+[0;33mW (770998) wifi_prov: Provisioning already active[0m
+[0;32mI (770998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (776098) main: State: AP_MODE[0m
+[0;33mW (776098) wifi_prov: Provisioning already active[0m
+[0;32mI (776098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (781198) main: State: AP_MODE[0m
+[0;33mW (781198) wifi_prov: Provisioning already active[0m
+[0;32mI (781198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (786298) main: State: AP_MODE[0m
+[0;33mW (786298) wifi_prov: Provisioning already active[0m
+[0;32mI (786298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (791398) main: State: AP_MODE[0m
+[0;33mW (791398) wifi_prov: Provisioning already active[0m
+[0;32mI (791398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (796498) main: State: AP_MODE[0m
+[0;33mW (796498) wifi_prov: Provisioning already active[0m
+[0;32mI (796498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (801598) main: State: AP_MODE[0m
+[0;33mW (801598) wifi_prov: Provisioning already active[0m
+[0;32mI (801598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (806698) main: State: AP_MODE[0m
+[0;33mW (806698) wifi_prov: Provisioning already active[0m
+[0;32mI (806698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (809368) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (809368) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (809388) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (809408) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (809928) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:15, winSize:64[0m
+[0;32mI (811798) main: State: AP_MODE[0m
+[0;33mW (811798) wifi_prov: Provisioning already active[0m
+[0;32mI (811798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (816898) main: State: AP_MODE[0m
+[0;33mW (816898) wifi_prov: Provisioning already active[0m
+[0;32mI (816898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (821998) main: State: AP_MODE[0m
+[0;33mW (821998) wifi_prov: Provisioning already active[0m
+[0;32mI (821998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (827098) main: State: AP_MODE[0m
+[0;33mW (827098) wifi_prov: Provisioning already active[0m
+[0;32mI (827098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (832198) main: State: AP_MODE[0m
+[0;33mW (832198) wifi_prov: Provisioning already active[0m
+[0;32mI (832198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (837298) main: State: AP_MODE[0m
+[0;33mW (837298) wifi_prov: Provisioning already active[0m
+[0;32mI (837298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (842398) main: State: AP_MODE[0m
+[0;33mW (842398) wifi_prov: Provisioning already active[0m
+[0;32mI (842398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (847498) main: State: AP_MODE[0m
+[0;33mW (847498) wifi_prov: Provisioning already active[0m
+[0;32mI (847498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (852598) main: State: AP_MODE[0m
+[0;33mW (852598) wifi_prov: Provisioning already active[0m
+[0;32mI (852598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (857698) main: State: AP_MODE[0m
+[0;33mW (857698) wifi_prov: Provisioning already active[0m
+[0;32mI (857698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (862798) main: State: AP_MODE[0m
+[0;33mW (862798) wifi_prov: Provisioning already active[0m
+[0;32mI (862798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (867898) main: State: AP_MODE[0m
+[0;33mW (867898) wifi_prov: Provisioning already active[0m
+[0;32mI (867898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (872998) main: State: AP_MODE[0m
+[0;33mW (872998) wifi_prov: Provisioning already active[0m
+[0;32mI (872998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (878098) main: State: AP_MODE[0m
+[0;33mW (878098) wifi_prov: Provisioning already active[0m
+[0;32mI (878098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (883198) main: State: AP_MODE[0m
+[0;33mW (883198) wifi_prov: Provisioning already active[0m
+[0;32mI (883198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (888298) main: State: AP_MODE[0m
+[0;33mW (888298) wifi_prov: Provisioning already active[0m
+[0;32mI (888298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (893398) main: State: AP_MODE[0m
+[0;33mW (893398) wifi_prov: Provisioning already active[0m
+[0;32mI (893398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (898498) main: State: AP_MODE[0m
+[0;33mW (898498) wifi_prov: Provisioning already active[0m
+[0;32mI (898498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (903598) main: State: AP_MODE[0m
+[0;33mW (903598) wifi_prov: Provisioning already active[0m
+[0;32mI (903598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (908698) main: State: AP_MODE[0m
+[0;33mW (908698) wifi_prov: Provisioning already active[0m
+[0;32mI (908698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (913798) main: State: AP_MODE[0m
+[0;33mW (913798) wifi_prov: Provisioning already active[0m
+[0;32mI (913798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (918898) main: State: AP_MODE[0m
+[0;33mW (918898) wifi_prov: Provisioning already active[0m
+[0;32mI (918898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (923998) main: State: AP_MODE[0m
+[0;33mW (923998) wifi_prov: Provisioning already active[0m
+[0;32mI (923998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (929098) main: State: AP_MODE[0m
+[0;33mW (929098) wifi_prov: Provisioning already active[0m
+[0;32mI (929098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (934198) main: State: AP_MODE[0m
+[0;33mW (934198) wifi_prov: Provisioning already active[0m
+[0;32mI (934198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (939298) main: State: AP_MODE[0m
+[0;33mW (939298) wifi_prov: Provisioning already active[0m
+[0;32mI (939298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (944398) main: State: AP_MODE[0m
+[0;33mW (944398) wifi_prov: Provisioning already active[0m
+[0;32mI (944398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (949498) main: State: AP_MODE[0m
+[0;33mW (949498) wifi_prov: Provisioning already active[0m
+[0;32mI (949498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (952058) wifi_prov: WiFi scan requested[0m
+[0;32mI (952058) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 2, bss_flags is 756835, bss:0x3fcae3a4[0m
+[0;32mI (952058) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (952068) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (952068) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (952078) wifi:mode : sta (80:b5:4e:c5:10:8c)[0m
+[0;32mI (952078) wifi:enable tsf[0m
+[0;32mI (952088) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=2[0m
+[0;32mI (952088) wifi_prov: WiFi STA started[0m
+[0;32mI (954598) main: State: AP_MODE[0m
+[0;33mW (954598) wifi_prov: Provisioning already active[0m
+[0;32mI (954598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;33mW (954898) httpd_txrx: httpd_sock_err: error in send : 113[0m
+[0;32mI (954898) wifi:flush txq[0m
+[0;32mI (954898) wifi:stop sw txq[0m
+[0;32mI (954898) wifi:lmac stop hw txq[0m
+[0;32mI (954908) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (954908) wifi:Total power save buffer number: 16[0m
+[0;32mI (954908) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (954908) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (954918) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;33mW (954918) httpd_txrx: httpd_sock_err: error in recv : 113[0m
+[0;32mI (959698) main: State: AP_MODE[0m
+[0;33mW (959698) wifi_prov: Provisioning already active[0m
+[0;32mI (959698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (963118) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (963118) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (963138) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (964798) main: State: AP_MODE[0m
+[0;33mW (964798) wifi_prov: Provisioning already active[0m
+[0;32mI (964798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (964908) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:24, winSize:64[0m
+[0;32mI (965148) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (969898) main: State: AP_MODE[0m
+[0;33mW (969898) wifi_prov: Provisioning already active[0m
+[0;32mI (969898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (974998) main: State: AP_MODE[0m
+[0;33mW (974998) wifi_prov: Provisioning already active[0m
+[0;32mI (974998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (980098) main: State: AP_MODE[0m
+[0;33mW (980098) wifi_prov: Provisioning already active[0m
+[0;32mI (980098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (985198) main: State: AP_MODE[0m
+[0;33mW (985198) wifi_prov: Provisioning already active[0m
+[0;32mI (985198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (990298) main: State: AP_MODE[0m
+[0;33mW (990298) wifi_prov: Provisioning already active[0m
+[0;32mI (990298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (995398) main: State: AP_MODE[0m
+[0;33mW (995398) wifi_prov: Provisioning already active[0m
+[0;32mI (995398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1000498) main: State: AP_MODE[0m
+[0;33mW (1000498) wifi_prov: Provisioning already active[0m
+[0;32mI (1000498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1005598) main: State: AP_MODE[0m
+[0;33mW (1005598) wifi_prov: Provisioning already active[0m
+[0;32mI (1005598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1010698) main: State: AP_MODE[0m
+[0;33mW (1010698) wifi_prov: Provisioning already active[0m
+[0;32mI (1010698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1015798) main: State: AP_MODE[0m
+[0;33mW (1015798) wifi_prov: Provisioning already active[0m
+[0;32mI (1015798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1020248) wifi_prov: WiFi scan requested[0m
+[0;32mI (1020248) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 2, bss_flags is 756835, bss:0x3fcae040[0m
+[0;32mI (1020248) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1020258) wifi:<ba-del>idx:2, tid:0[0m
+[0;32mI (1020258) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1020268) wifi:mode : sta (80:b5:4e:c5:10:8c)[0m
+[0;32mI (1020268) wifi:enable tsf[0m
+[0;32mI (1020268) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=2[0m
+[0;32mI (1020278) wifi_prov: WiFi STA started[0m
+[0;32mI (1020898) main: State: AP_MODE[0m
+[0;33mW (1020898) wifi_prov: Provisioning already active[0m
+[0;32mI (1020898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;33mW (1023078) httpd_txrx: httpd_sock_err: error in send : 113[0m
+[0;32mI (1023078) wifi:flush txq[0m
+[0;32mI (1023078) wifi:stop sw txq[0m
+[0;32mI (1023078) wifi:lmac stop hw txq[0m
+[0;32mI (1023088) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (1023088) wifi:Total power save buffer number: 16[0m
+[0;32mI (1023088) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (1023088) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (1023098) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;33mW (1023098) httpd_txrx: httpd_sock_err: error in recv : 113[0m
+[0;32mI (1025998) main: State: AP_MODE[0m
+[0;33mW (1025998) wifi_prov: Provisioning already active[0m
+[0;32mI (1025998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1029558) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1029558) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (1029568) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (1031098) main: State: AP_MODE[0m
+[0;33mW (1031098) wifi_prov: Provisioning already active[0m
+[0;32mI (1031098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1031598) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (1036198) main: State: AP_MODE[0m
+[0;33mW (1036198) wifi_prov: Provisioning already active[0m
+[0;32mI (1036198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1041298) main: State: AP_MODE[0m
+[0;33mW (1041298) wifi_prov: Provisioning already active[0m
+[0;32mI (1041298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1044268) wifi_prov: WiFi scan requested[0m
+[0;32mI (1044268) wifi:station: 50:eb:71:2d:69:aa leave, AID = 1, reason = 2, bss_flags is 756835, bss:0x3fcae040[0m
+[0;32mI (1044278) wifi:new:<1,0>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1044278) wifi:new:<1,1>, old:<1,0>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1044288) wifi:mode : sta (80:b5:4e:c5:10:8c)[0m
+[0;32mI (1044298) wifi:enable tsf[0m
+[0;32mI (1044298) wifi_prov: Station 50:eb:71:2d:69:aa disconnected, AID=1, reason=2[0m
+[0;32mI (1044308) wifi_prov: WiFi STA started[0m
+[0;32mI (1046398) main: State: AP_MODE[0m
+[0;33mW (1046398) wifi_prov: Provisioning already active[0m
+[0;32mI (1046398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;33mW (1047308) httpd_txrx: httpd_sock_err: error in send : 113[0m
+[0;32mI (1047308) wifi:flush txq[0m
+[0;32mI (1047308) wifi:stop sw txq[0m
+[0;32mI (1047308) wifi:lmac stop hw txq[0m
+[0;32mI (1047318) wifi:mode : softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (1047318) wifi:Total power save buffer number: 16[0m
+[0;32mI (1047318) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (1047328) wifi:Init max length of beacon: 752/752[0m
+[0;33mW (1047328) httpd_txrx: httpd_sock_err: error in recv : 113[0m
+[0;32mI (1047328) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (1047338) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<255,255>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1047348) wifi:station: 50:eb:71:2d:69:aa join, AID=1, bgn, 40U[0m
+[0;32mI (1047368) wifi_prov: Station 50:eb:71:2d:69:aa connected, AID=1[0m
+[0;32mI (1048448) wifi_prov: Provisioning request received[0m
+[0;32mI (1048448) wifi_prov: Authorization header received: Bearer bearer_246b274f1f57fbf9c1149f63[0m
+[0;32mI (1048448) wifi_prov: Extracted Bearer token: bearer_246b274f1f57fbf9c1149f63[0m
+[0;32mI (1048458) wifi_prov: Received credentials - SSID: TestWiFi_27500, Device ID: device_1295[0m
+[0;32mI (1048468) wifi_prov: Bearer token saved to NVS[0m
+[0;32mI (1048978) wifi_prov: Stopping WiFi provisioning[0m
+[0;32mI (1049388) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (1051498) main: State: AP_MODE[0m
+[0;33mW (1051498) wifi_prov: Provisioning already active[0m
+[0;32mI (1051498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1056598) main: State: AP_MODE[0m
+[0;33mW (1056598) wifi_prov: Provisioning already active[0m
+[0;32mI (1056598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1061698) main: State: AP_MODE[0m
+[0;33mW (1061698) wifi_prov: Provisioning already active[0m
+[0;32mI (1061698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1064518) wifi:<ba-add>idx:2 (ifx:1, 50:eb:71:2d:69:aa), tid:0, ssn:53, winSize:64[0m
+[0;32mI (1066798) main: State: AP_MODE[0m
+[0;33mW (1066798) wifi_prov: Provisioning already active[0m
+[0;32mI (1066798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1071898) main: State: AP_MODE[0m
+[0;33mW (1071898) wifi_prov: Provisioning already active[0m
+[0;32mI (1071898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1076998) main: State: AP_MODE[0m
+[0;33mW (1076998) wifi_prov: Provisioning already active[0m
+[0;32mI (1076998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1082098) main: State: AP_MODE[0m
+[0;33mW (1082098) wifi_prov: Provisioning already active[0m
+[0;32mI (1082098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1087198) main: State: AP_MODE[0m
+[0;33mW (1087198) wifi_prov: Provisioning already active[0m
+[0;32mI (1087198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1092298) main: State: AP_MODE[0m
+[0;33mW (1092298) wifi_prov: Provisioning already active[0m
+[0;32mI (1092298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1097398) main: State: AP_MODE[0m
+[0;33mW (1097398) wifi_prov: Provisioning already active[0m
+[0;32mI (1097398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1102498) main: State: AP_MODE[0m
+[0;33mW (1102498) wifi_prov: Provisioning already active[0m
+[0;32mI (1102498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1107598) main: State: AP_MODE[0m
+[0;33mW (1107598) wifi_prov: Provisioning already active[0m
+[0;32mI (1107598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1112698) main: State: AP_MODE[0m
+[0;33mW (1112698) wifi_prov: Provisioning already active[0m
+[0;32mI (1112698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1117798) main: State: AP_MODE[0m
+[0;33mW (1117798) wifi_prov: Provisioning already active[0m
+[0;32mI (1117798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1122898) main: State: AP_MODE[0m
+[0;33mW (1122898) wifi_prov: Provisioning already active[0m
+[0;32mI (1122898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1127998) main: State: AP_MODE[0m
+[0;33mW (1127998) wifi_prov: Provisioning already active[0m
+[0;32mI (1127998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1133098) main: State: AP_MODE[0m
+[0;33mW (1133098) wifi_prov: Provisioning already active[0m
+[0;32mI (1133098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1138198) main: State: AP_MODE[0m
+[0;33mW (1138198) wifi_prov: Provisioning already active[0m
+[0;32mI (1138198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1143298) main: State: AP_MODE[0m
+[0;33mW (1143298) wifi_prov: Provisioning already active[0m
+[0;32mI (1143298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1148398) main: State: AP_MODE[0m
+[0;33mW (1148398) wifi_prov: Provisioning already active[0m
+[0;32mI (1148398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1153498) main: State: AP_MODE[0m
+[0;33mW (1153498) wifi_prov: Provisioning already active[0m
+[0;32mI (1153498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1158598) main: State: AP_MODE[0m
+[0;33mW (1158598) wifi_prov: Provisioning already active[0m
+[0;32mI (1158598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1163698) main: State: AP_MODE[0m
+[0;33mW (1163698) wifi_prov: Provisioning already active[0m
+[0;32mI (1163698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1168798) main: State: AP_MODE[0m
+[0;33mW (1168798) wifi_prov: Provisioning already active[0m
+[0;32mI (1168798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1173898) main: State: AP_MODE[0m
+[0;33mW (1173898) wifi_prov: Provisioning already active[0m
+[0;32mI (1173898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1178998) main: State: AP_MODE[0m
+[0;33mW (1178998) wifi_prov: Provisioning already active[0m
+[0;32mI (1178998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1184098) main: State: AP_MODE[0m
+[0;33mW (1184098) wifi_prov: Provisioning already active[0m
+[0;32mI (1184098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1189198) main: State: AP_MODE[0m
+[0;33mW (1189198) wifi_prov: Provisioning already active[0m
+[0;32mI (1189198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1194298) main: State: AP_MODE[0m
+[0;33mW (1194298) wifi_prov: Provisioning already active[0m
+[0;32mI (1194298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1199398) main: State: AP_MODE[0m
+[0;33mW (1199398) wifi_prov: Provisioning already active[0m
+[0;32mI (1199398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1204498) main: State: AP_MODE[0m
+[0;33mW (1204498) wifi_prov: Provisioning already active[0m
+[0;32mI (1204498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1209598) main: State: AP_MODE[0m
+[0;33mW (1209598) wifi_prov: Provisioning already active[0m
+[0;32mI (1209598) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1214698) main: State: AP_MODE[0m
+[0;33mW (1214698) wifi_prov: Provisioning already active[0m
+[0;32mI (1214698) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1219798) main: State: AP_MODE[0m
+[0;33mW (1219798) wifi_prov: Provisioning already active[0m
+[0;32mI (1219798) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1224898) main: State: AP_MODE[0m
+[0;33mW (1224898) wifi_prov: Provisioning already active[0m
+[0;32mI (1224898) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1229998) main: State: AP_MODE[0m
+[0;33mW (1229998) wifi_prov: Provisioning already active[0m
+[0;32mI (1229998) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1235098) main: State: AP_MODE[0m
+[0;33mW (1235098) wifi_prov: Provisioning already active[0m
+[0;32mI (1235098) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1240198) main: State: AP_MODE[0m
+[0;33mW (1240198) wifi_prov: Provisioning already active[0m
+[0;32mI (1240198) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1245298) main: State: AP_MODE[0m
+[0;33mW (1245298) wifi_prov: Provisioning already active[0m
+[0;32mI (1245298) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1250398) main: State: AP_MODE[0m
+[0;33mW (1250398) wifi_prov: Provisioning already active[0m
+[0;32mI (1250398) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1255498) main: State: AP_MODE[0m
+[0;33mW (1255498) wifi_prov: Provisioning already active[0m
+[0;32mI (1255498) main: Provisioning AP started. Waiting for credentials...[0m
+[0;32mI (1260598) main: State: AP_MODE[0m
+[0;33mW (1260598) wifi_prov: Provisioning already active[0m
+[0;32mI (1260598) main: Provisioning AP started. W

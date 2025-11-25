@@ -1,0 +1,17 @@
+Command: ninja all
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/muthuselvan/esp/build/bootloader && /home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python /home/muthuselvan/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/muthuselvan/esp/build/bootloader/bootloader.bin
+Bootloader binary size 0x5320 bytes. 0x2ce0 bytes (35%) free.
+[2/8] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/internet_verification.c.obj
+[3/8] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj
+[4/8] Linking C static library esp-idf/main/libmain.a
+[5/8] Generating esp-idf/esp_system/ld/sections.ld
+[6/8] Linking CXX executable wifi_ap_project.elf
+[7/8] Generating binary image from built executable
+esptool v5.1.0
+Creating ESP32S3 image...
+Merged 2 ELF sections.
+Successfully created ESP32S3 image.
+Generated /home/muthuselvan/esp/build/wifi_ap_project.bin
+[8/8] cd /home/muthuselvan/esp/build && /home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python /home/muthuselvan/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/muthuselvan/esp/build/partition_table/partition-table.bin /home/muthuselvan/esp/build/wifi_ap_project.bin
+wifi_ap_project.bin binary size 0xe50a0 bytes. Smallest app partition is 0x100000 bytes. 0x1af60 bytes (11%) free.

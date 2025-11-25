@@ -1,0 +1,39 @@
+menu "WiFi Provisioning Configuration"
+
+    config AP_SSID_PREFIX
+        string "AP SSID Prefix"
+        default "ESP32-Prov"
+        help
+            SSID prefix for the provisioning Access Point.
+            The full SSID will be this prefix followed by device ID.
+
+    config AP_PASSWORD
+        string "AP Password"
+        default "prov12345678"
+        help
+            Password for the provisioning Access Point.
+            Minimum 8 characters for WPA2.
+
+endmenu
+
+menu "Backend Configuration"
+
+    config BACKEND_URL
+        string "Backend URL for CSR signing"
+        default "https://your-backend.com"
+        help
+            Base URL of the backend server for CSR signing.
+            Should include protocol (https://) but not the endpoint path.
+
+endmenu
+
+menu "MQTT Configuration"
+
+    config MQTT_BROKER_URI
+        string "MQTT Broker URI"
+        default "mqtts://your-broker.com:8883"
+        help
+            MQTT broker URI with mTLS (mqtts://).
+            Format: mqtts://hostname:port
+
+endmenu

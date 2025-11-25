@@ -1,0 +1,132 @@
+Command: ninja all
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/muthuselvan/esp/build/bootloader && /home/muthuselvan/.espressif/python_env/idf6.1_py3.10_env/bin/python /home/muthuselvan/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/muthuselvan/esp/build/bootloader/bootloader.bin
+Bootloader binary size 0x5320 bytes. 0x2ce0 bytes (35%) free.
+[2/8] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_client.c.obj
+FAILED: esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_client.c.obj 
+/home/muthuselvan/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc -DESP_PLATFORM -DIDF_VER=\"v6.1-dev-724-ga6e7046c30\" -DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\" -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -I/home/muthuselvan/esp/build/config -I/home/muthuselvan/esp/main -I/home/muthuselvan/esp/esp-idf/components/esp_libc/platform_include -I/home/muthuselvan/esp/esp-idf/components/freertos/config/include -I/home/muthuselvan/esp/esp-idf/components/freertos/config/include/freertos -I/home/muthuselvan/esp/esp-idf/components/freertos/config/xtensa/include -I/home/muthuselvan/esp/esp-idf/components/freertos/FreeRTOS-Kernel/include -I/home/muthuselvan/esp/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -I/home/muthuselvan/esp/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -I/home/muthuselvan/esp/esp-idf/components/freertos/esp_additions/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/include/soc -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/dma/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/ldo/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/debug_probe/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/etm/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/mspi_timing_tuning/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/power_supply/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/modem/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/include/soc/esp32s3 -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/port/esp32s3/. -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/port/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/mspi_timing_tuning/port/esp32s3/. -I/home/muthuselvan/esp/esp-idf/components/esp_hw_support/mspi_timing_tuning/port/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/heap/include -I/home/muthuselvan/esp/esp-idf/components/heap/tlsf -I/home/muthuselvan/esp/esp-idf/components/log/include -I/home/muthuselvan/esp/esp-idf/components/soc/include -I/home/muthuselvan/esp/esp-idf/components/soc/esp32s3 -I/home/muthuselvan/esp/esp-idf/components/soc/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/soc/esp32s3/register -I/home/muthuselvan/esp/esp-idf/components/hal/platform_port/include -I/home/muthuselvan/esp/esp-idf/components/hal/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/hal/include -I/home/muthuselvan/esp/esp-idf/components/esp_rom/include -I/home/muthuselvan/esp/esp-idf/components/esp_rom/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/esp_rom/esp32s3/include/esp32s3 -I/home/muthuselvan/esp/esp-idf/components/esp_rom/esp32s3 -I/home/muthuselvan/esp/esp-idf/components/esp_common/include -I/home/muthuselvan/esp/esp-idf/components/esp_system/include -I/home/muthuselvan/esp/esp-idf/components/esp_system/port/soc -I/home/muthuselvan/esp/esp-idf/components/esp_system/port/include/private -I/home/muthuselvan/esp/esp-idf/components/esp_stdio/include -I/home/muthuselvan/esp/esp-idf/components/xtensa/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/xtensa/include -I/home/muthuselvan/esp/esp-idf/components/xtensa/deprecated_include -I/home/muthuselvan/esp/esp-idf/components/esp_hal_dma/include -I/home/muthuselvan/esp/esp-idf/components/esp_hal_dma/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/esp_hal_usb/include -I/home/muthuselvan/esp/esp-idf/components/esp_hal_usb/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/lwip/include -I/home/muthuselvan/esp/esp-idf/components/lwip/include/apps -I/home/muthuselvan/esp/esp-idf/components/lwip/lwip/src/include -I/home/muthuselvan/esp/esp-idf/components/lwip/port/include -I/home/muthuselvan/esp/esp-idf/components/lwip/port/freertos/include -I/home/muthuselvan/esp/esp-idf/components/lwip/port/esp32xx/include -I/home/muthuselvan/esp/esp-idf/components/lwip/port/esp32xx/include/arch -I/home/muthuselvan/esp/esp-idf/components/lwip/port/esp32xx/include/sys -I/home/muthuselvan/esp/esp-idf/components/esp_wifi/include -I/home/muthuselvan/esp/esp-idf/components/esp_wifi/include/local -I/home/muthuselvan/esp/esp-idf/components/esp_wifi/wifi_apps/include -I/home/muthuselvan/esp/esp-idf/components/esp_wifi/wifi_apps/nan_app/include -I/home/muthuselvan/esp/esp-idf/components/esp_event/include -I/home/muthuselvan/esp/esp-idf/components/esp_phy/include -I/home/muthuselvan/esp/esp-idf/components/esp_phy/esp32s3/include -I/home/muthuselvan/esp/esp-idf/components/esp_netif/include -I/home/muthuselvan/esp/esp-idf/components/nvs_flash/include -I/home/muthuselvan/esp/esp-idf/components/esp_partition/include -I/home/muthuselvan/esp/esp-idf/components/esp_blockdev/include -I/home/muthuselvan/esp/esp-idf/components/esp_http_server/include -I/home/muthuselvan/esp/esp-idf/components/http_parser -I/home/muthuselvan/esp/esp-idf/components/esp_http_client/include -I/home/muthuselvan/esp/managed_components/espressif__mqtt/include -I/home/muthuselvan/esp/esp-idf/components/tcp_transport/include -I/home/muthuselvan/esp/esp-idf/components/esp-tls -I/home/muthuselvan/esp/esp-idf/components/esp-tls/esp-tls-crypto -I/home/muthuselvan/esp/esp-idf/components/mbedtls/port/include -I/home/muthuselvan/esp/esp-idf/components/mbedtls/mbedtls/include -I/home/muthuselvan/esp/esp-idf/components/mbedtls/mbedtls/library -I/home/muthuselvan/esp/esp-idf/components/mbedtls/esp_crt_bundle/include -I/home/muthuselvan/esp/esp-idf/components/esp_security/include -I/home/muthuselvan/esp/esp-idf/components/mbedtls/mbedtls/3rdparty/everest/include -I/home/muthuselvan/esp/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m -I/home/muthuselvan/esp/esp-idf/components/mbedtls/mbedtls/3rdparty/p256-m/p256-m -I/home/muthuselvan/esp/esp-idf/components/esp_timer/include -I/home/muthuselvan/esp/managed_components/espressif__cjson/cJSON @"/home/muthuselvan/esp/build/toolchain/cflags" -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fno-shrink-wrap -fmacro-prefix-map=/home/muthuselvan/esp=. -fmacro-prefix-map=/home/muthuselvan/esp/esp-idf=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -MD -MT esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_client.c.obj -MF esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_client.c.obj.d -o esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_client.c.obj -c /home/muthuselvan/esp/main/mqtt_client.c
+/home/muthuselvan/esp/main/mqtt_client.c:23:8: error: unknown type name 'esp_mqtt_client_handle_t'
+   23 | static esp_mqtt_client_handle_t s_mqtt_client = NULL;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:23:49: error: initialization of 'int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+   23 | static esp_mqtt_client_handle_t s_mqtt_client = NULL;
+      |                                                 ^~~~
+/home/muthuselvan/esp/main/mqtt_client.c:33:52: error: unknown type name 'esp_event_base_t'
+   33 | static void mqtt_event_handler(void *handler_args, esp_event_base_t base,
+      |                                                    ^~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c: In function 'mqtt_client_start':
+/home/muthuselvan/esp/main/mqtt_client.c:88:23: error: comparison between pointer and integer [-Werror]
+   88 |     if (s_mqtt_client != NULL) {
+      |                       ^~
+/home/muthuselvan/esp/main/mqtt_client.c:122:5: error: unknown type name 'esp_mqtt_client_config_t'
+  122 |     esp_mqtt_client_config_t mqtt_cfg = {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:123:9: error: field name not in record or union initializer
+  123 |         .broker = {
+      |         ^
+/home/muthuselvan/esp/main/mqtt_client.c:123:9: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:123:9: error: braces around scalar initializer [-Werror]
+/home/muthuselvan/esp/main/mqtt_client.c:123:9: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:124:13: error: field name not in record or union initializer
+  124 |             .address = {
+      |             ^
+/home/muthuselvan/esp/main/mqtt_client.c:124:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:124:13: error: braces around scalar initializer [-Werror]
+/home/muthuselvan/esp/main/mqtt_client.c:124:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:125:17: error: field name not in record or union initializer
+  125 |                 .uri = MQTT_BROKER_URI,
+      |                 ^
+/home/muthuselvan/esp/main/mqtt_client.c:125:17: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:125:24: error: initialization of 'int' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+  125 |                 .uri = MQTT_BROKER_URI,
+      |                        ^~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:125:24: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:127:13: error: field name not in record or union initializer
+  127 |             .verification = {
+      |             ^
+/home/muthuselvan/esp/main/mqtt_client.c:127:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:127:13: error: braces around scalar initializer [-Werror]
+/home/muthuselvan/esp/main/mqtt_client.c:127:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:128:17: error: field name not in record or union initializer
+  128 |                 .certificate = s_ca_cert,  // CA cert to verify broker
+      |                 ^
+/home/muthuselvan/esp/main/mqtt_client.c:128:17: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:128:32: error: initialization of 'int' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+  128 |                 .certificate = s_ca_cert,  // CA cert to verify broker
+      |                                ^~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:128:32: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:127:29: error: excess elements in scalar initializer [-Werror]
+  127 |             .verification = {
+      |                             ^
+/home/muthuselvan/esp/main/mqtt_client.c:127:29: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:131:9: error: field name not in record or union initializer
+  131 |         .credentials = {
+      |         ^
+/home/muthuselvan/esp/main/mqtt_client.c:131:9: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:131:9: error: braces around scalar initializer [-Werror]
+/home/muthuselvan/esp/main/mqtt_client.c:131:9: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:132:13: error: field name not in record or union initializer
+  132 |             .authentication = {
+      |             ^
+/home/muthuselvan/esp/main/mqtt_client.c:132:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:132:13: error: braces around scalar initializer [-Werror]
+/home/muthuselvan/esp/main/mqtt_client.c:132:13: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:133:17: error: field name not in record or union initializer
+  133 |                 .certificate = s_device_cert,  // Client certificate
+      |                 ^
+/home/muthuselvan/esp/main/mqtt_client.c:133:17: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:133:32: error: initialization of 'int' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+  133 |                 .certificate = s_device_cert,  // Client certificate
+      |                                ^~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:133:32: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:134:17: error: field name not in record or union initializer
+  134 |                 .key = private_key,            // Client private key
+      |                 ^
+/home/muthuselvan/esp/main/mqtt_client.c:134:17: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:134:24: error: excess elements in scalar initializer [-Werror]
+  134 |                 .key = private_key,            // Client private key
+      |                        ^~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:134:24: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:131:24: error: excess elements in scalar initializer [-Werror]
+  131 |         .credentials = {
+      |                        ^
+/home/muthuselvan/esp/main/mqtt_client.c:131:24: note: (near initialization for 'mqtt_cfg')
+/home/muthuselvan/esp/main/mqtt_client.c:142:21: error: implicit declaration of function 'esp_mqtt_client_init' [-Wimplicit-function-declaration]
+  142 |     s_mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+      |                     ^~~~~~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:143:23: error: comparison between pointer and integer [-Werror]
+  143 |     if (s_mqtt_client == NULL) {
+      |                       ^~
+/home/muthuselvan/esp/main/mqtt_client.c:149:5: error: implicit declaration of function 'esp_mqtt_client_register_event' [-Wimplicit-function-declaration]
+  149 |     esp_mqtt_client_register_event(s_mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:149:51: error: 'ESP_EVENT_ANY_ID' undeclared (first use in this function)
+  149 |     esp_mqtt_client_register_event(s_mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+      |                                                   ^~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:149:51: note: each undeclared identifier is reported only once for each function it appears in
+/home/muthuselvan/esp/main/mqtt_client.c:149:69: error: 'mqtt_event_handler' undeclared (first use in this function)
+  149 |     esp_mqtt_client_register_event(s_mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+      |                                                                     ^~~~~~~~~~~~~~~~~~
+/home/muthuselvan/esp/main/mqtt_client.c:152:11: error: implicit declaration of function 'esp_mqtt_client_start'; did you mean 'mqtt_client_start'? [-Wimplicit-function-declaration]
+  152 |     ret = esp_mqtt_client_start(s_mqtt_client);
+      |           ^~~~~~~~~~~~~~~~~~~~~
+      |           mqtt_client_start
+/home/muthuselvan/esp/main/mqtt_client.c:155:9: error: implicit declaration of function 'esp_mqtt_client_destroy'; did you mean 'mqtt_client_stop'? [-Wimplicit-function-declaration]
+  155 |         esp_mqtt_client_destroy(s_mqtt_client);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+      |         mqtt_client_stop
+/home/muthuselvan/esp/main/mqtt_client.c:156:23: error: assignment to 'int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+  156 |         s_mqtt_client = NULL;
+      |                       ^
+/home/muthuselvan/esp/main/mqtt_client.c: In function 'mqtt_client_stop':
+/home/muthuselvan/esp/main/mqtt_client.c:169:23: error: comparison between pointer and integer [-Werror]
+  169 |     if (s_mqtt_client == NULL) {
+      |                       ^~
+/home/muthuselvan/esp/main/mqtt_client.c:174:5: error: implicit declaration of function 'esp_mqtt_client_stop'; did you mean 'mqtt_client_stop'? [-Wimplicit-function-declaration]
+  174 |     esp_mqtt_client_stop(s_mqtt_client);
+      |     ^~~~~~~~~~~~~~~~~~~~
+      |     mqtt_client_stop
+/home/muthuselvan/esp/main/mqtt_client.c:176:19: error: assignment to 'int' from 'void *' makes integer from pointer without a cast [-Wint-conversion]
+  176 |     s_mqtt_client = NULL;
+      |                   ^
+/home/muthuselvan/esp/main/mqtt_client.c: In function 'mqtt_client_publish':
