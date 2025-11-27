@@ -1,0 +1,36 @@
+esp-idf/esp_hal_dma/CMakeFiles/__idf_esp_hal_dma.dir/gdma_hal_top.c.obj: \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_hal_dma/gdma_hal_top.c \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/stdlib.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/ieeefp.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/newlib.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_newlib_version.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/config.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/features.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stddef.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_libc/platform_include/sys/reent.h \
+ /home/statsnapp/Desktop/statsclient/build/config/sdkconfig.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/reent.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/cdefs.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/_default_types.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_types.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/_types.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_libc/platform_include/sys/lock.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/lock.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_libc/platform_include/assert.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_intsup.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/assert.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/stdlib.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/alloca.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_locale.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/hal/platform_port/include/hal/assert.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_hal_dma/include/hal/gdma_hal.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdbool.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/soc_caps.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/include/soc/soc_caps_eval.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_hal_dma/include/hal/gdma_types.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/register/soc/gdma_struct.h

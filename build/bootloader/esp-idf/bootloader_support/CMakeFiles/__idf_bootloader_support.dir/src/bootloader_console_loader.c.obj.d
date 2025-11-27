@@ -1,0 +1,29 @@
+esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir/src/bootloader_console_loader.c.obj: \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/bootloader_support/src/bootloader_console_loader.c \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/_default_types.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/features.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_newlib_version.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_intsup.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stddef.h \
+ /home/statsnapp/Desktop/statsclient/build/bootloader/config/sdkconfig.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/bootloader_support/private_include/bootloader_console.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/include/esp_rom_serial_output.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/include/esp_rom_sys.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdbool.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/newlib.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/config.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/ieeefp.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_ansi.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_locale.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdarg.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/reset_reasons.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/soc_caps.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/include/soc/soc_caps_eval.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/esp32s3/include/esp32s3/rom/usb/chip_usb_dw_wrapper.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/esp32s3/include/esp32s3/rom/usb/usb_dc.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/esp32s3/include/esp32s3/rom/usb/cdc_acm.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_rom/esp32s3/include/esp32s3/rom/usb/usb_persist.h

@@ -1,0 +1,24 @@
+Command: make -j 18 all
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c: In function 'ip_event_handler':
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:407:9: warning: 'IP_EVENT_AP_STAIPASSIGNED' is deprecated: Use IP_EVENT_ASSIGNED_IP_TO_CLIENT instead [-Wdeprecated-declarations]
+  407 |         case IP_EVENT_AP_STAIPASSIGNED:
+      |         ^~~~
+In file included from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif.h:13,
+                 from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_wifi/include/esp_wifi_default.h:10,
+                 from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_wifi/include/esp_wifi.h:57,
+                 from /home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:12:
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:102:5: note: declared here
+  102 |     IP_EVENT_AP_STAIPASSIGNED __attribute__((deprecated("Use IP_EVENT_ASSIGNED_IP_TO_CLIENT instead")))
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:409:17: warning: 'ip_event_ap_staipassigned_t' is deprecated: Use ip_event_assigned_ip_to_client_t instead of ip_event_ap_staipassigned_t [-Wdeprecated-declarations]
+  409 |                 ip_event_ap_staipassigned_t* event = (ip_event_ap_staipassigned_t*) event_data;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:174:9: note: declared here
+  174 | typedef struct {
+      |         ^~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:409:17: warning: 'ip_event_ap_staipassigned_t' is deprecated: Use ip_event_assigned_ip_to_client_t instead of ip_event_ap_staipassigned_t [-Wdeprecated-declarations]
+  409 |                 ip_event_ap_staipassigned_t* event = (ip_event_ap_staipassigned_t*) event_data;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:174:9: note: declared here
+  174 | typedef struct {
+      |         ^~~~~~

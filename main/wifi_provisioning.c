@@ -18,8 +18,12 @@
 #include "cJSON.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 static const char *TAG = "wifi_prov";
+
+// WiFi scan cache configuration
+#define WIFI_SCAN_MAX_APS        20     // Maximum APs to cache
 
 // NVS keys
 #define NVS_NAMESPACE "device_config"
@@ -40,6 +44,12 @@ static bool s_provisioning_active = false;
 static bool s_wifi_connected = false;
 static char s_sta_ip[16] = {0};
 
+// WiFi scan cache (for instant /local-wifi responses)
+static wifi_ap_record_t s_cached_networks[WIFI_SCAN_MAX_APS];
+static uint16_t s_cached_network_count = 0;
+static SemaphoreHandle_t s_cache_mutex = NULL;
+static bool s_initial_scan_done = false;
+
 // Forward declarations
 static esp_err_t scan_handler(httpd_req_t *req);
 static esp_err_t provision_handler(httpd_req_t *req);
@@ -48,6 +58,71 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                int32_t event_id, void* event_data);
 static void ip_event_handler(void* arg, esp_event_base_t event_base,
                              int32_t event_id, void* event_data);
+static esp_err_t perform_wifi_scan_and_cache(void);
+
+/**
+ * @brief Perform WiFi scan and update cache
+ * 
+ * This is called ONCE during provisioning startup (before any client connects)
+ * and optionally on-demand via /local-wifi?refresh=true
+ * 
+ * NO background scanning = stable AP connection for connected clients
+ */
+static esp_err_t perform_wifi_scan_and_cache(void)
+{
+    ESP_LOGI(TAG, "Performing WiFi scan...");
+    
+    // Create mutex if not exists
+    if (s_cache_mutex == NULL) {
+        s_cache_mutex = xSemaphoreCreateMutex();
+        if (s_cache_mutex == NULL) {
+            ESP_LOGE(TAG, "Failed to create cache mutex");
+            return ESP_ERR_NO_MEM;
+        }
+    }
+    
+    wifi_scan_config_t scan_config = {
+        .show_hidden = false,
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+        .scan_time = {
+            .active = {
+                .min = 100,
+                .max = 300
+            }
+        }
+    };
+    
+    // Perform WiFi scan (blocking)
+    esp_err_t ret = esp_wifi_scan_start(&scan_config, true);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "WiFi scan failed: %s", esp_err_to_name(ret));
+        return ret;
+    }
+    
+    // Get scan results
+    uint16_t ap_count = 0;
+    esp_wifi_scan_get_ap_num(&ap_count);
+    if (ap_count > WIFI_SCAN_MAX_APS) {
+        ap_count = WIFI_SCAN_MAX_APS;
+    }
+    
+    // Update cache with mutex protection
+    if (xSemaphoreTake(s_cache_mutex, pdMS_TO_TICKS(5000)) == pdTRUE) {
+        s_cached_network_count = ap_count;
+        if (ap_count > 0) {
+            esp_wifi_scan_get_ap_records(&s_cached_network_count, s_cached_networks);
+        }
+        s_initial_scan_done = true;
+        xSemaphoreGive(s_cache_mutex);
+        
+        ESP_LOGI(TAG, "WiFi scan completed: %d networks cached", s_cached_network_count);
+    } else {
+        ESP_LOGE(TAG, "Failed to acquire mutex for cache update");
+        return ESP_ERR_TIMEOUT;
+    }
+    
+    return ESP_OK;
+}
 
 /**
  * @brief Save WiFi credentials to NVS
@@ -98,71 +173,75 @@ cleanup:
 
 /**
  * @brief HTTP GET handler for /local-wifi endpoint
+ * 
+ * Returns cached WiFi scan results instantly (low latency UX).
+ * Cache is populated ONCE at startup. No background scanning = stable AP.
+ * 
+ * Optional: /local-wifi?refresh=true to force a new scan (will briefly disrupt connection)
  */
 static esp_err_t scan_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "WiFi scan requested");
 
-    // WiFi is already in APSTA mode, so we can scan without stopping
-    // This prevents connection resets - AP stays running during scan
+    // Check for refresh parameter
+    char query[32] = {0};
+    bool force_refresh = false;
     
-    // Perform scan
-    wifi_scan_config_t scan_config = {
-        .show_hidden = false,
-        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
-        .scan_time = {
-            .active = {
-                .min = 100,
-                .max = 300
+    if (httpd_req_get_url_query_str(req, query, sizeof(query)) == ESP_OK) {
+        char param[16] = {0};
+        if (httpd_query_key_value(query, "refresh", param, sizeof(param)) == ESP_OK) {
+            if (strcmp(param, "true") == 0 || strcmp(param, "1") == 0) {
+                force_refresh = true;
+                ESP_LOGW(TAG, "Force refresh requested - this will briefly disrupt WiFi");
             }
         }
-    };
+    }
 
-    ESP_LOGI(TAG, "Starting WiFi scan (this takes 15-20 seconds)...");
-    esp_err_t ret = esp_wifi_scan_start(&scan_config, true);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Scan failed: %s", esp_err_to_name(ret));
+    // If cache is empty or force refresh requested, do a scan
+    if (!s_initial_scan_done || force_refresh) {
+        ESP_LOGI(TAG, "Performing WiFi scan (cache %s)...", 
+                 force_refresh ? "refresh requested" : "empty");
+        
+        esp_err_t ret = perform_wifi_scan_and_cache();
+        if (ret != ESP_OK && !s_initial_scan_done) {
+            // Only fail if we have no cached data at all
+            httpd_resp_set_status(req, "500 Internal Server Error");
+            httpd_resp_set_type(req, "application/json");
+            httpd_resp_sendstr(req, "{\"error\":\"scan_failed\",\"message\":\"No cached data available\"}");
+            return ESP_FAIL;
+        }
+    }
+
+    // Take mutex to safely read cache
+    if (s_cache_mutex == NULL || xSemaphoreTake(s_cache_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
+        ESP_LOGE(TAG, "Failed to acquire cache mutex");
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"scan_failed\"}");
+        httpd_resp_sendstr(req, "{\"error\":\"cache_busy\"}");
         return ESP_FAIL;
     }
 
-    // Get scan results
-    uint16_t ap_count = 0;
-    esp_wifi_scan_get_ap_num(&ap_count);
-    if (ap_count > 20) ap_count = 20; // Limit to 20 APs
-
-    ESP_LOGI(TAG, "Found %d networks", ap_count);
-
-    wifi_ap_record_t *ap_records = NULL;
-    if (ap_count > 0) {
-        ap_records = malloc(sizeof(wifi_ap_record_t) * ap_count);
-        if (ap_records == NULL) {
-            ESP_LOGE(TAG, "Failed to allocate memory for scan results");
-            httpd_resp_set_status(req, "500 Internal Server Error");
-            httpd_resp_set_type(req, "application/json");
-            httpd_resp_sendstr(req, "{\"error\":\"memory_error\"}");
-            return ESP_FAIL;
-        }
-        esp_wifi_scan_get_ap_records(&ap_count, ap_records);
-    }
-
-    // Build JSON response
+    // Build JSON response from cached data
     cJSON *root = cJSON_CreateObject();
     cJSON *networks = cJSON_CreateArray();
 
-    for (int i = 0; i < ap_count; i++) {
+    for (int i = 0; i < s_cached_network_count; i++) {
         cJSON *network = cJSON_CreateObject();
-        cJSON_AddStringToObject(network, "ssid", (char*)ap_records[i].ssid);
-        cJSON_AddNumberToObject(network, "rssi", ap_records[i].rssi);
-        cJSON_AddNumberToObject(network, "channel", ap_records[i].primary);
-        cJSON_AddBoolToObject(network, "secure", ap_records[i].authmode != WIFI_AUTH_OPEN);
+        cJSON_AddStringToObject(network, "ssid", (char*)s_cached_networks[i].ssid);
+        cJSON_AddNumberToObject(network, "rssi", s_cached_networks[i].rssi);
+        cJSON_AddNumberToObject(network, "channel", s_cached_networks[i].primary);
+        cJSON_AddBoolToObject(network, "secure", s_cached_networks[i].authmode != WIFI_AUTH_OPEN);
         cJSON_AddItemToArray(networks, network);
     }
 
+    uint16_t count = s_cached_network_count;
+    
+    // Release mutex after reading
+    xSemaphoreGive(s_cache_mutex);
+
     cJSON_AddItemToObject(root, "networks", networks);
-    cJSON_AddNumberToObject(root, "count", ap_count);
+    cJSON_AddNumberToObject(root, "count", count);
+    cJSON_AddBoolToObject(root, "cached", !force_refresh);  // false if just refreshed
 
     char *json_string = cJSON_Print(root);
     if (json_string == NULL) {
@@ -170,9 +249,6 @@ static esp_err_t scan_handler(httpd_req_t *req)
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
         httpd_resp_sendstr(req, "{\"error\":\"json_error\"}");
-        if (ap_records) {
-            free(ap_records);
-        }
         cJSON_Delete(root);
         return ESP_FAIL;
     }
@@ -180,13 +256,10 @@ static esp_err_t scan_handler(httpd_req_t *req)
     httpd_resp_set_type(req, "application/json");
     httpd_resp_sendstr(req, json_string);
 
-    ESP_LOGI(TAG, "WiFi scan completed, sent %d networks", ap_count);
+    ESP_LOGI(TAG, "Returned %d networks (instant response)", count);
 
     free(json_string);
     cJSON_Delete(root);
-    if (ap_records) {
-        free(ap_records);
-    }
 
     return ESP_OK;
 }
@@ -433,6 +506,10 @@ static httpd_handle_t start_http_server(void)
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
     config.lru_purge_enable = true;
+    
+    // Increase timeouts for long-running operations like WiFi scan (15-20 seconds)
+    config.recv_wait_timeout = 30;  // 30 seconds receive timeout
+    config.send_wait_timeout = 30;  // 30 seconds send timeout
 
     ESP_LOGI(TAG, "Starting HTTP server on port %d", config.server_port);
 
@@ -547,7 +624,15 @@ esp_err_t wifi_provisioning_start(void)
         return ret;
     }
 
-    // Start HTTP server
+    // Perform initial WiFi scan BEFORE starting HTTP server
+    // This ensures cache is populated before any client connects
+    ESP_LOGI(TAG, "Performing initial WiFi scan (before clients connect)...");
+    esp_err_t scan_ret = perform_wifi_scan_and_cache();
+    if (scan_ret != ESP_OK) {
+        ESP_LOGW(TAG, "Initial scan failed, will retry on first /local-wifi request");
+    }
+
+    // Start HTTP server (clients can now connect with stable AP)
     s_httpd = start_http_server();
     if (s_httpd == NULL) {
         esp_wifi_stop();
@@ -555,7 +640,12 @@ esp_err_t wifi_provisioning_start(void)
     }
 
     s_provisioning_active = true;
+    ESP_LOGI(TAG, "========================================");
     ESP_LOGI(TAG, "WiFi provisioning started successfully");
+    ESP_LOGI(TAG, "AP is stable - no background scanning");
+    ESP_LOGI(TAG, "/local-wifi returns cached results instantly");
+    ESP_LOGI(TAG, "Use /local-wifi?refresh=true to rescan");
+    ESP_LOGI(TAG, "========================================");
     return ESP_OK;
 }
 
@@ -572,6 +662,10 @@ esp_err_t wifi_provisioning_stop(void)
         httpd_stop(s_httpd);
         s_httpd = NULL;
     }
+
+    // Reset scan cache state
+    s_initial_scan_done = false;
+    s_cached_network_count = 0;
 
     s_provisioning_active = false;
     return ESP_OK;
@@ -643,6 +737,10 @@ esp_err_t wifi_provisioning_clear_and_restart(void)
         httpd_stop(s_httpd);
         s_httpd = NULL;
     }
+    
+    // Reset scan cache state
+    s_initial_scan_done = false;
+    s_cached_network_count = 0;
     
     // Reset provisioning active flag
     s_provisioning_active = false;

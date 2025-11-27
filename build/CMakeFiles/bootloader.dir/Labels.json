@@ -2,34 +2,34 @@
 	"sources" : 
 	[
 		{
-			"file" : "/home/muthuselvan/esp/build/CMakeFiles/bootloader"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/CMakeFiles/bootloader.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/CMakeFiles/bootloader-complete.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader-complete.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
 		},
 		{
-			"file" : "/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+			"file" : "/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
 		}
 	],
 	"target" : 

@@ -1,0 +1,21 @@
+esp-idf/esp_hal_usb/CMakeFiles/__idf_esp_hal_usb.dir/esp32s3/usb_dwc_periph.c.obj: \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_hal_usb/esp32s3/usb_dwc_periph.c \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/gpio_sig_map.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/interrupts.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/stdint.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/machine/_default_types.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/features.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/_newlib_version.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_intsup.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/_stdint.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_hal_usb/include/soc/usb_periph.h \
+ /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdbool.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/soc_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/usb_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/gpio_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/spi_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/sdmmc_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/touch_sensor_pins.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/esp32s3/include/soc/soc_caps.h \
+ /home/statsnapp/Desktop/statsclient/esp-idf/components/soc/include/soc/soc_caps_eval.h
