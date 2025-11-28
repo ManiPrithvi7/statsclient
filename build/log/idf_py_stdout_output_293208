@@ -1,0 +1,127 @@
+Command: /home/statsnapp/.espressif/python_env/idf6.1_py3.12_env/bin/python /home/statsnapp/Desktop/statsclient/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /home/statsnapp/Desktop/statsclient/build/wifi_ap_project.elf /home/statsnapp/Desktop/statsclient/build/bootloader/bootloader.elf -m '/home/statsnapp/.espressif/python_env/idf6.1_py3.12_env/bin/python' '/home/statsnapp/Desktop/statsclient/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+[0;32mI (115) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 sizeESP-ROM:esp32s3-20210327[0m
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037af6e
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-853-g80ed20959d 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 28 2025 11:23:51[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (57) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (70) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0c0020 size=25164h (151908) map[0m
+[0;32mI (115) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 size=04bfch ( 19452) load[0m
+[0;32mI (119) esp_image: segment 2: paddr=00039d90 vaddr=40374000 size=06288h ( 25224) load[0m
+[0;32mI (125) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=b18a4h (727204) map[0m
+[0;32mI (257) esp_image: segment 4: paddr=000f18cc vaddr=4037a288 size=0d7c0h ( 55232) load[0m
+[0;32mI (269) esp_image: segment 5: paddr=000ff094 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (278) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (278) boot: Disabling RNG early entropy source...[0m
+[0;32mI (288) cpu_start: Multicore app[0m
+[0;32mI (297) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (298) cpu_start: Pro cpu start user code[0m
+[0;32mI (298) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (299) app_init: Application information:[0m
+[0;32mI (303) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (308) app_init: App version:      7518ba2-dirty[0m
+[0;32mI (312) app_init: Compile time:     Nov 28 2025 11:24:02[0m
+[0;32mI (317) app_init: ELF file SHA256:  d7e5be886...[0m
+[0;32mI (321) app_init: ESP-IDF:          v6.1-dev-853-g80ed20959d[0m
+[0;32mI (327) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (331) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (335) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (339) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (345) heap_init: At 3FCA3260 len 000464B0 (281 KiB): RAM[0m
+[0;32mI (350) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (355) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (360) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (367) spi_flash: detected chip: boya[0m
+[0;32mI (369) spi_flash: flash io: dio[0m
+[0;33mW (372) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (385) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (391) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (398) main_task: Started on CPU0[0m
+[0;32mI (408) main_task: Calling app_main()[0m
+[0;32mI (408) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (408) main: Device ID: device_0070[0m
+[0;32mI (428) main: NVS initialized[0m
+[0;32mI (428) main: ========================================[0m
+[0;32mI (428) main: DEVELOPMENT MODE: Clearing provisioning[0m
+[0;32mI (428) main: ========================================[0m
+[0;32mI (438) main: Clearing all provisioning data...[0m
+[0;32mI (438) main: ✓ All provisioning data cleared[0m
+[0;32mI (438) main: ✓ Device will start in AP mode[0m
+[0;32mI (448) main: ========================================[0m
+[0;32mI (448) main: Network interface initialized[0m
+[0;32mI (458) main: Event loop created[0m
+[0;32mI (458) main: Event handlers registered[0m
+[0;32mI (458) main: Application state machine started[0m
+[0;32mI (468) main: State: INIT[0m
+[0;32mI (468) main: State machine task started[0m
+[0;32mI (468) main: Application initialization complete[0m
+[0;32mI (478) main_task: Returned from app_main()[0m
+[0;32mI (568) main: State: CHECK_PROVISIONING[0m
+[0;32mI (568) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (668) main: State: AP_MODE[0m
+[0;32mI (668) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (668) pp: pp rom version: e7ae62f[0m
+[0;32mI (668) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (678) wifi:wifi driver task: 3fca66b0, prio:23, stack:6656, core=0[0m
+[0;32mI (678) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (678) wifi:wifi certification version: v7.0[0m
+[0;32mI (688) wifi:config NVS flash: enabled[0m
+[0;32mI (688) wifi:config nano formatting: disabled[0m
+[0;32mI (688) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (688) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (698) wifi:Init management short buffer num: 32[0m
+[0;32mI (698) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (708) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (708) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (718) wifi:Init static rx buffer num: 10[0m
+[0;32mI (718) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (718) wifi_init: rx ba win: 6[0m
+[0;32mI (728) wifi_init: accept mbox: 6[0m
+[0;32mI (728) wifi_init: tcpip mbox: 32[0m
+[0;32mI (728) wifi_init: udp mbox: 6[0m
+[0;32mI (728) wifi_init: tcp mbox: 6[0m
+[0;32mI (738) wifi_init: tcp tx win: 5760[0m
+[0;32mI (738) wifi_init: tcp rx win: 5760[0m
+[0;32mI (738) wifi_init: tcp mss: 1440[0m
+[0;32mI (748) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (748) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (758) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (798) wifi:mode : sta (80:b5:4e:c5:10:8c) + softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (798) wifi:enable tsf[0m
+[0;32mI (798) wifi:Total power save buffer number: 16[0m
+[0;32mI (808) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (808) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (808) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (808) wifi_prov: WiFi STA started[0m
+[0;32mI (818) wifi_prov: Performing initial WiFi scan (before clients connect)...[0m
+[0;32mI (818) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (828) wifi_prov: Performing WiFi scan...[0m
+[0;32mI (4138) wifi_prov: WiFi scan completed: 8 networks cached[0m
+[0;32mI (4138) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (4138) wifi_prov: HTTP server started[0m
+[0;32mI (4138) wifi_prov: ========================================[0m
+[0;32mI (4138) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (4148) wifi_prov: AP is stable - no background scanning[0m
+[0;32mI (4148) wifi_prov: /local-wifi returns cached results instantly[0m
+[0;32mI (4158) wifi_prov: Use /local-wifi?refresh=true to rescan[0m
+[0;32mI (4158) wifi_prov: ========================================[0m
+[0;32mI (4168) main: Provisionin

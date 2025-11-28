@@ -1,0 +1,41 @@
+Command: make -j 18 all
+In file included from /home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:10:
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c: In function 'log_incoming_request':
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:75:33: error: implicit declaration of function 'httpd_req_get_method' [-Wimplicit-function-declaration]
+   75 |     ESP_LOGI(TAG, "Method: %s", httpd_req_get_method(req) == HTTP_GET ? "GET" :
+      |                                 ^~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/log/include/esp_log.h:220:167: note: in definition of macro 'ESP_LOG_LEVEL'
+  220 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |                                                                                                                                                                       ^~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/log/include/esp_log.h:127:41: note: in expansion of macro 'ESP_LOG_LEVEL_LOCAL'
+  127 | #define ESP_LOGI(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_INFO, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:75:5: note: in expansion of macro 'ESP_LOGI'
+   75 |     ESP_LOGI(TAG, "Method: %s", httpd_req_get_method(req) == HTTP_GET ? "GET" :
+      |     ^~~~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c: In function 'ip_event_handler':
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:602:9: warning: 'IP_EVENT_AP_STAIPASSIGNED' is deprecated: Use IP_EVENT_ASSIGNED_IP_TO_CLIENT instead [-Wdeprecated-declarations]
+  602 |         case IP_EVENT_AP_STAIPASSIGNED:
+      |         ^~~~
+In file included from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif.h:13,
+                 from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_wifi/include/esp_wifi_default.h:10,
+                 from /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_wifi/include/esp_wifi.h:57,
+                 from /home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:12:
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:102:5: note: declared here
+  102 |     IP_EVENT_AP_STAIPASSIGNED __attribute__((deprecated("Use IP_EVENT_ASSIGNED_IP_TO_CLIENT instead")))
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:604:17: warning: 'ip_event_ap_staipassigned_t' is deprecated: Use ip_event_assigned_ip_to_client_t instead of ip_event_ap_staipassigned_t [-Wdeprecated-declarations]
+  604 |                 ip_event_ap_staipassigned_t* event = (ip_event_ap_staipassigned_t*) event_data;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:174:9: note: declared here
+  174 | typedef struct {
+      |         ^~~~~~
+/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c:604:17: warning: 'ip_event_ap_staipassigned_t' is deprecated: Use ip_event_assigned_ip_to_client_t instead of ip_event_ap_staipassigned_t [-Wdeprecated-declarations]
+  604 |                 ip_event_ap_staipassigned_t* event = (ip_event_ap_staipassigned_t*) event_data;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/statsnapp/Desktop/statsclient/esp-idf/components/esp_netif/include/esp_netif_types.h:174:9: note: declared here
+  174 | typedef struct {
+      |         ^~~~~~
+make[2]: *** [esp-idf/main/CMakeFiles/__idf_main.dir/build.make:90: esp-idf/main/CMakeFiles/__idf_main.dir/wifi_provisioning.c.obj] Error 1
+make[1]: *** [CMakeFiles/Makefile2:6466: esp-idf/main/CMakeFiles/__idf_main.dir/all] Error 2
+make: *** [Makefile:136: all] Error 2

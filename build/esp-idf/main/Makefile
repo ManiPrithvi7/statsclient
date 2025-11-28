@@ -247,6 +247,30 @@ main.c.s:
 	cd /home/statsnapp/Desktop/statsclient/build && $(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/main.c.s
 .PHONY : main.c.s
 
+mqtt_handler.obj: mqtt_handler.c.obj
+.PHONY : mqtt_handler.obj
+
+# target to build an object file
+mqtt_handler.c.obj:
+	cd /home/statsnapp/Desktop/statsclient/build && $(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_handler.c.obj
+.PHONY : mqtt_handler.c.obj
+
+mqtt_handler.i: mqtt_handler.c.i
+.PHONY : mqtt_handler.i
+
+# target to preprocess a source file
+mqtt_handler.c.i:
+	cd /home/statsnapp/Desktop/statsclient/build && $(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_handler.c.i
+.PHONY : mqtt_handler.c.i
+
+mqtt_handler.s: mqtt_handler.c.s
+.PHONY : mqtt_handler.s
+
+# target to generate assembly for a file
+mqtt_handler.c.s:
+	cd /home/statsnapp/Desktop/statsclient/build && $(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/mqtt_handler.c.s
+.PHONY : mqtt_handler.c.s
+
 wifi_provisioning.obj: wifi_provisioning.c.obj
 .PHONY : wifi_provisioning.obj
 
@@ -293,6 +317,9 @@ help:
 	@echo "... main.obj"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... mqtt_handler.obj"
+	@echo "... mqtt_handler.i"
+	@echo "... mqtt_handler.s"
 	@echo "... wifi_provisioning.obj"
 	@echo "... wifi_provisioning.i"
 	@echo "... wifi_provisioning.s"

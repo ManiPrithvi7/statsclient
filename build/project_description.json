@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "wifi_ap_project",
-    "project_version":    "a8d4ab1-dirty",
+    "project_version":    "7518ba2-dirty",
     "project_path":       "/home/statsnapp/Desktop/statsclient",
     "idf_path":           "/home/statsnapp/Desktop/statsclient/esp-idf",
     "build_dir":          "/home/statsnapp/Desktop/statsclient/build",
@@ -1536,11 +1536,11 @@
             "type": "LIBRARY",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__cjson", "espressif__mqtt" ],
+            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "espressif__cjson" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "espressif__cjson", "espressif__mqtt" ],
             "file": "/home/statsnapp/Desktop/statsclient/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/statsnapp/Desktop/statsclient/main/main.c", "/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c", "/home/statsnapp/Desktop/statsclient/main/certificate_manager.c", "/home/statsnapp/Desktop/statsclient/main/internet_verification.c" ],
+            "sources": [ "/home/statsnapp/Desktop/statsclient/main/main.c", "/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c", "/home/statsnapp/Desktop/statsclient/main/certificate_manager.c", "/home/statsnapp/Desktop/statsclient/main/internet_verification.c", "/home/statsnapp/Desktop/statsclient/main/mqtt_handler.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {
@@ -3331,7 +3331,7 @@
             "dir": "/home/statsnapp/Desktop/statsclient/main",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__cjson", "espressif__mqtt" ],
+            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "espressif__cjson" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "espressif__cjson", "espressif__mqtt" ],
             "include_dirs": [ "." ]

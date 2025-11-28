@@ -8,5 +8,5 @@ C_INCLUDES = -I/home/statsnapp/Desktop/statsclient/build/config -I/home/statsnap
 
 C_FLAGS = @"/home/statsnapp/Desktop/statsclient/build/toolchain/cflags" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -Og -fno-shrink-wrap -fmacro-prefix-map=/home/statsnapp/Desktop/statsclient=. -fmacro-prefix-map=/home/statsnapp/Desktop/statsclient/esp-idf=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce
 
-# Custom defines: esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj_DEFINES = PROJECT_VER="a8d4ab1-dirty"; PROJECT_NAME="wifi_ap_project"
+# Custom defines: esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir/esp_app_desc.c.obj_DEFINES = PROJECT_VER="7518ba2-dirty"; PROJECT_NAME="wifi_ap_project"
 

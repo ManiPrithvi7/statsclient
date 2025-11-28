@@ -1,0 +1,2287 @@
+Command: /home/statsnapp/.espressif/python_env/idf6.1_py3.12_env/bin/python /home/statsnapp/Desktop/statsclient/esp-idf/tools/idf_monitor.py -p /dev/ttyACM0 -b 115200 --toolchain-prefix xtensa-esp32s3-elf- --target esp32s3 --revision 0 /home/statsnapp/Desktop/statsclient/build/wifi_ap_project.elf /home/statsnapp/Desktop/statsclient/build/bootloader/bootloader.elf -m '/home/statsnapp/.espressif/python_env/idf6.1_py3.12_env/bin/python' '/home/statsnapp/Desktop/statsclient/esp-idf/tools/idf.py' '-p' '/dev/ttyACM0'
+[0;32mI (115) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 sizeESP-ROM:esp32s3-20210327[0m
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037af6e
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-853-g80ed20959d 2nd stage bootloader[0m
+[0;32mI (25) boot: compile time Nov 28 2025 11:23:51[0m
+[0;32mI (25) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (33) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (37) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (57) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (70) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0c0020 size=25164h (151908) map[0m
+[0;32mI (115) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 size=04bfch ( 19452) load[0m
+[0;32mI (119) esp_image: segment 2: paddr=00039d90 vaddr=40374000 size=06288h ( 25224) load[0m
+[0;32mI (125) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=b18a4h (727204) map[0m
+[0;32mI (257) esp_image: segment 4: paddr=000f18cc vaddr=4037a288 size=0d7c0h ( 55232) load[0m
+[0;32mI (269) esp_image: segment 5: paddr=000ff094 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (278) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (278) boot: Disabling RNG early entropy source...[0m
+[0;32mI (288) cpu_start: Multicore app[0m
+[0;32mI (297) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (298) cpu_start: Pro cpu start user code[0m
+[0;32mI (298) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (299) app_init: Application information:[0m
+[0;32mI (303) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (308) app_init: App version:      7518ba2-dirty[0m
+[0;32mI (312) app_init: Compile time:     Nov 28 2025 11:24:02[0m
+[0;32mI (317) app_init: ELF file SHA256:  d7e5be886...[0m
+[0;32mI (321) app_init: ESP-IDF:          v6.1-dev-853-g80ed20959d[0m
+[0;32mI (327) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (331) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (335) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (339) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (345) heap_init: At 3FCA3260 len 000464B0 (281 KiB): RAM[0m
+[0;32mI (350) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (355) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (360) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (367) spi_flash: detected chip: boya[0m
+[0;32mI (369) spi_flash: flash io: dio[0m
+[0;33mW (372) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (385) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (391) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (398) main_task: Started on CPU0[0m
+[0;32mI (408) main_task: Calling app_main()[0m
+[0;32mI (408) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (408) main: Device ID: device_0070[0m
+[0;32mI (428) main: NVS initialized[0m
+[0;32mI (428) main: ========================================[0m
+[0;32mI (428) main: DEVELOPMENT MODE: Clearing provisioning[0m
+[0;32mI (428) main: ========================================[0m
+[0;32mI (438) main: Clearing all provisioning data...[0m
+[0;32mI (438) main: ✓ All provisioning data cleared[0m
+[0;32mI (438) main: ✓ Device will start in AP mode[0m
+[0;32mI (448) main: ========================================[0m
+[0;32mI (448) main: Network interface initialized[0m
+[0;32mI (458) main: Event loop created[0m
+[0;32mI (458) main: Event handlers registered[0m
+[0;32mI (458) main: Application state machine started[0m
+[0;32mI (468) main: State: INIT[0m
+[0;32mI (468) main: State machine task started[0m
+[0;32mI (468) main: Application initialization complete[0m
+[0;32mI (478) main_task: Returned from app_main()[0m
+[0;32mI (568) main: State: CHECK_PROVISIONING[0m
+[0;32mI (568) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (668) main: State: AP_MODE[0m
+[0;32mI (668) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (668) pp: pp rom version: e7ae62f[0m
+[0;32mI (668) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (678) wifi:wifi driver task: 3fca66b0, prio:23, stack:6656, core=0[0m
+[0;32mI (678) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (678) wifi:wifi certification version: v7.0[0m
+[0;32mI (688) wifi:config NVS flash: enabled[0m
+[0;32mI (688) wifi:config nano formatting: disabled[0m
+[0;32mI (688) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (688) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (698) wifi:Init management short buffer num: 32[0m
+[0;32mI (698) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (708) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (708) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (718) wifi:Init static rx buffer num: 10[0m
+[0;32mI (718) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (718) wifi_init: rx ba win: 6[0m
+[0;32mI (728) wifi_init: accept mbox: 6[0m
+[0;32mI (728) wifi_init: tcpip mbox: 32[0m
+[0;32mI (728) wifi_init: udp mbox: 6[0m
+[0;32mI (728) wifi_init: tcp mbox: 6[0m
+[0;32mI (738) wifi_init: tcp tx win: 5760[0m
+[0;32mI (738) wifi_init: tcp rx win: 5760[0m
+[0;32mI (738) wifi_init: tcp mss: 1440[0m
+[0;32mI (748) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (748) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (758) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (798) wifi:mode : sta (80:b5:4e:c5:10:8c) + softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (798) wifi:enable tsf[0m
+[0;32mI (798) wifi:Total power save buffer number: 16[0m
+[0;32mI (798) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (808) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (808) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (808) wifi_prov: WiFi STA started[0m
+[0;32mI (818) wifi_prov: Performing initial WiFi scan (before clients connect)...[0m
+[0;32mI (818) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (828) wifi_prov: Performing WiFi scan...[0m
+[0;32mI (4138) wifi_prov: WiFi scan completed: 9 networks cached[0m
+[0;32mI (4138) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (4138) wifi_prov: HTTP server started[0m
+[0;32mI (4138) wifi_prov: ========================================[0m
+[0;32mI (4138) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (4148) wifi_prov: AP is stable - no background scanning[0m
+[0;32mI (4148) wifi_prov: /local-wifi returns cached results instantly[0m
+[0;32mI (4158) wifi_prov: Use /local-wifi?refresh=true to rescan[0m
+[0;32mI (4158) wifi_prov: ========================================[0m
+[0;32mI (4168) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (6278) main: State: AP_MODE[0m
+[0;33mW (6278) wifi_prov: Provisioning already active[0m
+[0;32mI (6278) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (8378) main: State: AP_MODE[0m
+[0;33mW (8378) wifi_prov: Provisioning already active[0m
+[0;32mI (8378) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (10478) main: State: AP_MODE[0m
+[0;33mW (10478) wifi_prov: Provisioning already active[0m
+[0;32mI (10478) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (578) main: State: CHECK_PROVISIONING[0m
+[0;32mI (578) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (678) main: State: AP_MODE[0m
+[0;32mI (678) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (678) pp: pp rom version: e7ae62f[0m
+[0;32mI (678) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (688) wifi:wifi driver task: 3fca66b0, prio:23, stack:6656, core=0[0m
+[0;32mI (688) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (688) wifi:wifi certification version: v7.0[0m
+[0;32mI (698) wifi:config NVS flash: enabled[0m
+[0;32mI (698) wifi:config nano formatting: disabled[0m
+[0;32mI (698) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (698) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (708) wifi:Init management short buffer num: 32[0m
+[0;32mI (708) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (718) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (718) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (728) wifi:Init static rx buffer num: 10[0m
+[0;32mI (728) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (728) wifi_init: rx ba win: 6[0m
+[0;32mI (738) wifi_init: accept mbox: 6[0m
+[0;32mI (738) wifi_init: tcpip mbox: 32[0m
+[0;32mI (738) wifi_init: udp mbox: 6[0m
+[0;32mI (738) wifi_init: tcp mbox: 6[0m
+[0;32mI (748) wifi_init: tcp tx win: 5760[0m
+[0;32mI (748) wifi_init: tcp rx win: 5760[0m
+[0;32mI (748) wifi_init: tcp mss: 1440[0m
+[0;32mI (758) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (758) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (768) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (808) wifi:mode : sta (80:b5:4e:c5:10:8c) + softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (808) wifi:enable tsf[0m
+[0;32mI (808) wifi:Total power save buffer number: 16[0m
+[0;32mI (808) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (818) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (818) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (818) wifi_prov: WiFi STA started[0m
+[0;32mI (828) wifi_prov: Performing initial WiFi scan (before clients connect)...[0m
+[0;32mI (828) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (838) wifi_prov: Performing WiFi scan...[0m
+[0;32mI (4148) wifi_prov: WiFi scan completed: 8 networks cached[0m
+[0;32mI (4148) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (4148) wifi_prov: HTTP server started[0m
+[0;32mI (4148) wifi_prov: ========================================[0m
+[0;32mI (4148) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (4158) wifi_prov: AP is stable - no background scanning[0m
+[0;32mI (4158) wifi_prov: /local-wifi returns cached results instantly[0m
+[0;32mI (4168) wifi_prov: Use /local-wifi?refresh=true to rescan[0m
+[0;32mI (4168) wifi_prov: ========================================[0m
+[0;32mI (4178) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (6288) main: State: AP_MODE[0m
+[0;33mW (6288) wifi_prov: Provisioning already active[0m
+[0;32mI (6288) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (8388) main: State: AP_MODE[0m
+[0;33mW (8388) wifi_prov: Provisioning already active[0m
+[0;32mI (8388) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (10488) main: State: AP_MODE[0m
+[0;33mW (10488) wifi_prov: Provisioning already active[0m
+[0;32mI (10488) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (12588) main: State: AP_MODE[0m
+[0;33mW (12588) wifi_prov: Provisioning already active[0m
+[0;32mI (12588) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (14688) main: State: AP_MODE[0m
+[0;33mW (14688) wifi_prov: Provisioning already active[0m
+[0;32mI (14688) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (16788) main: State: AP_MODE[0m
+[0;33mW (16788) wifi_prov: Provisioning already active[0m
+[0;32mI (16788) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (18888) main: State: AP_MODE[0m
+[0;33mW (18888) wifi_prov: Provisioning already active[0m
+[0;32mI (18888) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (20988) main: State: AP_MODE[0m
+[0;33mW (20988) wifi_prov: Provisioning already active[0m
+[0;32mI (20988) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (22958) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<0,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (22958) wifi:station: bc:c7:46:e3:d2:cb join, AID=1, bgn, 40U[0m
+[0;32mI (23078) wifi_prov: Station bc:c7:46:e3:d2:cb connected, AID=1[0m
+[0;32mI (23088) main: State: AP_MODE[0m
+[0;33mW (23088) wifi_prov: Provisioning already active[0m
+[0;32mI (23088) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (23088) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (23098) wifi_prov: AP assigned IP 192.168.4.2 to station[0m
+[0;32mI (23108) wifi:<ba-add>idx:2 (ifx:1, bc:c7:46:e3:d2:cb), tid:0, ssn:1, winSize:64[0m
+[0;32mI (25198) main: State: AP_MODE[0m
+[0;33mW (25198) wifi_prov: Provisioning already active[0m
+[0;32mI (25198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (26328) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (26328) wifi_prov: [0m
+[0;32mI (26328) wifi_prov: ========================================[0m
+[0;32mI (26328) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (26338) wifi_prov: ========================================[0m
+[0;32mI (26338) wifi_prov: Method: GET[0m
+[0;32mI (26348) wifi_prov: URI: /status[0m
+[0;32mI (26348) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (26348) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (26358) wifi_prov: Authorization: (not present)[0m
+[0;32mI (26358) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (26358) wifi_prov: ========================================[0m
+[0;32mI (26368) wifi_prov: [0m
+[0;32mI (26368) wifi_prov: [0m
+[0;32mI (26368) wifi_prov: ========================================[0m
+[0;32mI (26378) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (26378) wifi_prov: ========================================[0m
+[0;32mI (26388) wifi_prov: Method: GET[0m
+[0;32mI (26388) wifi_prov: URI: /status[0m
+[0;32mI (26388) wifi_prov: HTTP Status: 200[0m
+[0;32mI (26398) wifi_prov: Status Description: OK[0m
+[0;32mI (26398) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (26408) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (26408) wifi_prov: ========================================[0m
+[0;32mI (26418) wifi_prov: [0m
+[1;31mE (26558) wifi_prov: ========================================[0m
+[1;31mE (26558) wifi_prov: SCAN_HANDLER CALLED - /local-wifi REQUEST[0m
+[1;31mE (26558) wifi_prov: ========================================[0m
+[0;32mI (26558) wifi_prov: [0m
+[0;32mI (26568) wifi_prov: *** SCAN_HANDLER CALLED ***[0m
+[0;32mI (26568) wifi_prov: URI: /local-wifi[0m
+[0;32mI (26568) wifi_prov: Method: 1 (1=GET, 3=POST)[0m
+[0;32mI (26578) wifi_prov: [0m
+[0;32mI (26578) wifi_prov: ========================================[0m
+[0;32mI (26588) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (26588) wifi_prov: ========================================[0m
+[0;32mI (26598) wifi_prov: Method: GET[0m
+[0;32mI (26598) wifi_prov: URI: /local-wifi[0m
+[0;32mI (26598) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (26608) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (26608) wifi_prov: Authorization: (not present)[0m
+[0;32mI (26608) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (26618) wifi_prov: ========================================[0m
+[0;32mI (26618) wifi_prov: [0m
+[0;32mI (26628) wifi_prov: [0m
+[0;32mI (26628) wifi_prov: ========================================[0m
+[0;32mI (26628) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (26638) wifi_prov: ========================================[0m
+[0;32mI (26638) wifi_prov: Method: GET[0m
+[0;32mI (26648) wifi_prov: URI: /local-wifi[0m
+[0;32mI (26648) wifi_prov: HTTP Status: 200[0m
+[0;32mI (26648) wifi_prov: Status Description: OK[0m
+[0;32mI (26658) wifi_prov: Response Body Length: 731 bytes[0m
+[0;32mI (26658) wifi_prov: Response Body (first 500 chars): {[0m
+	"networks":	[{
+			"ssid":	"Statsnapp",
+			"rssi":	-54,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"JioFiber-2Qdq6",
+			"rssi":	-91,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108309178440",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108589498135",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"Yaswanth",
+			"rssi":	-92,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"vivo T2 5G",
+			"rssi":	-93,
+			"channel":	1...
+[0;32mI (26708) wifi_prov: Response Body (full): [See ESP_LOGD for full body][0m
+[0;32mI (26718) wifi_prov: ========================================[0m
+[0;32mI (26718) wifi_prov: [0m
+[0;32mI (26728) wifi_prov: Returned 8 networks (instant response)[0m
+[0;32mI (26778) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (26778) wifi_prov: [0m
+[0;32mI (26778) wifi_prov: ========================================[0m
+[0;32mI (26788) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (26788) wifi_prov: ========================================[0m
+[0;32mI (26798) wifi_prov: Method: GET[0m
+[0;32mI (26798) wifi_prov: URI: /status[0m
+[0;32mI (26798) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (26808) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (26808) wifi_prov: Authorization: (not present)[0m
+[0;32mI (26808) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (26818) wifi_prov: ========================================[0m
+[0;32mI (26818) wifi_prov: [0m
+[0;32mI (26828) wifi_prov: [0m
+[0;32mI (26828) wifi_prov: ========================================[0m
+[0;32mI (26828) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (26838) wifi_prov: ========================================[0m
+[0;32mI (26838) wifi_prov: Method: GET[0m
+[0;32mI (26848) wifi_prov: URI: /status[0m
+[0;32mI (26848) wifi_prov: HTTP Status: 200[0m
+[0;32mI (26848) wifi_prov: Status Description: OK[0m
+[0;32mI (26858) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (26858) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (26868) wifi_prov: ========================================[0m
+[0;32mI (26868) wifi_prov: [0m
+[0;32mI (27298) main: State: AP_MODE[0m
+[0;33mW (27298) wifi_prov: Provisioning already active[0m
+[0;32mI (27298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (29398) main: State: AP_MODE[0m
+[0;33mW (29398) wifi_prov: Provisioning already active[0m
+[0;32mI (29398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (31498) main: State: AP_MODE[0m
+[0;33mW (31498) wifi_prov: Provisioning already active[0m
+[0;32mI (31498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[1;31mE (33338) wifi_prov: ========================================[0m
+[1;31mE (33338) wifi_prov: SCAN_HANDLER CALLED - /local-wifi REQUEST[0m
+[1;31mE (33338) wifi_prov: ========================================[0m
+[0;32mI (33338) wifi_prov: [0m
+[0;32mI (33348) wifi_prov: *** SCAN_HANDLER CALLED ***[0m
+[0;32mI (33348) wifi_prov: URI: /local-wifi[0m
+[0;32mI (33348) wifi_prov: Method: 1 (1=GET, 3=POST)[0m
+[0;32mI (33358) wifi_prov: [0m
+[0;32mI (33358) wifi_prov: ========================================[0m
+[0;32mI (33358) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (33368) wifi_prov: ========================================[0m
+[0;32mI (33368) wifi_prov: Method: GET[0m
+[0;32mI (33378) wifi_prov: URI: /local-wifi[0m
+[0;32mI (33378) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (33388) wifi_prov: User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36[0m
+[0;32mI (33398) wifi_prov: Authorization: (not present)[0m
+[0;32mI (33398) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (33398) wifi_prov: ========================================[0m
+[0;32mI (33408) wifi_prov: [0m
+[0;32mI (33408) wifi_prov: [0m
+[0;32mI (33408) wifi_prov: ========================================[0m
+[0;32mI (33418) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (33418) wifi_prov: ========================================[0m
+[0;32mI (33428) wifi_prov: Method: GET[0m
+[0;32mI (33428) wifi_prov: URI: /local-wifi[0m
+[0;32mI (33438) wifi_prov: HTTP Status: 200[0m
+[0;32mI (33438) wifi_prov: Status Description: OK[0m
+[0;32mI (33438) wifi_prov: Response Body Length: 731 bytes[0m
+[0;32mI (33448) wifi_prov: Response Body (first 500 chars): {[0m
+	"networks":	[{
+			"ssid":	"Statsnapp",
+			"rssi":	-54,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"JioFiber-2Qdq6",
+			"rssi":	-91,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108309178440",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108589498135",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"Yaswanth",
+			"rssi":	-92,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"vivo T2 5G",
+			"rssi":	-93,
+			"channel":	1...
+[0;32mI (33498) wifi_prov: Response Body (full): [See ESP_LOGD for full body][0m
+[0;32mI (33508) wifi_prov: ========================================[0m
+[0;32mI (33508) wifi_prov: [0m
+[0;32mI (33508) wifi_prov: Returned 8 networks (instant response)[0m
+[0;32mI (33598) main: State: AP_MODE[0m
+[0;33mW (33598) wifi_prov: Provisioning already active[0m
+[0;32mI (33598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (35698) main: State: AP_MODE[0m
+[0;33mW (35698) wifi_prov: Provisioning already active[0m
+[0;32mI (35698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (36988) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (36988) wifi_prov: [0m
+[0;32mI (36988) wifi_prov: ========================================[0m
+[0;32mI (36988) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (36988) wifi_prov: ========================================[0m
+[0;32mI (36998) wifi_prov: Method: GET[0m
+[0;32mI (36998) wifi_prov: URI: /status[0m
+[0;32mI (37008) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (37008) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (37008) wifi_prov: Authorization: (not present)[0m
+[0;32mI (37018) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (37018) wifi_prov: ========================================[0m
+[0;32mI (37028) wifi_prov: [0m
+[0;32mI (37028) wifi_prov: [0m
+[0;32mI (37028) wifi_prov: ========================================[0m
+[0;32mI (37038) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (37038) wifi_prov: ========================================[0m
+[0;32mI (37048) wifi_prov: Method: GET[0m
+[0;32mI (37048) wifi_prov: URI: /status[0m
+[0;32mI (37048) wifi_prov: HTTP Status: 200[0m
+[0;32mI (37058) wifi_prov: Status Description: OK[0m
+[0;32mI (37058) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (37058) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (37068) wifi_prov: ========================================[0m
+[0;32mI (37078) wifi_prov: [0m
+[0;32mI (37798) main: State: AP_MODE[0m
+[0;33mW (37798) wifi_prov: Provisioning already active[0m
+[0;32mI (37798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (39898) main: State: AP_MODE[0m
+[0;33mW (39898) wifi_prov: Provisioning already active[0m
+[0;32mI (39898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (41998) main: State: AP_MODE[0m
+[0;33mW (41998) wifi_prov: Provisioning already active[0m
+[0;32mI (41998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (44098) main: State: AP_MODE[0m
+[0;33mW (44098) wifi_prov: Provisioning already active[0m
+[0;32mI (44098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (46198) main: State: AP_MODE[0m
+[0;33mW (46198) wifi_prov: Provisioning already active[0m
+[0;32mI (46198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (47258) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (47258) wifi_prov: [0m
+[0;32mI (47258) wifi_prov: ========================================[0m
+[0;32mI (47258) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (47268) wifi_prov: ========================================[0m
+[0;32mI (47268) wifi_prov: Method: GET[0m
+[0;32mI (47268) wifi_prov: URI: /status[0m
+[0;32mI (47278) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (47278) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (47288) wifi_prov: Authorization: (not present)[0m
+[0;32mI (47288) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (47288) wifi_prov: ========================================[0m
+[0;32mI (47298) wifi_prov: [0m
+[0;32mI (47298) wifi_prov: [0m
+[0;32mI (47298) wifi_prov: ========================================[0m
+[0;32mI (47308) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (47308) wifi_prov: ========================================[0m
+[0;32mI (47318) wifi_prov: Method: GET[0m
+[0;32mI (47318) wifi_prov: URI: /status[0m
+[0;32mI (47318) wifi_prov: HTTP Status: 200[0m
+[0;32mI (47328) wifi_prov: Status Description: OK[0m
+[0;32mI (47328) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (47338) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (47338) wifi_prov: ========================================[0m
+[0;32mI (47348) wifi_prov: [0m
+[0;32mI (48298) main: State: AP_MODE[0m
+[0;33mW (48298) wifi_prov: Provisioning already active[0m
+[0;32mI (48298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (50398) main: State: AP_MODE[0m
+[0;33mW (50398) wifi_prov: Provisioning already active[0m
+[0;32mI (50398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;33mW (52028) httpd_uri: httpd_uri: URI '/' not found[0m
+[0;33mW (52028) httpd_txrx: httpd_resp_send_err: 404 Not Found - Nothing matches the given URI[0m
+[0;33mW (52048) httpd_uri: httpd_uri: URI '/' not found[0m
+[0;33mW (52048) httpd_txrx: httpd_resp_send_err: 404 Not Found - Nothing matches the given URI[0m
+[0;32mI (52498) main: State: AP_MODE[0m
+[0;33mW (52498) wifi_prov: Provisioning already active[0m
+[0;32mI (52498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (54598) main: State: AP_MODE[0m
+[0;33mW (54598) wifi_prov: Provisioning already active[0m
+[0;32mI (54598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (56698) main: State: AP_MODE[0m
+[0;33mW (56698) wifi_prov: Provisioning already active[0m
+[0;32mI (56698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (57448) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (57448) wifi_prov: [0m
+[0;32mI (57448) wifi_prov: ========================================[0m
+[0;32mI (57448) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (57458) wifi_prov: ========================================[0m
+[0;32mI (57458) wifi_prov: Method: GET[0m
+[0;32mI (57468) wifi_prov: URI: /status[0m
+[0;32mI (57468) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (57468) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (57478) wifi_prov: Authorization: (not present)[0m
+[0;32mI (57478) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (57488) wifi_prov: ========================================[0m
+[0;32mI (57488) wifi_prov: [0m
+[0;32mI (57488) wifi_prov: [0m
+[0;32mI (57498) wifi_prov: ========================================[0m
+[0;32mI (57498) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (57508) wifi_prov: ========================================[0m
+[0;32mI (57508) wifi_prov: Method: GET[0m
+[0;32mI (57508) wifi_prov: URI: /status[0m
+[0;32mI (57518) wifi_prov: HTTP Status: 200[0m
+[0;32mI (57518) wifi_prov: Status Description: OK[0m
+[0;32mI (57518) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (57528) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (57538) wifi_prov: ========================================[0m
+[0;32mI (57538) wifi_prov: [0m
+[0;32mI (58798) main: State: AP_MODE[0m
+[0;33mW (58798) wifi_prov: Provisioning already active[0m
+[0;32mI (58798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (60898) main: State: AP_MODE[0m
+[0;33mW (60898) wifi_prov: Provisioning already active[0m
+[0;32mI (60898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[1;31mE (61578) wifi_prov: ========================================[0m
+[1;31mE (61578) wifi_prov: SCAN_HANDLER CALLED - /local-wifi REQUEST[0m
+[1;31mE (61578) wifi_prov: ========================================[0m
+[0;32mI (61578) wifi_prov: [0m
+[0;32mI (61588) wifi_prov: *** SCAN_HANDLER CALLED ***[0m
+[0;32mI (61588) wifi_prov: URI: /local-wifi[0m
+[0;32mI (61588) wifi_prov: Method: 1 (1=GET, 3=POST)[0m
+[0;32mI (61598) wifi_prov: [0m
+[0;32mI (61598) wifi_prov: ========================================[0m
+[0;32mI (61608) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (61608) wifi_prov: ========================================[0m
+[0;32mI (61618) wifi_prov: Method: GET[0m
+[0;32mI (61618) wifi_prov: URI: /local-wifi[0m
+[0;32mI (61618) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (61628) wifi_prov: User-Agent: node[0m
+[0;32mI (61628) wifi_prov: Authorization: (not present)[0m
+[0;32mI (61628) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (61638) wifi_prov: ========================================[0m
+[0;32mI (61638) wifi_prov: [0m
+[0;32mI (61648) wifi_prov: [0m
+[0;32mI (61648) wifi_prov: ========================================[0m
+[0;32mI (61648) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (61658) wifi_prov: ========================================[0m
+[0;32mI (61658) wifi_prov: Method: GET[0m
+[0;32mI (61668) wifi_prov: URI: /local-wifi[0m
+[0;32mI (61668) wifi_prov: HTTP Status: 200[0m
+[0;32mI (61668) wifi_prov: Status Description: OK[0m
+[0;32mI (61678) wifi_prov: Response Body Length: 731 bytes[0m
+[0;32mI (61678) wifi_prov: Response Body (first 500 chars): {[0m
+	"networks":	[{
+			"ssid":	"Statsnapp",
+			"rssi":	-54,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"JioFiber-2Qdq6",
+			"rssi":	-91,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108309178440",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108589498135",
+			"rssi":	-92,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"Yaswanth",
+			"rssi":	-92,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"vivo T2 5G",
+			"rssi":	-93,
+			"channel":	1...
+[0;32mI (61728) wifi_prov: Response Body (full): [See ESP_LOGD for full body][0m
+[0;32mI (61738) wifi_prov: ========================================[0m
+[0;32mI (61738) wifi_prov: [0m
+[0;32mI (61748) wifi_prov: Returned 8 networks (instant response)[0m
+[0;32mI (62998) main: State: AP_MODE[0m
+[0;33mW (62998) wifi_prov: Provisioning already active[0m
+[0;32mI (62998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (65098) main: State: AP_MODE[0m
+[0;33mW (65098) wifi_prov: Provisioning already active[0m
+[0;32mI (65098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (67198) main: State: AP_MODE[0m
+[0;33mW (67198) wifi_prov: Provisioning already active[0m
+[0;32mI (67198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (67588) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (67588) wifi_prov: [0m
+[0;32mI (67588) wifi_prov: ========================================[0m
+[0;32mI (67588) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (67598) wifi_prov: ========================================[0m
+[0;32mI (67598) wifi_prov: Method: GET[0m
+[0;32mI (67608) wifi_prov: URI: /status[0m
+[0;32mI (67608) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (67608) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (67618) wifi_prov: Authorization: (not present)[0m
+[0;32mI (67618) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (67618) wifi_prov: ========================================[0m
+[0;32mI (67628) wifi_prov: [0m
+[0;32mI (67628) wifi_prov: [0m
+[0;32mI (67628) wifi_prov: ========================================[0m
+[0;32mI (67638) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (67638) wifi_prov: ========================================[0m
+[0;32mI (67648) wifi_prov: Method: GET[0m
+[0;32mI (67648) wifi_prov: URI: /status[0m
+[0;32mI (67648) wifi_prov: HTTP Status: 200[0m
+[0;32mI (67658) wifi_prov: Status Description: OK[0m
+[0;32mI (67658) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (67668) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (67668) wifi_prov: ========================================[0m
+[0;32mI (67678) wifi_prov: [0m
+[0;32mI (69298) main: State: AP_MODE[0m
+[0;33mW (69298) wifi_prov: Provisioning already active[0m
+[0;32mI (69298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (71398) main: State: AP_MODE[0m
+[0;33mW (71398) wifi_prov: Provisioning already active[0m
+[0;32mI (71398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;33mW (71628) httpd_uri: httpd_uri: Method '6' not allowed for URI '/provision'[0m
+[0;33mW (71628) httpd_txrx: httpd_resp_send_err: 405 Method Not Allowed - Specified method is invalid for this resource[0m
+[0;32mI (73498) main: State: AP_MODE[0m
+[0;33mW (73498) wifi_prov: Provisioning already active[0m
+[0;32mI (73498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (75598) main: State: AP_MODE[0m
+[0;33mW (75598) wifi_prov: Provisioning already active[0m
+[0;32mI (75598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (77698) main: State: AP_MODE[0m
+[0;33mW (77698) wifi_prov: Provisioning already active[0m
+[0;32mI (77698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (77718) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (77718) wifi_prov: [0m
+[0;32mI (77718) wifi_prov: ========================================[0m
+[0;32mI (77718) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (77728) wifi_prov: ========================================[0m
+[0;32mI (77728) wifi_prov: Method: GET[0m
+[0;32mI (77738) wifi_prov: URI: /status[0m
+[0;32mI (77738) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (77738) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (77748) wifi_prov: Authorization: (not present)[0m
+[0;32mI (77748) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (77758) wifi_prov: ========================================[0m
+[0;32mI (77758) wifi_prov: [0m
+[0;32mI (77758) wifi_prov: [0m
+[0;32mI (77758) wifi_prov: ========================================[0m
+[0;32mI (77768) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (77768) wifi_prov: ========================================[0m
+[0;32mI (77778) wifi_prov: Method: GET[0m
+[0;32mI (77778) wifi_prov: URI: /status[0m
+[0;32mI (77788) wifi_prov: HTTP Status: 200[0m
+[0;32mI (77788) wifi_prov: Status Description: OK[0m
+[0;32mI (77788) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (77798) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (77808) wifi_prov: ========================================[0m
+[0;32mI (77808) wifi_prov: [0m
+[0;32mI (79798) main: State: AP_MODE[0m
+[0;33mW (79798) wifi_prov: Provisioning already active[0m
+[0;32mI (79798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (81898) main: State: AP_MODE[0m
+[0;33mW (81898) wifi_prov: Provisioning already active[0m
+[0;32mI (81898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (83998) main: State: AP_MODE[0m
+[0;33mW (83998) wifi_prov: Provisioning already active[0m
+[0;32mI (83998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (86098) main: State: AP_MODE[0m
+[0;33mW (86098) wifi_prov: Provisioning already active[0m
+[0;32mI (86098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (87968) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (87968) wifi_prov: [0m
+[0;32mI (87978) wifi_prov: ========================================[0m
+[0;32mI (87978) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (87978) wifi_prov: ========================================[0m
+[0;32mI (87988) wifi_prov: Method: GET[0m
+[0;32mI (87988) wifi_prov: URI: /status[0m
+[0;32mI (87988) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (87998) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (87998) wifi_prov: Authorization: (not present)[0m
+[0;32mI (88008) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (88008) wifi_prov: ========================================[0m
+[0;32mI (88008) wifi_prov: [0m
+[0;32mI (88018) wifi_prov: [0m
+[0;32mI (88018) wifi_prov: ========================================[0m
+[0;32mI (88018) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (88028) wifi_prov: ========================================[0m
+[0;32mI (88028) wifi_prov: Method: GET[0m
+[0;32mI (88038) wifi_prov: URI: /status[0m
+[0;32mI (88038) wifi_prov: HTTP Status: 200[0m
+[0;32mI (88038) wifi_prov: Status Description: OK[0m
+[0;32mI (88048) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (88048) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (88058) wifi_prov: ========================================[0m
+[0;32mI (88068) wifi_prov: [0m
+[0;32mI (88198) main: State: AP_MODE[0m
+[0;33mW (88198) wifi_prov: Provisioning already active[0m
+[0;32mI (88198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (90298) main: State: AP_MODE[0m
+[0;33mW (90298) wifi_prov: Provisioning already active[0m
+[0;32mI (90298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (92398) main: State: AP_MODE[0m
+[0;33mW (92398) wifi_prov: Provisioning already active[0m
+[0;32mI (92398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (94498) main: State: AP_MODE[0m
+[0;33mW (94498) wifi_prov: Provisioning already active[0m
+[0;32mI (94498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (96598) main: State: AP_MODE[0m
+[0;33mW (96598) wifi_prov: Provisioning already active[0m
+[0;32mI (96598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (98218) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (98218) wifi_prov: [0m
+[0;32mI (98218) wifi_prov: ========================================[0m
+[0;32mI (98218) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (98228) wifi_prov: ========================================[0m
+[0;32mI (98228) wifi_prov: Method: GET[0m
+[0;32mI (98228) wifi_prov: URI: /status[0m
+[0;32mI (98238) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (98238) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (98248) wifi_prov: Authorization: (not present)[0m
+[0;32mI (98248) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (98248) wifi_prov: ========================================[0m
+[0;32mI (98258) wifi_prov: [0m
+[0;32mI (98258) wifi_prov: [0m
+[0;32mI (98258) wifi_prov: ========================================[0m
+[0;32mI (98268) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (98268) wifi_prov: ========================================[0m
+[0;32mI (98278) wifi_prov: Method: GET[0m
+[0;32mI (98278) wifi_prov: URI: /status[0m
+[0;32mI (98278) wifi_prov: HTTP Status: 200[0m
+[0;32mI (98288) wifi_prov: Status Description: OK[0m
+[0;32mI (98288) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (98298) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (98298) wifi_prov: ========================================[0m
+[0;32mI (98308) wifi_prov: [0m
+[0;32mI (98698) main: State: AP_MODE[0m
+[0;33mW (98698) wifi_prov: Provisioning already active[0m
+[0;32mI (98698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (100798) main: State: AP_MODE[0m
+[0;33mW (100798) wifi_prov: Provisioning already active[0m
+[0;32mI (100798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (102898) main: State: AP_MODE[0m
+[0;33mW (102898) wifi_prov: Provisioning already active[0m
+[0;32mI (102898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (104998) main: State: AP_MODE[0m
+[0;33mW (104998) wifi_prov: Provisioning already active[0m
+[0;32mI (104998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (107098) main: State: AP_MODE[0m
+[0;33mW (107098) wifi_prov: Provisioning already active[0m
+[0;32mI (107098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (108438) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (108448) wifi_prov: [0m
+[0;32mI (108448) wifi_prov: ========================================[0m
+[0;32mI (108448) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (108448) wifi_prov: ========================================[0m
+[0;32mI (108458) wifi_prov: Method: GET[0m
+[0;32mI (108458) wifi_prov: URI: /status[0m
+[0;32mI (108458) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (108468) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (108468) wifi_prov: Authorization: (not present)[0m
+[0;32mI (108478) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (108478) wifi_prov: ========================================[0m
+[0;32mI (108488) wifi_prov: [0m
+[0;32mI (108488) wifi_prov: [0m
+[0;32mI (108488) wifi_prov: ========================================[0m
+[0;32mI (108498) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (108498) wifi_prov: ========================================[0m
+[0;32mI (108508) wifi_prov: Method: GET[0m
+[0;32mI (108508) wifi_prov: URI: /status[0m
+[0;32mI (108508) wifi_prov: HTTP Status: 200[0m
+[0;32mI (108518) wifi_prov: Status Description: OK[0m
+[0;32mI (108518) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (108518) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (108528) wifi_prov: ========================================[0m
+[0;32mI (108538) wifi_prov: [0m
+[0;32mI (109198) main: State: AP_MODE[0m
+[0;33mW (109198) wifi_prov: Provisioning already active[0m
+[0;32mI (109198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (111298) main: State: AP_MODE[0m
+[0;33mW (111298) wifi_prov: Provisioning already active[0m
+[0;32mI (111298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (113398) main: State: AP_MODE[0m
+[0;33mW (113398) wifi_prov: Provisioning already active[0m
+[0;32mI (113398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (115498) main: State: AP_MODE[0m
+[0;33mW (115498) wifi_prov: Provisioning already active[0m
+[0;32mI (115498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (117598) main: State: AP_MODE[0m
+[0;33mW (117598) wifi_prov: Provisioning already active[0m
+[0;32mI (117598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (118688) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (118688) wifi_prov: [0m
+[0;32mI (118688) wifi_prov: ========================================[0m
+[0;32mI (118688) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (118698) wifi_prov: ========================================[0m
+[0;32mI (118698) wifi_prov: Method: GET[0m
+[0;32mI (118708) wifi_prov: URI: /status[0m
+[0;32mI (118708) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (118708) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (118718) wifi_prov: Authorization: (not present)[0m
+[0;32mI (118718) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (118728) wifi_prov: ========================================[0m
+[0;32mI (118728) wifi_prov: [0m
+[0;32mI (118728) wifi_prov: [0m
+[0;32mI (118738) wifi_prov: ========================================[0m
+[0;32mI (118738) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (118748) wifi_prov: ========================================[0m
+[0;32mI (118748) wifi_prov: Method: GET[0m
+[0;32mI (118748) wifi_prov: URI: /status[0m
+[0;32mI (118758) wifi_prov: HTTP Status: 200[0m
+[0;32mI (118758) wifi_prov: Status Description: OK[0m
+[0;32mI (118768) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (118768) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (118778) wifi_prov: ========================================[0m
+[0;32mI (118778) wifi_prov: [0m
+[0;32mI (119698) main: State: AP_MODE[0m
+[0;33mW (119698) wifi_prov: Provisioning already active[0m
+[0;32mI (119698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (121798) main: State: AP_MODE[0m
+[0;33mW (121798) wifi_prov: Provisioning already active[0m
+[0;32mI (121798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (123898) main: State: AP_MODE[0m
+[0;33mW (123898) wifi_prov: Provisioning already active[0m
+[0;32mI (123898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (125998) main: State: AP_MODE[0m
+[0;33mW (125998) wifi_prov: Provisioning already active[0m
+[0;32mI (125998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (128098) main: State: AP_MODE[0m
+[0;33mW (128098) wifi_prov: Provisioning already active[0m
+[0;32mI (128098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (128878) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (128878) wifi_prov: [0m
+[0;32mI (128878) wifi_prov: ========================================[0m
+[0;32mI (128888) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (128888) wifi_prov: ========================================[0m
+[0;32mI (128898) wifi_prov: Method: GET[0m
+[0;32mI (128898) wifi_prov: URI: /status[0m
+[0;32mI (128898) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (128908) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (128908) wifi_prov: Authorization: (not present)[0m
+[0;32mI (128918) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (128918) wifi_prov: ========================================[0m
+[0;32mI (128928) wifi_prov: [0m
+[0;32mI (128928) wifi_prov: [0m
+[0;32mI (128928) wifi_prov: ========================================[0m
+[0;32mI (128938) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (128938) wifi_prov: ========================================[0m
+[0;32mI (128948) wifi_prov: Method: GET[0m
+[0;32mI (128948) wifi_prov: URI: /status[0m
+[0;32mI (128948) wifi_prov: HTTP Status: 200[0m
+[0;32mI (128948) wifi_prov: Status Description: OK[0m
+[0;32mI (128958) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (128958) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (128968) wifi_prov: ========================================[0m
+[0;32mI (128978) wifi_prov: [0m
+[0;32mI (130198) main: State: AP_MODE[0m
+[0;33mW (130198) wifi_prov: Provisioning already active[0m
+[0;32mI (130198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (132298) main: State: AP_MODE[0m
+[0;33mW (132298) wifi_prov: Provisioning already active[0m
+[0;32mI (132298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (134398) main: State: AP_MODE[0m
+[0;33mW (134398) wifi_prov: Provisioning already active[0m
+[0;32mI (134398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (136498) main: State: AP_MODE[0m
+[0;33mW (136498) wifi_prov: Provisioning already active[0m
+[0;32mI (136498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (138598) main: State: AP_MODE[0m
+[0;33mW (138598) wifi_prov: Provisioning already active[0m
+[0;32mI (138598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (139178) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (139178) wifi_prov: [0m
+[0;32mI (139178) wifi_prov: ========================================[0m
+[0;32mI (139178) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (139178) wifi_prov: ========================================[0m
+[0;32mI (139188) wifi_prov: Method: GET[0m
+[0;32mI (139188) wifi_prov: URI: /status[0m
+[0;32mI (139198) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (139198) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (139198) wifi_prov: Authorization: (not present)[0m
+[0;32mI (139208) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (139208) wifi_prov: ========================================[0m
+[0;32mI (139218) wifi_prov: [0m
+[0;32mI (139218) wifi_prov: [0m
+[0;32mI (139218) wifi_prov: ========================================[0m
+[0;32mI (139228) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (139228) wifi_prov: ========================================[0m
+[0;32mI (139238) wifi_prov: Method: GET[0m
+[0;32mI (139238) wifi_prov: URI: /status[0m
+[0;32mI (139238) wifi_prov: HTTP Status: 200[0m
+[0;32mI (139248) wifi_prov: Status Description: OK[0m
+[0;32mI (139248) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (139258) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (139258) wifi_prov: ========================================[0m
+[0;32mI (139268) wifi_prov: [0m
+[0;32mI (140698) main: State: AP_MODE[0m
+[0;33mW (140698) wifi_prov: Provisioning already active[0m
+[0;32mI (140698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (142798) main: State: AP_MODE[0m
+[0;33mW (142798) wifi_prov: Provisioning already active[0m
+[0;32mI (142798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (144898) main: State: AP_MODE[0m
+[0;33mW (144898) wifi_prov: Provisioning already active[0m
+[0;32mI (144898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (146998) main: State: AP_MODE[0m
+[0;33mW (146998) wifi_prov: Provisioning already active[0m
+[0;32mI (146998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (149098) main: State: AP_MODE[0m
+[0;33mW (149098) wifi_prov: Provisioning already active[0m
+[0;32mI (149098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (149408) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (149408) wifi_prov: [0m
+[0;32mI (149408) wifi_prov: ========================================[0m
+[0;32mI (149418) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (149418) wifi_prov: ========================================[0m
+[0;32mI (149428) wifi_prov: Method: GET[0m
+[0;32mI (149428) wifi_prov: URI: /status[0m
+[0;32mI (149428) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (149438) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (149438) wifi_prov: Authorization: (not present)[0m
+[0;32mI (149448) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (149448) wifi_prov: ========================================[0m
+[0;32mI (149448) wifi_prov: [0m
+[0;32mI (149458) wifi_prov: [0m
+[0;32mI (149458) wifi_prov: ========================================[0m
+[0;32mI (149458) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (149468) wifi_prov: ========================================[0m
+[0;32mI (149468) wifi_prov: Method: GET[0m
+[0;32mI (149478) wifi_prov: URI: /status[0m
+[0;32mI (149478) wifi_prov: HTTP Status: 200[0m
+[0;32mI (149478) wifi_prov: Status Description: OK[0m
+[0;32mI (149488) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (149488) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (149498) wifi_prov: ========================================[0m
+[0;32mI (149508) wifi_prov: [0m
+[0;32mI (151198) main: State: AP_MODE[0m
+[0;33mW (151198) wifi_prov: Provisioning already active[0m
+[0;32mI (151198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (153298) main: State: AP_MODE[0m
+[0;33mW (153298) wifi_prov: Provisioning already active[0m
+[0;32mI (153298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (155398) main: State: AP_MODE[0m
+[0;33mW (155398) wifi_prov: Provisioning already active[0m
+[0;32mI (155398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (157498) main: State: AP_MODE[0m
+[0;33mW (157498) wifi_prov: Provisioning already active[0m
+[0;32mI (157498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (159598) main: State: AP_MODE[0m
+[0;33mW (159598) wifi_prov: Provisioning already active[0m
+[0;32mI (159598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (159638) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (159638) wifi_prov: [0m
+[0;32mI (159638) wifi_prov: ========================================[0m
+[0;32mI (159648) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (159648) wifi_prov: ========================================[0m
+[0;32mI (159658) wifi_prov: Method: GET[0m
+[0;32mI (159658) wifi_prov: URI: /status[0m
+[0;32mI (159658) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (159668) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (159668) wifi_prov: Authorization: (not present)[0m
+[0;32mI (159678) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (159678) wifi_prov: ========================================[0m
+[0;32mI (159678) wifi_prov: [0m
+[0;32mI (159688) wifi_prov: [0m
+[0;32mI (159688) wifi_prov: ========================================[0m
+[0;32mI (159688) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (159698) wifi_prov: ========================================[0m
+[0;32mI (159698) wifi_prov: Method: GET[0m
+[0;32mI (159708) wifi_prov: URI: /status[0m
+[0;32mI (159708) wifi_prov: HTTP Status: 200[0m
+[0;32mI (159708) wifi_prov: Status Description: OK[0m
+[0;32mI (159718) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (159718) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (159728) wifi_prov: ========================================[0m
+[0;32mI (159738) wifi_prov: [0m
+[0;32mI (161698) main: State: AP_MODE[0m
+[0;33mW (161698) wifi_prov: Provisioning already active[0m
+[0;32mI (161698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (163798) main: State: AP_MODE[0m
+[0;33mW (163798) wifi_prov: Provisioning already active[0m
+[0;32mI (163798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (165898) main: State: AP_MODE[0m
+[0;33mW (165898) wifi_prov: Provisioning already active[0m
+[0;32mI (165898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (167998) main: State: AP_MODE[0m
+[0;33mW (167998) wifi_prov: Provisioning already active[0m
+[0;32mI (167998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (169788) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (169788) wifi_prov: [0m
+[0;32mI (169788) wifi_prov: ========================================[0m
+[0;32mI (169788) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (169788) wifi_prov: ========================================[0m
+[0;32mI (169798) wifi_prov: Method: GET[0m
+[0;32mI (169798) wifi_prov: URI: /status[0m
+[0;32mI (169798) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (169808) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (169808) wifi_prov: Authorization: (not present)[0m
+[0;32mI (169818) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (169818) wifi_prov: ========================================[0m
+[0;32mI (169828) wifi_prov: [0m
+[0;32mI (169828) wifi_prov: [0m
+[0;32mI (169828) wifi_prov: ========================================[0m
+[0;32mI (169838) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (169838) wifi_prov: ========================================[0m
+[0;32mI (169848) wifi_prov: Method: GET[0m
+[0;32mI (169848) wifi_prov: URI: /status[0m
+[0;32mI (169848) wifi_prov: HTTP Status: 200[0m
+[0;32mI (169858) wifi_prov: Status Description: OK[0m
+[0;32mI (169858) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (169858) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (169868) wifi_prov: ========================================[0m
+[0;32mI (169878) wifi_prov: [0m
+[0;32mI (170098) main: State: AP_MODE[0m
+[0;33mW (170098) wifi_prov: Provisioning already active[0m
+[0;32mI (170098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (172198) main: State: AP_MODE[0m
+[0;33mW (172198) wifi_prov: Provisioning already active[0m
+[0;32mI (172198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (174298) main: State: AP_MODE[0m
+[0;33mW (174298) wifi_prov: Provisioning already active[0m
+[0;32mI (174298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (176398) main: State: AP_MODE[0m
+[0;33mW (176398) wifi_prov: Provisioning already active[0m
+[0;32mI (176398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (178498) main: State: AP_MODE[0m
+[0;33mW (178498) wifi_prov: Provisioning already active[0m
+[0;32mI (178498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (180028) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (180028) wifi_prov: [0m
+[0;32mI (180028) wifi_prov: ========================================[0m
+[0;32mI (180028) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (180038) wifi_prov: ========================================[0m
+[0;32mI (180038) wifi_prov: Method: GET[0m
+[0;32mI (180038) wifi_prov: URI: /status[0m
+[0;32mI (180048) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (180048) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (180058) wifi_prov: Authorization: (not present)[0m
+[0;32mI (180058) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (180058) wifi_prov: ========================================[0m
+[0;32mI (180068) wifi_prov: [0m
+[0;32mI (180068) wifi_prov: [0m
+[0;32mI (180068) wifi_prov: ========================================[0m
+[0;32mI (180078) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (180078) wifi_prov: ========================================[0m
+[0;32mI (180088) wifi_prov: Method: GET[0m
+[0;32mI (180088) wifi_prov: URI: /status[0m
+[0;32mI (180098) wifi_prov: HTTP Status: 200[0m
+[0;32mI (180098) wifi_prov: Status Description: OK[0m
+[0;32mI (180098) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (180108) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (180118) wifi_prov: ========================================[0m
+[0;32mI (180118) wifi_prov: [0m
+[0;32mI (180598) main: State: AP_MODE[0m
+[0;33mW (180598) wifi_prov: Provisioning already active[0m
+[0;32mI (180598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (182698) main: State: AP_MODE[0m
+[0;33mW (182698) wifi_prov: Provisioning already active[0m
+[0;32mI (182698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (184798) main: State: AP_MODE[0m
+[0;33mW (184798) wifi_prov: Provisioning already active[0m
+[0;32mI (184798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (186898) main: State: AP_MODE[0m
+[0;33mW (186898) wifi_prov: Provisioning already active[0m
+[0;32mI (186898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (188998) main: State: AP_MODE[0m
+[0;33mW (188998) wifi_prov: Provisioning already active[0m
+[0;32mI (188998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (190268) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (190268) wifi_prov: [0m
+[0;32mI (190268) wifi_prov: ========================================[0m
+[0;32mI (190268) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (190278) wifi_prov: ========================================[0m
+[0;32mI (190278) wifi_prov: Method: GET[0m
+[0;32mI (190278) wifi_prov: URI: /status[0m
+[0;32mI (190288) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (190288) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (190298) wifi_prov: Authorization: (not present)[0m
+[0;32mI (190298) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (190298) wifi_prov: ========================================[0m
+[0;32mI (190308) wifi_prov: [0m
+[0;32mI (190308) wifi_prov: [0m
+[0;32mI (190308) wifi_prov: ========================================[0m
+[0;32mI (190318) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (190318) wifi_prov: ========================================[0m
+[0;32mI (190328) wifi_prov: Method: GET[0m
+[0;32mI (190328) wifi_prov: URI: /status[0m
+[0;32mI (190338) wifi_prov: HTTP Status: 200[0m
+[0;32mI (190338) wifi_prov: Status Description: OK[0m
+[0;32mI (190338) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (190348) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (190358) wifi_prov: ========================================[0m
+[0;32mI (190358) wifi_prov: [0m
+[0;32mI (191098) main: State: AP_MODE[0m
+[0;33mW (191098) wifi_prov: Provisioning already active[0m
+[0;32mI (191098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (193198) main: State: AP_MODE[0m
+[0;33mW (193198) wifi_prov: Provisioning already active[0m
+[0;32mI (193198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (195298) main: State: AP_MODE[0m
+[0;33mW (195298) wifi_prov: Provisioning already active[0m
+[0;32mI (195298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (197398) main: State: AP_MODE[0m
+[0;33mW (197398) wifi_prov: Provisioning already active[0m
+[0;32mI (197398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (199498) main: State: AP_MODE[0m
+[0;33mW (199498) wifi_prov: Provisioning already active[0m
+[0;32mI (199498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (200398) wifi_prov: [STATUS_HANDLER] Request received for URI: /status[0m
+[0;32mI (200398) wifi_prov: [0m
+[0;32mI (200398) wifi_prov: ========================================[0m
+[0;32mI (200398) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (200408) wifi_prov: ========================================[0m
+[0;32mI (200408) wifi_prov: Method: GET[0m
+[0;32mI (200418) wifi_prov: URI: /status[0m
+[0;32mI (200418) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (200418) wifi_prov: User-Agent: curl/8.5.0[0m
+[0;32mI (200428) wifi_prov: Authorization: (not present)[0m
+[0;32mI (200428) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (200438) wifi_prov: ========================================[0m
+[0;32mI (200438) wifi_prov: [0m
+[0;32mI (200438) wifi_prov: [0m
+[0;32mI (200448) wifi_prov: ========================================[0m
+[0;32mI (200448) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (200458) wifi_prov: ========================================[0m
+[0;32mI (200458) wifi_prov: Method: GET[0m
+[0;32mI (200458) wifi_prov: URI: /status[0m
+[0;32mI (200468) wifi_prov: HTTP Status: 200[0m
+[0;32mI (200468) wifi_prov: Status Description: OK[0m
+[0;32mI (200468) wifi_prov: Response Body Length: 51 bytes[0m
+[0;32mI (200478) wifi_prov: Response Body: {[0m
+	"status":	"provisioning",
+	"ip":	"192.168.4.1"
+}
+[0;32mI (200488) wifi_prov: ========================================[0m
+[0;32mI (200488) wifi_prov: [0m
+[0;32mI (201598) main: State: AP_MODE[0m
+[0;33mW (201598) wifi_prov: Provisioning already active[0m
+[0;32mI (201598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (203698) main: State: AP_MODE[0m
+[0;33mW (203698) wifi_prov: Provisioning already active[0m
+[0;32mI (203698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (205798) main: State: AP_MODE[0m
+[0;33mW (205798) wifi_prov: Provisioning already active[0m
+[0;32mI (205798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (207898) main: State: AP_MODE[0m
+[0;33mW (207898) wifi_prov: Provisioning already active[0m
+[0;32mI (207898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (209998) main: State: AP_MODE[0m
+[0;33mW (209998) wifi_prov: Provisioning already active[0m
+[0;32mI (209998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (212098) main: State: AP_MODE[0m
+[0;33mW (212098) wifi_prov: Provisioning already active[0m
+[0;32mI (212098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (214198) main: State: AP_MODE[0m
+[0;33mW (214198) wifi_prov: Provisioning already active[0m
+[0;32mI (214198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (216298) main: State: AP_MODE[0m
+[0;33mW (216298) wifi_prov: Provisioning already active[0m
+[0;32mI (216298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (218398) main: State: AP_MODE[0m
+[0;33mW (218398) wifi_prov: Provisioning already active[0m
+[0;32mI (218398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (220498) main: State: AP_MODE[0m
+[0;33mW (220498) wifi_prov: Provisioning already active[0m
+[0;32mI (220498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (222598) main: State: AP_MODE[0m
+[0;33mW (222598) wifi_prov: Provisioning already active[0m
+[0;32mI (222598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (224698) main: State: AP_MODE[0m
+[0;33mW (224698) wifi_prov: Provisioning already active[0m
+[0;32mI (224698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (226798) main: State: AP_MODE[0m
+[0;33mW (226798) wifi_prov: Provisioning already active[0m
+[0;32mI (226798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (228898) main: State: AP_MODE[0m
+[0;33mW (228898) wifi_prov: Provisioning already active[0m
+[0;32mI (228898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (230998) main: State: AP_MODE[0m
+[0;33mW (230998) wifi_prov: Provisioning already active[0m
+[0;32mI (230998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (233098) main: State: AP_MODE[0m
+[0;33mW (233098) wifi_prov: Provisioning already active[0m
+[0;32mI (233098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (235198) main: State: AP_MODE[0m
+[0;33mW (235198) wifi_prov: Provisioning already active[0m
+[0;32mI (235198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (237298) main: State: AP_MODE[0m
+[0;33mW (237298) wifi_prov: Provisioning already active[0m
+[0;32mI (237298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (239398) main: State: AP_MODE[0m
+[0;33mW (239398) wifi_prov: Provisioning already active[0m
+[0;32mI (239398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (241498) main: State: AP_MODE[0m
+[0;33mW (241498) wifi_prov: Provisioning already active[0m
+[0;32mI (241498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (243598) main: State: AP_MODE[0m
+[0;33mW (243598) wifi_prov: Provisioning already active[0m
+[0;32mI (243598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (245698) main: State: AP_MODE[0m
+[0;33mW (245698) wifi_prov: Provisioning already active[0m
+[0;32mI (245698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (247798) main: State: AP_MODE[0m
+[0;33mW (247798) wifi_prov: Provisioning already active[0m
+[0;32mI (247798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (249898) main: State: AP_MODE[0m
+[0;33mW (249898) wifi_prov: Provisioning already active[0m
+[0;32mI (249898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (251998) main: State: AP_MODE[0m
+[0;33mW (251998) wifi_prov: Provisioning already active[0m
+[0;32mI (251998) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (254098) main: State: AP_MODE[0m
+[0;33mW (254098) wifi_prov: Provisioning already active[0m
+[0;32mI (254098) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (256198) main: State: AP_MODE[0m
+[0;33mW (256198) wifi_prov: Provisioning already active[0m
+[0;32mI (256198) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (258298) main: State: AP_MODE[0m
+[0;33mW (258298) wifi_prov: Provisioning already active[0m
+[0;32mI (258298) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (260398) main: State: AP_MODE[0m
+[0;33mW (260398) wifi_prov: Provisioning already active[0m
+[0;32mI (260398) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (262498) main: State: AP_MODE[0m
+[0;33mW (262498) wifi_prov: Provisioning already active[0m
+[0;32mI (262498) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (264598) main: State: AP_MODE[0m
+[0;33mW (264598) wifi_prov: Provisioning already active[0m
+[0;32mI (264598) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (266698) main: State: AP_MODE[0m
+[0;33mW (266698) wifi_prov: Provisioning already active[0m
+[0;32mI (266698) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (268798) main: State: AP_MODE[0m
+[0;33mW (268798) wifi_prov: Provisioning already active[0m
+[0;32mI (268798) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (270898) main: State: AP_MODE[0m
+[0;33mW (270898) wifi_prov: Provisioning already active[0m
+[0;32mI (270898) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[1;31mE (272778) wifi_prov: ========================================[0m
+[1;31mE (272778) wifi_prov: PROVISION_HANDLER CALLED - /provision REQUEST[0m
+[1;31mE (272778) wifi_prov: ========================================[0m
+[0;32mI (272778) wifi_prov: [PROVISION_HANDLER] Request received for URI: /provision[0m
+[0;32mI (272788) wifi_prov: [0m
+
+***ERROR*** A stack overflow in task  has been detected.
+
+
+Backtrace: 0x4037cffd:0x3fcb26d0 0x4037cfc5:0x3fcb26f0 0x420aeef6:0x3fcb2710 0x4037e25b:0x3fcb2790 0x4037d824:0x3fcb27b0 0x4037d81a:0x00000001 |<-CORRUPTED
+
+
+
+
+ELF file SHA256: d7e5be886
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037d14d
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-853-g80ed20959d 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Nov 28 2025 11:23:51[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (32) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (36) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (48) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (57) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (63) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (70) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0c0020 size=25164h (151908) map[0m
+[0;32mI (114) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 size=04bfch ( 19452) load[0m
+[0;32mI (119) esp_image: segment 2: paddr=00039d90 vaddr=40374000 size=06288h ( 25224) load[0m
+[0;32mI (125) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=b18a4h (727204) map[0m
+[0;32mI (256) esp_image: segment 4: paddr=000f18cc vaddr=4037a288 size=0d7c0h ( 55232) load[0m
+[0;32mI (269) esp_image: segment 5: paddr=000ff094 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (278) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (278) boot: Disabling RNG early entropy source...[0m
+[0;32mI (288) cpu_start: Multicore app[0m
+[0;32mI (296) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (297) cpu_start: Pro cpu start user code[0m
+[0;32mI (297) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (299) app_init: Application information:[0m
+[0;32mI (302) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (307) app_init: App version:      7518ba2-dirty[0m
+[0;32mI (311) app_init: Compile time:     Nov 28 2025 11:24:02[0m
+[0;32mI (317) app_init: ELF file SHA256:  d7e5be886...[0m
+[0;32mI (321) app_init: ESP-IDF:          v6.1-dev-853-g80ed20959d[0m
+[0;32mI (326) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (330) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (334) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (338) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (344) heap_init: At 3FCA3260 len 000464B0 (281 KiB): RAM[0m
+[0;32mI (349) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (354) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (360) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (366) spi_flash: detected chip: boya[0m
+[0;32mI (368) spi_flash: flash io: dio[0m
+[0;33mW (371) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (384) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (390) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (397) main_task: Started on CPU0[0m
+[0;32mI (407) main_task: Calling app_main()[0m
+[0;32mI (407) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (407) main: Device ID: device_0070[0m
+[0;32mI (427) main: NVS initialized[0m
+[0;32mI (427) main: ========================================[0m
+[0;32mI (427) main: DEVELOPMENT MODE: Clearing provisioning[0m
+[0;32mI (427) main: ========================================[0m
+[0;32mI (437) main: Clearing all provisioning data...[0m
+[0;32mI (437) main: ✓ All provisioning data cleared[0m
+[0;32mI (437) main: ✓ Device will start in AP mode[0m
+[0;32mI (447) main: ========================================[0m
+[0;32mI (447) main: Network interface initialized[0m
+[0;32mI (457) main: Event loop created[0m
+[0;32mI (457) main: Event handlers registered[0m
+[0;32mI (457) main: Application state machine started[0m
+[0;32mI (467) main: State: INIT[0m
+[0;32mI (467) main: State machine task started[0m
+[0;32mI (467) main: Application initialization complete[0m
+[0;32mI (477) main_task: Returned from app_main()[0m
+[0;32mI (567) main: State: CHECK_PROVISIONING[0m
+[0;32mI (567) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (667) main: State: AP_MODE[0m
+[0;32mI (667) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (667) pp: pp rom version: e7ae62f[0m
+[0;32mI (667) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (677) wifi:wifi driver task: 3fca66b0, prio:23, stack:6656, core=0[0m
+[0;32mI (677) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (677) wifi:wifi certification version: v7.0[0m
+[0;32mI (687) wifi:config NVS flash: enabled[0m
+[0;32mI (687) wifi:config nano formatting: disabled[0m
+[0;32mI (687) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (687) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (697) wifi:Init management short buffer num: 32[0m
+[0;32mI (697) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (707) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (707) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (717) wifi:Init static rx buffer num: 10[0m
+[0;32mI (717) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (717) wifi_init: rx ba win: 6[0m
+[0;32mI (727) wifi_init: accept mbox: 6[0m
+[0;32mI (727) wifi_init: tcpip mbox: 32[0m
+[0;32mI (727) wifi_init: udp mbox: 6[0m
+[0;32mI (727) wifi_init: tcp mbox: 6[0m
+[0;32mI (737) wifi_init: tcp tx win: 5760[0m
+[0;32mI (737) wifi_init: tcp rx win: 5760[0m
+[0;32mI (737) wifi_init: tcp mss: 1440[0m
+[0;32mI (747) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (747) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (757) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (797) wifi:mode : sta (80:b5:4e:c5:10:8c) + softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (797) wifi:enable tsf[0m
+[0;32mI (797) wifi:Total power save buffer number: 16[0m
+[0;32mI (797) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (807) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (807) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (807) wifi_prov: WiFi STA started[0m
+[0;32mI (817) wifi_prov: Performing initial WiFi scan (before clients connect)...[0m
+[0;32mI (817) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (827) wifi_prov: Performing WiFi scan...[0m
+[0;32mI (3937) wifi_prov: WiFi scan completed: 7 networks cached[0m
+[0;32mI (3937) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (3937) wifi_prov: HTTP server started[0m
+[0;32mI (3937) wifi_prov: ========================================[0m
+[0;32mI (3937) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (3947) wifi_prov: AP is stable - no background scanning[0m
+[0;32mI (3947) wifi_prov: /local-wifi returns cached results instantly[0m
+[0;32mI (3957) wifi_prov: Use /local-wifi?refresh=true to rescan[0m
+[0;32mI (3957) wifi_prov: ========================================[0m
+[0;32mI (3967) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (4997) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<0,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (4997) wifi:station: bc:c7:46:e3:d2:cb join, AID=1, bgn, 40U[0m
+[0;32mI (5117) wifi_prov: Station bc:c7:46:e3:d2:cb connected, AID=1[0m
+[0;32mI (5167) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (5167) wifi_prov: AP assigned IP 192.168.4.2 to station[0m
+[0;32mI (5167) wifi:<ba-add>idx:2 (ifx:1, bc:c7:46:e3:d2:cb), tid:0, ssn:1, winSize:64[0m
+[0;32mI (5677) wifi:<ba-add>idx:3 (ifx:1, bc:c7:46:e3:d2:cb), tid:7, ssn:3, winSize:64[0m
+[0;32mI (6077) main: State: AP_MODE[0m
+[0;33mW (6077) wifi_prov: Provisioning already active[0m
+[0;32mI (6077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (8177) main: State: AP_MODE[0m
+[0;33mW (8177) wifi_prov: Provisioning already active[0m
+[0;32mI (8177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (10277) main: State: AP_MODE[0m
+[0;33mW (10277) wifi_prov: Provisioning already active[0m
+[0;32mI (10277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (12377) main: State: AP_MODE[0m
+[0;33mW (12377) wifi_prov: Provisioning already active[0m
+[0;32mI (12377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (14477) main: State: AP_MODE[0m
+[0;33mW (14477) wifi_prov: Provisioning already active[0m
+[0;32mI (14477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (16577) main: State: AP_MODE[0m
+[0;33mW (16577) wifi_prov: Provisioning already active[0m
+[0;32mI (16577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (18677) main: State: AP_MODE[0m
+[0;33mW (18677) wifi_prov: Provisioning already active[0m
+[0;32mI (18677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (20777) main: State: AP_MODE[0m
+[0;33mW (20777) wifi_prov: Provisioning already active[0m
+[0;32mI (20777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (22877) main: State: AP_MODE[0m
+[0;33mW (22877) wifi_prov: Provisioning already active[0m
+[0;32mI (22877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (24977) main: State: AP_MODE[0m
+[0;33mW (24977) wifi_prov: Provisioning already active[0m
+[0;32mI (24977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (27077) main: State: AP_MODE[0m
+[0;33mW (27077) wifi_prov: Provisioning already active[0m
+[0;32mI (27077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (29177) main: State: AP_MODE[0m
+[0;33mW (29177) wifi_prov: Provisioning already active[0m
+[0;32mI (29177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (31277) main: State: AP_MODE[0m
+[0;33mW (31277) wifi_prov: Provisioning already active[0m
+[0;32mI (31277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (33377) main: State: AP_MODE[0m
+[0;33mW (33377) wifi_prov: Provisioning already active[0m
+[0;32mI (33377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (35477) main: State: AP_MODE[0m
+[0;33mW (35477) wifi_prov: Provisioning already active[0m
+[0;32mI (35477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (37577) main: State: AP_MODE[0m
+[0;33mW (37577) wifi_prov: Provisioning already active[0m
+[0;32mI (37577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (39677) main: State: AP_MODE[0m
+[0;33mW (39677) wifi_prov: Provisioning already active[0m
+[0;32mI (39677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (41777) main: State: AP_MODE[0m
+[0;33mW (41777) wifi_prov: Provisioning already active[0m
+[0;32mI (41777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (43877) main: State: AP_MODE[0m
+[0;33mW (43877) wifi_prov: Provisioning already active[0m
+[0;32mI (43877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (45977) main: State: AP_MODE[0m
+[0;33mW (45977) wifi_prov: Provisioning already active[0m
+[0;32mI (45977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (48077) main: State: AP_MODE[0m
+[0;33mW (48077) wifi_prov: Provisioning already active[0m
+[0;32mI (48077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (50177) main: State: AP_MODE[0m
+[0;33mW (50177) wifi_prov: Provisioning already active[0m
+[0;32mI (50177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (52277) main: State: AP_MODE[0m
+[0;33mW (52277) wifi_prov: Provisioning already active[0m
+[0;32mI (52277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (54377) main: State: AP_MODE[0m
+[0;33mW (54377) wifi_prov: Provisioning already active[0m
+[0;32mI (54377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (56477) main: State: AP_MODE[0m
+[0;33mW (56477) wifi_prov: Provisioning already active[0m
+[0;32mI (56477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (58577) main: State: AP_MODE[0m
+[0;33mW (58577) wifi_prov: Provisioning already active[0m
+[0;32mI (58577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (60677) main: State: AP_MODE[0m
+[0;33mW (60677) wifi_prov: Provisioning already active[0m
+[0;32mI (60677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (62777) main: State: AP_MODE[0m
+[0;33mW (62777) wifi_prov: Provisioning already active[0m
+[0;32mI (62777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (64877) main: State: AP_MODE[0m
+[0;33mW (64877) wifi_prov: Provisioning already active[0m
+[0;32mI (64877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (66977) main: State: AP_MODE[0m
+[0;33mW (66977) wifi_prov: Provisioning already active[0m
+[0;32mI (66977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (69077) main: State: AP_MODE[0m
+[0;33mW (69077) wifi_prov: Provisioning already active[0m
+[0;32mI (69077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;33mW (69277) httpd_uri: httpd_uri: URI '/' not found[0m
+[0;33mW (69277) httpd_txrx: httpd_resp_send_err: 404 Not Found - Nothing matches the given URI[0m
+[0;33mW (69287) httpd_uri: httpd_uri: URI '/' not found[0m
+[0;33mW (69287) httpd_txrx: httpd_resp_send_err: 404 Not Found - Nothing matches the given URI[0m
+[0;32mI (71177) main: State: AP_MODE[0m
+[0;33mW (71177) wifi_prov: Provisioning already active[0m
+[0;32mI (71177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[1;31mE (71187) wifi_prov: ========================================[0m
+[1;31mE (71187) wifi_prov: SCAN_HANDLER CALLED - /local-wifi REQUEST[0m
+[1;31mE (71187) wifi_prov: ========================================[0m
+[0;32mI (71197) wifi_prov: [0m
+[0;32mI (71197) wifi_prov: *** SCAN_HANDLER CALLED ***[0m
+[0;32mI (71197) wifi_prov: URI: /local-wifi[0m
+[0;32mI (71207) wifi_prov: Method: 1 (1=GET, 3=POST)[0m
+[0;32mI (71207) wifi_prov: [0m
+[0;32mI (71207) wifi_prov: ========================================[0m
+[0;32mI (71217) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (71217) wifi_prov: ========================================[0m
+[0;32mI (71227) wifi_prov: Method: GET[0m
+[0;32mI (71227) wifi_prov: URI: /local-wifi[0m
+[0;32mI (71227) wifi_prov: Content-Length: 0 (no body)[0m
+[0;32mI (71237) wifi_prov: User-Agent: node[0m
+[0;32mI (71237) wifi_prov: Authorization: (not present)[0m
+[0;32mI (71247) wifi_prov: Host: 192.168.4.1[0m
+[0;32mI (71247) wifi_prov: ========================================[0m
+[0;32mI (71257) wifi_prov: [0m
+[0;32mI (71257) wifi_prov: [0m
+[0;32mI (71257) wifi_prov: ========================================[0m
+[0;32mI (71267) wifi_prov: <<< OUTGOING HTTP RESPONSE[0m
+[0;32mI (71267) wifi_prov: ========================================[0m
+[0;32mI (71267) wifi_prov: Method: GET[0m
+[0;32mI (71277) wifi_prov: URI: /local-wifi[0m
+[0;32mI (71277) wifi_prov: HTTP Status: 200[0m
+[0;32mI (71277) wifi_prov: Status Description: OK[0m
+[0;32mI (71287) wifi_prov: Response Body Length: 647 bytes[0m
+[0;32mI (71287) wifi_prov: Response Body (first 500 chars): {[0m
+	"networks":	[{
+			"ssid":	"Statsnapp",
+			"rssi":	-54,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108589498135",
+			"rssi":	-91,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"JioFiber-2Qdq6",
+			"rssi":	-92,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108309178440",
+			"rssi":	-93,
+			"channel":	6,
+			"secure":	true
+		}, {
+			"ssid":	"vivo T2 5G",
+			"rssi":	-94,
+			"channel":	1,
+			"secure":	true
+		}, {
+			"ssid":	"ACT108589498135_5g",
+			"rssi":	-94,
+			"c...
+[0;32mI (71337) wifi_prov: Response Body (full): [See ESP_LOGD for full body][0m
+[0;32mI (71347) wifi_prov: ========================================[0m
+[0;32mI (71357) wifi_prov: [0m
+[0;32mI (71357) wifi_prov: Returned 7 networks (instant response)[0m
+[0;32mI (73277) main: State: AP_MODE[0m
+[0;33mW (73277) wifi_prov: Provisioning already active[0m
+[0;32mI (73277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (75377) main: State: AP_MODE[0m
+[0;33mW (75377) wifi_prov: Provisioning already active[0m
+[0;32mI (75377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (77477) main: State: AP_MODE[0m
+[0;33mW (77477) wifi_prov: Provisioning already active[0m
+[0;32mI (77477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[1;31mE (77657) wifi_prov: ========================================[0m
+[1;31mE (77657) wifi_prov: PROVISION_HANDLER CALLED - /provision REQUEST[0m
+[1;31mE (77657) wifi_prov: ========================================[0m
+[0;32mI (77667) wifi_prov: [PROVISION_HANDLER] Request received for URI: /provision[0m
+[0;32mI (77667) wifi_prov: [0m
+[0;32mI (77667) wifi_prov: ========================================[0m
+[0;32mI (77677) wifi_prov: >>> INCOMING HTTP REQUEST[0m
+[0;32mI (77677) wifi_prov: ========================================[0m
+[0;32mI (77687) wifi_prov: Method: POST[0m
+[0;32mI (77687) wifi_prov: URI: /provision[0m
+[0;32mI (77697) wifi_prov: Content-Length: 3[0m
+[0;32mI (77697) wifi_prov: User-Agent: node[0m
+[0;32mI (77697) wifi_prov: Authorization: (not present)[0m
+[0;32mI (77707) wifi_prov: Content-Type: application/json[0m
+
+***ERROR*** A stack overflow in task  has been detected.
+
+
+Backtrace: 0x4037cffd:0x3fcb26d0 0x4037cfc5:0x3fcb26f0 0x420aeef6:0x3fcb2710 0x4037e25b:0x3fcb2790 0x4037d824:0x3fcb27b0 0x4037d81a:0x00000000 |<-CORRUPTED
+
+
+
+
+ELF file SHA256: d7e5be886
+
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037d14d
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1588
+load:0x403c8700,len:0xda0
+load:0x403cb700,len:0x2fa0
+entry 0x403c8908
+[0;32mI (24) boot: ESP-IDF v6.1-dev-853-g80ed20959d 2nd stage bootloader[0m
+[0;32mI (24) boot: compile time Nov 28 2025 11:23:51[0m
+[0;32mI (24) boot: Multicore bootloader[0m
+[0;32mI (26) boot: chip revision: v0.2[0m
+[0;32mI (29) boot: efuse block revision: v1.3[0m
+[0;32mI (32) boot.esp32s3: Boot SPI Speed : 80MHz[0m
+[0;32mI (36) boot.esp32s3: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32s3: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (48) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (57) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (63) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (70) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3c0c0020 size=25164h (151908) map[0m
+[0;32mI (114) esp_image: segment 1: paddr=0003518c vaddr=3fc97b00 size=04bfch ( 19452) load[0m
+[0;32mI (119) esp_image: segment 2: paddr=00039d90 vaddr=40374000 size=06288h ( 25224) load[0m
+[0;32mI (125) esp_image: segment 3: paddr=00040020 vaddr=42000020 size=b18a4h (727204) map[0m
+[0;32mI (256) esp_image: segment 4: paddr=000f18cc vaddr=4037a288 size=0d7c0h ( 55232) load[0m
+[0;32mI (269) esp_image: segment 5: paddr=000ff094 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (278) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (278) boot: Disabling RNG early entropy source...[0m
+[0;32mI (288) cpu_start: Multicore app[0m
+[0;32mI (296) cpu_start: GPIO 44 and 43 are used as console UART I/O pins[0m
+[0;32mI (297) cpu_start: Pro cpu start user code[0m
+[0;32mI (297) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (299) app_init: Application information:[0m
+[0;32mI (302) app_init: Project name:     wifi_ap_project[0m
+[0;32mI (307) app_init: App version:      7518ba2-dirty[0m
+[0;32mI (311) app_init: Compile time:     Nov 28 2025 11:24:02[0m
+[0;32mI (317) app_init: ELF file SHA256:  d7e5be886...[0m
+[0;32mI (321) app_init: ESP-IDF:          v6.1-dev-853-g80ed20959d[0m
+[0;32mI (326) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (330) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (334) efuse_init: Chip rev:         v0.2[0m
+[0;32mI (338) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (344) heap_init: At 3FCA3260 len 000464B0 (281 KiB): RAM[0m
+[0;32mI (349) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM[0m
+[0;32mI (354) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM[0m
+[0;32mI (360) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM[0m
+[0;32mI (366) spi_flash: detected chip: boya[0m
+[0;32mI (368) spi_flash: flash io: dio[0m
+[0;33mW (371) spi_flash: Detected size(16384k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (384) sleep_gpio: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (390) sleep_gpio: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (397) main_task: Started on CPU0[0m
+[0;32mI (407) main_task: Calling app_main()[0m
+[0;32mI (407) main: === WiFi Provisioning with mTLS MQTT ===[0m
+[0;32mI (407) main: Device ID: device_0070[0m
+[0;32mI (427) main: NVS initialized[0m
+[0;32mI (427) main: ========================================[0m
+[0;32mI (427) main: DEVELOPMENT MODE: Clearing provisioning[0m
+[0;32mI (427) main: ========================================[0m
+[0;32mI (437) main: Clearing all provisioning data...[0m
+[0;32mI (437) main: ✓ All provisioning data cleared[0m
+[0;32mI (437) main: ✓ Device will start in AP mode[0m
+[0;32mI (447) main: ========================================[0m
+[0;32mI (447) main: Network interface initialized[0m
+[0;32mI (457) main: Event loop created[0m
+[0;32mI (457) main: Event handlers registered[0m
+[0;32mI (457) main: Application state machine started[0m
+[0;32mI (467) main: State: INIT[0m
+[0;32mI (467) main: State machine task started[0m
+[0;32mI (467) main: Application initialization complete[0m
+[0;32mI (477) main_task: Returned from app_main()[0m
+[0;32mI (567) main: State: CHECK_PROVISIONING[0m
+[0;32mI (567) main: Device not provisioned, starting AP mode...[0m
+[0;32mI (667) main: State: AP_MODE[0m
+[0;32mI (667) wifi_prov: Starting WiFi provisioning[0m
+[0;32mI (667) pp: pp rom version: e7ae62f[0m
+[0;32mI (667) net80211: net80211 rom version: e7ae62f[0m
+[0;32mI (677) wifi:wifi driver task: 3fca66b0, prio:23, stack:6656, core=0[0m
+[0;32mI (677) wifi:wifi firmware version: 6a8253a[0m
+[0;32mI (677) wifi:wifi certification version: v7.0[0m
+[0;32mI (687) wifi:config NVS flash: enabled[0m
+[0;32mI (687) wifi:config nano formatting: disabled[0m
+[0;32mI (687) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (687) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (697) wifi:Init management short buffer num: 32[0m
+[0;32mI (697) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (707) wifi:Init static tx FG buffer num: 2[0m
+[0;32mI (707) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (717) wifi:Init static rx buffer num: 10[0m
+[0;32mI (717) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (717) wifi_init: rx ba win: 6[0m
+[0;32mI (727) wifi_init: accept mbox: 6[0m
+[0;32mI (727) wifi_init: tcpip mbox: 32[0m
+[0;32mI (727) wifi_init: udp mbox: 6[0m
+[0;32mI (727) wifi_init: tcp mbox: 6[0m
+[0;32mI (737) wifi_init: tcp tx win: 5760[0m
+[0;32mI (737) wifi_init: tcp rx win: 5760[0m
+[0;32mI (737) wifi_init: tcp mss: 1440[0m
+[0;32mI (747) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (747) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (757) phy_init: phy_version 711,97bcf0a2,Aug 25 2025,19:04:10[0m
+[0;32mI (797) wifi:mode : sta (80:b5:4e:c5:10:8c) + softAP (80:b5:4e:c5:10:8d)[0m
+[0;32mI (797) wifi:enable tsf[0m
+[0;32mI (807) wifi:Total power save buffer number: 16[0m
+[0;32mI (807) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (807) wifi:Init max length of beacon: 752/752[0m
+[0;32mI (807) wifi_prov: WiFi AP started: SSID=ESP32-Prov, Password=prov12345678[0m
+[0;32mI (807) wifi_prov: WiFi STA started[0m
+[0;32mI (817) wifi_prov: Performing initial WiFi scan (before clients connect)...[0m
+[0;32mI (817) esp_netif_lwip: DHCP server started on interface WIFI_AP_DEF with IP: 192.168.4.1[0m
+[0;32mI (827) wifi_prov: Performing WiFi scan...[0m
+[0;32mI (4137) wifi_prov: WiFi scan completed: 8 networks cached[0m
+[0;32mI (4137) wifi_prov: Starting HTTP server on port 80[0m
+[0;32mI (4137) wifi_prov: HTTP server started[0m
+[0;32mI (4137) wifi_prov: ========================================[0m
+[0;32mI (4137) wifi_prov: WiFi provisioning started successfully[0m
+[0;32mI (4147) wifi_prov: AP is stable - no background scanning[0m
+[0;32mI (4147) wifi_prov: /local-wifi returns cached results instantly[0m
+[0;32mI (4157) wifi_prov: Use /local-wifi?refresh=true to rescan[0m
+[0;32mI (4157) wifi_prov: ========================================[0m
+[0;32mI (4167) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (5027) wifi:new:<1,1>, old:<1,1>, ap:<1,1>, sta:<0,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (5027) wifi:station: bc:c7:46:e3:d2:cb join, AID=1, bgn, 40U[0m
+[0;32mI (5157) wifi_prov: Station bc:c7:46:e3:d2:cb connected, AID=1[0m
+[0;32mI (5207) wifi:<ba-add>idx:2 (ifx:1, bc:c7:46:e3:d2:cb), tid:0, ssn:1, winSize:64[0m
+[0;32mI (5217) esp_netif_lwip: DHCP server assigned IP to a client, IP is: 192.168.4.2[0m
+[0;32mI (5217) wifi_prov: AP assigned IP 192.168.4.2 to station[0m
+[0;32mI (5687) wifi:<ba-add>idx:3 (ifx:1, bc:c7:46:e3:d2:cb), tid:7, ssn:3, winSize:64[0m
+[0;32mI (6277) main: State: AP_MODE[0m
+[0;33mW (6277) wifi_prov: Provisioning already active[0m
+[0;32mI (6277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (8377) main: State: AP_MODE[0m
+[0;33mW (8377) wifi_prov: Provisioning already active[0m
+[0;32mI (8377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (10477) main: State: AP_MODE[0m
+[0;33mW (10477) wifi_prov: Provisioning already active[0m
+[0;32mI (10477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (12577) main: State: AP_MODE[0m
+[0;33mW (12577) wifi_prov: Provisioning already active[0m
+[0;32mI (12577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (14677) main: State: AP_MODE[0m
+[0;33mW (14677) wifi_prov: Provisioning already active[0m
+[0;32mI (14677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (16777) main: State: AP_MODE[0m
+[0;33mW (16777) wifi_prov: Provisioning already active[0m
+[0;32mI (16777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (18877) main: State: AP_MODE[0m
+[0;33mW (18877) wifi_prov: Provisioning already active[0m
+[0;32mI (18877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (20977) main: State: AP_MODE[0m
+[0;33mW (20977) wifi_prov: Provisioning already active[0m
+[0;32mI (20977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (23077) main: State: AP_MODE[0m
+[0;33mW (23077) wifi_prov: Provisioning already active[0m
+[0;32mI (23077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (25177) main: State: AP_MODE[0m
+[0;33mW (25177) wifi_prov: Provisioning already active[0m
+[0;32mI (25177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (27277) main: State: AP_MODE[0m
+[0;33mW (27277) wifi_prov: Provisioning already active[0m
+[0;32mI (27277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (29377) main: State: AP_MODE[0m
+[0;33mW (29377) wifi_prov: Provisioning already active[0m
+[0;32mI (29377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (31477) main: State: AP_MODE[0m
+[0;33mW (31477) wifi_prov: Provisioning already active[0m
+[0;32mI (31477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (33577) main: State: AP_MODE[0m
+[0;33mW (33577) wifi_prov: Provisioning already active[0m
+[0;32mI (33577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (35677) main: State: AP_MODE[0m
+[0;33mW (35677) wifi_prov: Provisioning already active[0m
+[0;32mI (35677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (37777) main: State: AP_MODE[0m
+[0;33mW (37777) wifi_prov: Provisioning already active[0m
+[0;32mI (37777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (39877) main: State: AP_MODE[0m
+[0;33mW (39877) wifi_prov: Provisioning already active[0m
+[0;32mI (39877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (41977) main: State: AP_MODE[0m
+[0;33mW (41977) wifi_prov: Provisioning already active[0m
+[0;32mI (41977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (44077) main: State: AP_MODE[0m
+[0;33mW (44077) wifi_prov: Provisioning already active[0m
+[0;32mI (44077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (46177) main: State: AP_MODE[0m
+[0;33mW (46177) wifi_prov: Provisioning already active[0m
+[0;32mI (46177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (48277) main: State: AP_MODE[0m
+[0;33mW (48277) wifi_prov: Provisioning already active[0m
+[0;32mI (48277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (50377) main: State: AP_MODE[0m
+[0;33mW (50377) wifi_prov: Provisioning already active[0m
+[0;32mI (50377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (52477) main: State: AP_MODE[0m
+[0;33mW (52477) wifi_prov: Provisioning already active[0m
+[0;32mI (52477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (54577) main: State: AP_MODE[0m
+[0;33mW (54577) wifi_prov: Provisioning already active[0m
+[0;32mI (54577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (56677) main: State: AP_MODE[0m
+[0;33mW (56677) wifi_prov: Provisioning already active[0m
+[0;32mI (56677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (58777) main: State: AP_MODE[0m
+[0;33mW (58777) wifi_prov: Provisioning already active[0m
+[0;32mI (58777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (60877) main: State: AP_MODE[0m
+[0;33mW (60877) wifi_prov: Provisioning already active[0m
+[0;32mI (60877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (62977) main: State: AP_MODE[0m
+[0;33mW (62977) wifi_prov: Provisioning already active[0m
+[0;32mI (62977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (65077) main: State: AP_MODE[0m
+[0;33mW (65077) wifi_prov: Provisioning already active[0m
+[0;32mI (65077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (67177) main: State: AP_MODE[0m
+[0;33mW (67177) wifi_prov: Provisioning already active[0m
+[0;32mI (67177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (69277) main: State: AP_MODE[0m
+[0;33mW (69277) wifi_prov: Provisioning already active[0m
+[0;32mI (69277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (71377) main: State: AP_MODE[0m
+[0;33mW (71377) wifi_prov: Provisioning already active[0m
+[0;32mI (71377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (73477) main: State: AP_MODE[0m
+[0;33mW (73477) wifi_prov: Provisioning already active[0m
+[0;32mI (73477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (75577) main: State: AP_MODE[0m
+[0;33mW (75577) wifi_prov: Provisioning already active[0m
+[0;32mI (75577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (77677) main: State: AP_MODE[0m
+[0;33mW (77677) wifi_prov: Provisioning already active[0m
+[0;32mI (77677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (79777) main: State: AP_MODE[0m
+[0;33mW (79777) wifi_prov: Provisioning already active[0m
+[0;32mI (79777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (81877) main: State: AP_MODE[0m
+[0;33mW (81877) wifi_prov: Provisioning already active[0m
+[0;32mI (81877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (83977) main: State: AP_MODE[0m
+[0;33mW (83977) wifi_prov: Provisioning already active[0m
+[0;32mI (83977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (86077) main: State: AP_MODE[0m
+[0;33mW (86077) wifi_prov: Provisioning already active[0m
+[0;32mI (86077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (88177) main: State: AP_MODE[0m
+[0;33mW (88177) wifi_prov: Provisioning already active[0m
+[0;32mI (88177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (90277) main: State: AP_MODE[0m
+[0;33mW (90277) wifi_prov: Provisioning already active[0m
+[0;32mI (90277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (92377) main: State: AP_MODE[0m
+[0;33mW (92377) wifi_prov: Provisioning already active[0m
+[0;32mI (92377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (94477) main: State: AP_MODE[0m
+[0;33mW (94477) wifi_prov: Provisioning already active[0m
+[0;32mI (94477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (96577) main: State: AP_MODE[0m
+[0;33mW (96577) wifi_prov: Provisioning already active[0m
+[0;32mI (96577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (98677) main: State: AP_MODE[0m
+[0;33mW (98677) wifi_prov: Provisioning already active[0m
+[0;32mI (98677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (100777) main: State: AP_MODE[0m
+[0;33mW (100777) wifi_prov: Provisioning already active[0m
+[0;32mI (100777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (102877) main: State: AP_MODE[0m
+[0;33mW (102877) wifi_prov: Provisioning already active[0m
+[0;32mI (102877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (104977) main: State: AP_MODE[0m
+[0;33mW (104977) wifi_prov: Provisioning already active[0m
+[0;32mI (104977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (107077) main: State: AP_MODE[0m
+[0;33mW (107077) wifi_prov: Provisioning already active[0m
+[0;32mI (107077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (109177) main: State: AP_MODE[0m
+[0;33mW (109177) wifi_prov: Provisioning already active[0m
+[0;32mI (109177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (111277) main: State: AP_MODE[0m
+[0;33mW (111277) wifi_prov: Provisioning already active[0m
+[0;32mI (111277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (113377) main: State: AP_MODE[0m
+[0;33mW (113377) wifi_prov: Provisioning already active[0m
+[0;32mI (113377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (115477) main: State: AP_MODE[0m
+[0;33mW (115477) wifi_prov: Provisioning already active[0m
+[0;32mI (115477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (117577) main: State: AP_MODE[0m
+[0;33mW (117577) wifi_prov: Provisioning already active[0m
+[0;32mI (117577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (119677) main: State: AP_MODE[0m
+[0;33mW (119677) wifi_prov: Provisioning already active[0m
+[0;32mI (119677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (121777) main: State: AP_MODE[0m
+[0;33mW (121777) wifi_prov: Provisioning already active[0m
+[0;32mI (121777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (123877) main: State: AP_MODE[0m
+[0;33mW (123877) wifi_prov: Provisioning already active[0m
+[0;32mI (123877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (125977) main: State: AP_MODE[0m
+[0;33mW (125977) wifi_prov: Provisioning already active[0m
+[0;32mI (125977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (128077) main: State: AP_MODE[0m
+[0;33mW (128077) wifi_prov: Provisioning already active[0m
+[0;32mI (128077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (130177) main: State: AP_MODE[0m
+[0;33mW (130177) wifi_prov: Provisioning already active[0m
+[0;32mI (130177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (132277) main: State: AP_MODE[0m
+[0;33mW (132277) wifi_prov: Provisioning already active[0m
+[0;32mI (132277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (134377) main: State: AP_MODE[0m
+[0;33mW (134377) wifi_prov: Provisioning already active[0m
+[0;32mI (134377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (136477) main: State: AP_MODE[0m
+[0;33mW (136477) wifi_prov: Provisioning already active[0m
+[0;32mI (136477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (138577) main: State: AP_MODE[0m
+[0;33mW (138577) wifi_prov: Provisioning already active[0m
+[0;32mI (138577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (140677) main: State: AP_MODE[0m
+[0;33mW (140677) wifi_prov: Provisioning already active[0m
+[0;32mI (140677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (142777) main: State: AP_MODE[0m
+[0;33mW (142777) wifi_prov: Provisioning already active[0m
+[0;32mI (142777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (144877) main: State: AP_MODE[0m
+[0;33mW (144877) wifi_prov: Provisioning already active[0m
+[0;32mI (144877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (146977) main: State: AP_MODE[0m
+[0;33mW (146977) wifi_prov: Provisioning already active[0m
+[0;32mI (146977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (149077) main: State: AP_MODE[0m
+[0;33mW (149077) wifi_prov: Provisioning already active[0m
+[0;32mI (149077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (151177) main: State: AP_MODE[0m
+[0;33mW (151177) wifi_prov: Provisioning already active[0m
+[0;32mI (151177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (153277) main: State: AP_MODE[0m
+[0;33mW (153277) wifi_prov: Provisioning already active[0m
+[0;32mI (153277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (155377) main: State: AP_MODE[0m
+[0;33mW (155377) wifi_prov: Provisioning already active[0m
+[0;32mI (155377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (157477) main: State: AP_MODE[0m
+[0;33mW (157477) wifi_prov: Provisioning already active[0m
+[0;32mI (157477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (159577) main: State: AP_MODE[0m
+[0;33mW (159577) wifi_prov: Provisioning already active[0m
+[0;32mI (159577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (161677) main: State: AP_MODE[0m
+[0;33mW (161677) wifi_prov: Provisioning already active[0m
+[0;32mI (161677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (163777) main: State: AP_MODE[0m
+[0;33mW (163777) wifi_prov: Provisioning already active[0m
+[0;32mI (163777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (165877) main: State: AP_MODE[0m
+[0;33mW (165877) wifi_prov: Provisioning already active[0m
+[0;32mI (165877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (167977) main: State: AP_MODE[0m
+[0;33mW (167977) wifi_prov: Provisioning already active[0m
+[0;32mI (167977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (170077) main: State: AP_MODE[0m
+[0;33mW (170077) wifi_prov: Provisioning already active[0m
+[0;32mI (170077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (172177) main: State: AP_MODE[0m
+[0;33mW (172177) wifi_prov: Provisioning already active[0m
+[0;32mI (172177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (174277) main: State: AP_MODE[0m
+[0;33mW (174277) wifi_prov: Provisioning already active[0m
+[0;32mI (174277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (176377) main: State: AP_MODE[0m
+[0;33mW (176377) wifi_prov: Provisioning already active[0m
+[0;32mI (176377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (178477) main: State: AP_MODE[0m
+[0;33mW (178477) wifi_prov: Provisioning already active[0m
+[0;32mI (178477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (180577) main: State: AP_MODE[0m
+[0;33mW (180577) wifi_prov: Provisioning already active[0m
+[0;32mI (180577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (182677) main: State: AP_MODE[0m
+[0;33mW (182677) wifi_prov: Provisioning already active[0m
+[0;32mI (182677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (184777) main: State: AP_MODE[0m
+[0;33mW (184777) wifi_prov: Provisioning already active[0m
+[0;32mI (184777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (186877) main: State: AP_MODE[0m
+[0;33mW (186877) wifi_prov: Provisioning already active[0m
+[0;32mI (186877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (188977) main: State: AP_MODE[0m
+[0;33mW (188977) wifi_prov: Provisioning already active[0m
+[0;32mI (188977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (191077) main: State: AP_MODE[0m
+[0;33mW (191077) wifi_prov: Provisioning already active[0m
+[0;32mI (191077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (193177) main: State: AP_MODE[0m
+[0;33mW (193177) wifi_prov: Provisioning already active[0m
+[0;32mI (193177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (195277) main: State: AP_MODE[0m
+[0;33mW (195277) wifi_prov: Provisioning already active[0m
+[0;32mI (195277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (197377) main: State: AP_MODE[0m
+[0;33mW (197377) wifi_prov: Provisioning already active[0m
+[0;32mI (197377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (199477) main: State: AP_MODE[0m
+[0;33mW (199477) wifi_prov: Provisioning already active[0m
+[0;32mI (199477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (201577) main: State: AP_MODE[0m
+[0;33mW (201577) wifi_prov: Provisioning already active[0m
+[0;32mI (201577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (203677) main: State: AP_MODE[0m
+[0;33mW (203677) wifi_prov: Provisioning already active[0m
+[0;32mI (203677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (205777) main: State: AP_MODE[0m
+[0;33mW (205777) wifi_prov: Provisioning already active[0m
+[0;32mI (205777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (207877) main: State: AP_MODE[0m
+[0;33mW (207877) wifi_prov: Provisioning already active[0m
+[0;32mI (207877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (209977) main: State: AP_MODE[0m
+[0;33mW (209977) wifi_prov: Provisioning already active[0m
+[0;32mI (209977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (212077) main: State: AP_MODE[0m
+[0;33mW (212077) wifi_prov: Provisioning already active[0m
+[0;32mI (212077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (214177) main: State: AP_MODE[0m
+[0;33mW (214177) wifi_prov: Provisioning already active[0m
+[0;32mI (214177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (216277) main: State: AP_MODE[0m
+[0;33mW (216277) wifi_prov: Provisioning already active[0m
+[0;32mI (216277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (218377) main: State: AP_MODE[0m
+[0;33mW (218377) wifi_prov: Provisioning already active[0m
+[0;32mI (218377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (220477) main: State: AP_MODE[0m
+[0;33mW (220477) wifi_prov: Provisioning already active[0m
+[0;32mI (220477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (222577) main: State: AP_MODE[0m
+[0;33mW (222577) wifi_prov: Provisioning already active[0m
+[0;32mI (222577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (224677) main: State: AP_MODE[0m
+[0;33mW (224677) wifi_prov: Provisioning already active[0m
+[0;32mI (224677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (226777) main: State: AP_MODE[0m
+[0;33mW (226777) wifi_prov: Provisioning already active[0m
+[0;32mI (226777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (228877) main: State: AP_MODE[0m
+[0;33mW (228877) wifi_prov: Provisioning already active[0m
+[0;32mI (228877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (230977) main: State: AP_MODE[0m
+[0;33mW (230977) wifi_prov: Provisioning already active[0m
+[0;32mI (230977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (233077) main: State: AP_MODE[0m
+[0;33mW (233077) wifi_prov: Provisioning already active[0m
+[0;32mI (233077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (235177) main: State: AP_MODE[0m
+[0;33mW (235177) wifi_prov: Provisioning already active[0m
+[0;32mI (235177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (237277) main: State: AP_MODE[0m
+[0;33mW (237277) wifi_prov: Provisioning already active[0m
+[0;32mI (237277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (239377) main: State: AP_MODE[0m
+[0;33mW (239377) wifi_prov: Provisioning already active[0m
+[0;32mI (239377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (241477) main: State: AP_MODE[0m
+[0;33mW (241477) wifi_prov: Provisioning already active[0m
+[0;32mI (241477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (243577) main: State: AP_MODE[0m
+[0;33mW (243577) wifi_prov: Provisioning already active[0m
+[0;32mI (243577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (245677) main: State: AP_MODE[0m
+[0;33mW (245677) wifi_prov: Provisioning already active[0m
+[0;32mI (245677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (247777) main: State: AP_MODE[0m
+[0;33mW (247777) wifi_prov: Provisioning already active[0m
+[0;32mI (247777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (249877) main: State: AP_MODE[0m
+[0;33mW (249877) wifi_prov: Provisioning already active[0m
+[0;32mI (249877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (251977) main: State: AP_MODE[0m
+[0;33mW (251977) wifi_prov: Provisioning already active[0m
+[0;32mI (251977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (254077) main: State: AP_MODE[0m
+[0;33mW (254077) wifi_prov: Provisioning already active[0m
+[0;32mI (254077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (256177) main: State: AP_MODE[0m
+[0;33mW (256177) wifi_prov: Provisioning already active[0m
+[0;32mI (256177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (258277) main: State: AP_MODE[0m
+[0;33mW (258277) wifi_prov: Provisioning already active[0m
+[0;32mI (258277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (260377) main: State: AP_MODE[0m
+[0;33mW (260377) wifi_prov: Provisioning already active[0m
+[0;32mI (260377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (262477) main: State: AP_MODE[0m
+[0;33mW (262477) wifi_prov: Provisioning already active[0m
+[0;32mI (262477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (264577) main: State: AP_MODE[0m
+[0;33mW (264577) wifi_prov: Provisioning already active[0m
+[0;32mI (264577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (266677) main: State: AP_MODE[0m
+[0;33mW (266677) wifi_prov: Provisioning already active[0m
+[0;32mI (266677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (268777) main: State: AP_MODE[0m
+[0;33mW (268777) wifi_prov: Provisioning already active[0m
+[0;32mI (268777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (270877) main: State: AP_MODE[0m
+[0;33mW (270877) wifi_prov: Provisioning already active[0m
+[0;32mI (270877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (272977) main: State: AP_MODE[0m
+[0;33mW (272977) wifi_prov: Provisioning already active[0m
+[0;32mI (272977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (275077) main: State: AP_MODE[0m
+[0;33mW (275077) wifi_prov: Provisioning already active[0m
+[0;32mI (275077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (277177) main: State: AP_MODE[0m
+[0;33mW (277177) wifi_prov: Provisioning already active[0m
+[0;32mI (277177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (279277) main: State: AP_MODE[0m
+[0;33mW (279277) wifi_prov: Provisioning already active[0m
+[0;32mI (279277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (281377) main: State: AP_MODE[0m
+[0;33mW (281377) wifi_prov: Provisioning already active[0m
+[0;32mI (281377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (283477) main: State: AP_MODE[0m
+[0;33mW (283477) wifi_prov: Provisioning already active[0m
+[0;32mI (283477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (285577) main: State: AP_MODE[0m
+[0;33mW (285577) wifi_prov: Provisioning already active[0m
+[0;32mI (285577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (287677) main: State: AP_MODE[0m
+[0;33mW (287677) wifi_prov: Provisioning already active[0m
+[0;32mI (287677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (289777) main: State: AP_MODE[0m
+[0;33mW (289777) wifi_prov: Provisioning already active[0m
+[0;32mI (289777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (291877) main: State: AP_MODE[0m
+[0;33mW (291877) wifi_prov: Provisioning already active[0m
+[0;32mI (291877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (293977) main: State: AP_MODE[0m
+[0;33mW (293977) wifi_prov: Provisioning already active[0m
+[0;32mI (293977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (296077) main: State: AP_MODE[0m
+[0;33mW (296077) wifi_prov: Provisioning already active[0m
+[0;32mI (296077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (298177) main: State: AP_MODE[0m
+[0;33mW (298177) wifi_prov: Provisioning already active[0m
+[0;32mI (298177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (300277) main: State: AP_MODE[0m
+[0;33mW (300277) wifi_prov: Provisioning already active[0m
+[0;32mI (300277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (302377) main: State: AP_MODE[0m
+[0;33mW (302377) wifi_prov: Provisioning already active[0m
+[0;32mI (302377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (304477) main: State: AP_MODE[0m
+[0;33mW (304477) wifi_prov: Provisioning already active[0m
+[0;32mI (304477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (306577) main: State: AP_MODE[0m
+[0;33mW (306577) wifi_prov: Provisioning already active[0m
+[0;32mI (306577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (308677) main: State: AP_MODE[0m
+[0;33mW (308677) wifi_prov: Provisioning already active[0m
+[0;32mI (308677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (310777) main: State: AP_MODE[0m
+[0;33mW (310777) wifi_prov: Provisioning already active[0m
+[0;32mI (310777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (312877) main: State: AP_MODE[0m
+[0;33mW (312877) wifi_prov: Provisioning already active[0m
+[0;32mI (312877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (314977) main: State: AP_MODE[0m
+[0;33mW (314977) wifi_prov: Provisioning already active[0m
+[0;32mI (314977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (317077) main: State: AP_MODE[0m
+[0;33mW (317077) wifi_prov: Provisioning already active[0m
+[0;32mI (317077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (319177) main: State: AP_MODE[0m
+[0;33mW (319177) wifi_prov: Provisioning already active[0m
+[0;32mI (319177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (321277) main: State: AP_MODE[0m
+[0;33mW (321277) wifi_prov: Provisioning already active[0m
+[0;32mI (321277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (323377) main: State: AP_MODE[0m
+[0;33mW (323377) wifi_prov: Provisioning already active[0m
+[0;32mI (323377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (325477) main: State: AP_MODE[0m
+[0;33mW (325477) wifi_prov: Provisioning already active[0m
+[0;32mI (325477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (327577) main: State: AP_MODE[0m
+[0;33mW (327577) wifi_prov: Provisioning already active[0m
+[0;32mI (327577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (329677) main: State: AP_MODE[0m
+[0;33mW (329677) wifi_prov: Provisioning already active[0m
+[0;32mI (329677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (331777) main: State: AP_MODE[0m
+[0;33mW (331777) wifi_prov: Provisioning already active[0m
+[0;32mI (331777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (333877) main: State: AP_MODE[0m
+[0;33mW (333877) wifi_prov: Provisioning already active[0m
+[0;32mI (333877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (335977) main: State: AP_MODE[0m
+[0;33mW (335977) wifi_prov: Provisioning already active[0m
+[0;32mI (335977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (338077) main: State: AP_MODE[0m
+[0;33mW (338077) wifi_prov: Provisioning already active[0m
+[0;32mI (338077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (340177) main: State: AP_MODE[0m
+[0;33mW (340177) wifi_prov: Provisioning already active[0m
+[0;32mI (340177) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (342277) main: State: AP_MODE[0m
+[0;33mW (342277) wifi_prov: Provisioning already active[0m
+[0;32mI (342277) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (344377) main: State: AP_MODE[0m
+[0;33mW (344377) wifi_prov: Provisioning already active[0m
+[0;32mI (344377) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (346477) main: State: AP_MODE[0m
+[0;33mW (346477) wifi_prov: Provisioning already active[0m
+[0;32mI (346477) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (348577) main: State: AP_MODE[0m
+[0;33mW (348577) wifi_prov: Provisioning already active[0m
+[0;32mI (348577) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (350677) main: State: AP_MODE[0m
+[0;33mW (350677) wifi_prov: Provisioning already active[0m
+[0;32mI (350677) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (352777) main: State: AP_MODE[0m
+[0;33mW (352777) wifi_prov: Provisioning already active[0m
+[0;32mI (352777) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (354877) main: State: AP_MODE[0m
+[0;33mW (354877) wifi_prov: Provisioning already active[0m
+[0;32mI (354877) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (356977) main: State: AP_MODE[0m
+[0;33mW (356977) wifi_prov: Provisioning already active[0m
+[0;32mI (356977) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (359077) main: State: AP_MODE[0m
+[0;33mW (359077) wifi_prov: Provisioning already active[0m
+[0;32mI (359077) main: Provisioning AP active. Waiting for credentials via HTTP POST /provision...[0m
+[0;32mI (361177) main: State: AP_MODE[0m
+[0;33mW (361177) wifi_prov: Provisioning already active[0m
+[0;

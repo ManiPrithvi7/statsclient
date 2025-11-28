@@ -317,3 +317,9 @@ INIT → CHECK_PROVISIONING → [Provisioned?]
 ## License
 
 This example code is in the Public Domain (CC0 licensed).
+
+
+for logging
+   cd ~/Desktop/statsclient
+   source esp-idf/export.sh
+   idf.py -p /dev/ttyACM0 monitor

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "certificate_manager.h"
+#include "wifi_provisioning.h"
 #include "device_keys.h"
 #include "esp_log.h"
 #include "esp_http_client.h"
@@ -121,19 +122,40 @@ static esp_err_t save_certificate_to_nvs(const char *key, const char *cert_pem)
 
 /**
  * @brief Submit CSR to backend
+ * 
+ * Sends CSR to backend for signing. The server will:
+ * - Extract userId from provisioning_token
+ * - Verify user and device associations
+ * 
+ * Payload includes:
+ * - device_id: Device identifier
+ * - csr: Certificate Signing Request
+ * - provisioning_token: Token containing userId (server extracts it)
  */
-esp_err_t certificate_manager_submit_csr(const char *device_id, const char *token)
+esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov_token)
 {
-    ESP_LOGI(TAG, "Submitting CSR for device: %s", device_id);
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "CSR Submission to Backend");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "Device ID: %s", device_id);
 
-    // Build request URL
+    // Note: Server extracts userId from provisioning_token, so we don't need to send auth_token
+    // The provisioning_token contains all necessary information for server validation
+
+    // Build request URL (correct endpoint path: /api/v1/sign-csr)
     char url[256];
-    snprintf(url, sizeof(url), "%s/sign-csr", BACKEND_URL);
+    snprintf(url, sizeof(url), "%s/api/v1/sign-csr", BACKEND_URL);
+    ESP_LOGI(TAG, "Endpoint: %s", url);
 
-    // Build JSON request body
+    // Build JSON request body with CSR, device_id, and provisioning_token
+    // Note: Server extracts userId from provisioning_token and validates user-device association
     cJSON *root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "device_id", device_id);
     cJSON_AddStringToObject(root, "csr", DEVICE_CSR_PEM);
+    cJSON_AddStringToObject(root, "provisioning_token", prov_token);
+    
+    ESP_LOGI(TAG, "Payload includes: device_id, csr, provisioning_token");
+    ESP_LOGI(TAG, "Server will extract userId from provisioning_token for validation");
 
     char *json_string = cJSON_Print(root);
     if (json_string == NULL) {
@@ -142,11 +164,11 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *toke
         return ESP_ERR_NO_MEM;
     }
 
+    ESP_LOGI(TAG, "Request body prepared (device_id + csr + provisioning_token)");
     ESP_LOGD(TAG, "Request body: %s", json_string);
 
-    // Build authorization header
-    char auth_header[128];
-    snprintf(auth_header, sizeof(auth_header), "Bearer %s", token);
+    // Note: Authorization header not required - server extracts userId from provisioning_token
+    // But we can optionally include it if needed for other server-side processing
 
     // Configure HTTP client
     esp_http_client_config_t config = {
@@ -173,7 +195,7 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *toke
     // Set headers
     esp_http_client_set_method(client, HTTP_METHOD_POST);
     esp_http_client_set_header(client, "Content-Type", "application/json");
-    esp_http_client_set_header(client, "Authorization", auth_header);
+    // Authorization header removed - server extracts userId from provisioning_token
     esp_http_client_set_post_field(client, json_string, strlen(json_string));
 
     // Free response buffer if exists
@@ -183,16 +205,33 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *toke
         s_http_response_len = 0;
     }
 
+    // Log outgoing request
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "📤 OUTGOING HTTP REQUEST (Backend)");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "Method: POST");
+    ESP_LOGI(TAG, "URL: %s", url);
+    ESP_LOGI(TAG, "Request Body (length: %d):", strlen(json_string));
+    ESP_LOGD(TAG, "Request Body: %s", json_string);
+    ESP_LOGI(TAG, "Headers:");
+    ESP_LOGI(TAG, "  Content-Type: application/json");
+    ESP_LOGI(TAG, "  (Authorization header not sent - server extracts userId from provisioning_token)");
+    ESP_LOGI(TAG, "========================================");
+    
     // Perform request
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
         int status_code = esp_http_client_get_status_code(client);
-        ESP_LOGI(TAG, "HTTP POST Status = %d", status_code);
+        ESP_LOGI(TAG, "========================================");
+        ESP_LOGI(TAG, "📥 INCOMING HTTP RESPONSE (Backend)");
+        ESP_LOGI(TAG, "========================================");
+        ESP_LOGI(TAG, "Status Code: %d", status_code);
 
         if (status_code == 200 || status_code == 201) {
             // Parse response
             if (s_http_response_buffer) {
-                ESP_LOGD(TAG, "Response: %s", s_http_response_buffer);
+                ESP_LOGI(TAG, "Response Body (length: %d):", strlen(s_http_response_buffer));
+                ESP_LOGD(TAG, "Response Body: %s", s_http_response_buffer);
 
                 cJSON *response = cJSON_Parse(s_http_response_buffer);
                 if (response) {
@@ -211,33 +250,45 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *toke
                             }
 
                             if (err == ESP_OK) {
-                                ESP_LOGI(TAG, "Successfully saved certificates");
+                                ESP_LOGI(TAG, "✅ Successfully saved certificates");
+                                ESP_LOGI(TAG, "========================================");
                             } else {
-                                ESP_LOGE(TAG, "Failed to save certificates: %s", esp_err_to_name(err));
+                                ESP_LOGE(TAG, "✗ Failed to save certificates: %s", esp_err_to_name(err));
+                                ESP_LOGI(TAG, "========================================");
                             }
                         } else {
-                            ESP_LOGE(TAG, "Invalid certificate format in response");
+                            ESP_LOGE(TAG, "✗ Invalid certificate format in response");
+                            ESP_LOGI(TAG, "========================================");
                             err = ESP_ERR_INVALID_RESPONSE;
                         }
                     } else {
-                        ESP_LOGE(TAG, "Missing certificate fields in response");
+                        ESP_LOGE(TAG, "✗ Missing certificate fields in response");
+                        ESP_LOGI(TAG, "========================================");
                         err = ESP_ERR_INVALID_RESPONSE;
                     }
                     cJSON_Delete(response);
                 } else {
-                    ESP_LOGE(TAG, "Failed to parse JSON response");
+                    ESP_LOGE(TAG, "✗ Failed to parse JSON response");
+                    ESP_LOGI(TAG, "========================================");
                     err = ESP_ERR_INVALID_RESPONSE;
                 }
             } else {
-                ESP_LOGE(TAG, "No response data received");
+                ESP_LOGE(TAG, "✗ No response data received");
+                ESP_LOGI(TAG, "========================================");
                 err = ESP_ERR_INVALID_RESPONSE;
             }
         } else {
-            ESP_LOGE(TAG, "HTTP request failed with status %d", status_code);
+            ESP_LOGE(TAG, "✗ HTTP request failed with status %d", status_code);
+            if (s_http_response_buffer && strlen(s_http_response_buffer) > 0) {
+                ESP_LOGE(TAG, "Error Response: %s", s_http_response_buffer);
+            }
+            ESP_LOGI(TAG, "========================================");
             err = ESP_FAIL;
         }
     } else {
-        ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "========================================");
+        ESP_LOGE(TAG, "✗ HTTP POST request failed: %s", esp_err_to_name(err));
+        ESP_LOGE(TAG, "========================================");
     }
 
     // Cleanup

@@ -38,6 +38,54 @@ print_warning() {
     echo -e "${YELLOW}⚠ $1${NC}"
 }
 
+# Step 0: Cleanup processes using serial port
+cleanup_serial_port() {
+    print_step "Cleaning up serial port"
+    
+    # Check if port exists
+    if [ ! -e "$ESP_PORT" ]; then
+        print_info "Port $ESP_PORT does not exist yet (device may not be connected)"
+        return 0
+    fi
+    
+    # Check if port is in use
+    if lsof "$ESP_PORT" >/dev/null 2>&1; then
+        print_info "Serial port is in use. Cleaning up processes..."
+        
+        # Kill common processes that might lock the port
+        pkill -f "idf.py.*monitor" 2>/dev/null && print_info "  ✓ Killed idf.py monitor processes"
+        pkill -f "esp_idf_monitor" 2>/dev/null && print_info "  ✓ Killed esp_idf_monitor processes"
+        pkill -f "idf_monitor" 2>/dev/null && print_info "  ✓ Killed idf_monitor processes"
+        
+        # Use fuser as fallback
+        if fuser -k "$ESP_PORT" >/dev/null 2>&1; then
+            print_info "  ✓ Killed processes using port via fuser"
+        fi
+        
+        # Wait for processes to die
+        sleep 2
+        
+        # Verify port is free
+        if lsof "$ESP_PORT" >/dev/null 2>&1; then
+            print_warning "Some processes may still be using the port"
+            print_info "Attempting to continue anyway..."
+        else
+            print_success "Port is now free"
+        fi
+    else
+        print_success "Port is already free"
+    fi
+    
+    # Also clean up any build artifacts that might cause issues
+    print_info "Cleaning up build artifacts..."
+    cd "$PROJECT_DIR"
+    if [ -d "build" ]; then
+        # Don't remove build directory, just clean stale locks
+        rm -f build/.cmake_lock 2>/dev/null
+        print_info "  ✓ Cleaned build locks"
+    fi
+}
+
 # Step 1: Setup ESP-IDF environment
 setup_esp_idf() {
     print_step "Setting up ESP-IDF environment"
@@ -66,6 +114,15 @@ build_project() {
 flash_esp32() {
     print_step "Flashing firmware to ESP32"
     cd "$PROJECT_DIR"
+    
+    # Quick check if port is still in use (cleanup should have handled this, but double-check)
+    if lsof "$ESP_PORT" >/dev/null 2>&1; then
+        print_warning "Port is still in use, attempting quick cleanup..."
+        pkill -9 -f "idf.py.*monitor" 2>/dev/null
+        pkill -9 -f "esp_idf_monitor" 2>/dev/null
+        fuser -k "$ESP_PORT" 2>/dev/null
+        sleep 1
+    fi
     
     if [ ! -e "$ESP_PORT" ]; then
         print_error "ESP32 not found at $ESP_PORT"
@@ -381,6 +438,10 @@ main() {
     echo "=========================================="
     echo "ESP32 WiFi Provisioning - Run Script"
     echo "=========================================="
+    echo ""
+    
+    # Step 0: Cleanup first (before any operations)
+    cleanup_serial_port
     echo ""
     
     setup_esp_idf

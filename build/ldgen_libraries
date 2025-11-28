@@ -175,8 +175,8 @@
 /home/statsnapp/Desktop/statsclient/build/esp-idf/perfmon/libperfmon.a
 /home/statsnapp/Desktop/statsclient/build/esp-idf/rt/librt.a
 /home/statsnapp/Desktop/statsclient/build/esp-idf/spiffs/libspiffs.a
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/libespressif__cjson.a
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/libespressif__mqtt.a
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/libespressif__cjson.a
 /home/statsnapp/Desktop/statsclient/build/esp-idf/main/libmain.a
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/libespressif__cjson.a
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/libespressif__mqtt.a
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/libespressif__cjson.a

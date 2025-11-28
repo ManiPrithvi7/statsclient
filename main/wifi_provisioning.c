@@ -59,6 +59,146 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
 static void ip_event_handler(void* arg, esp_event_base_t event_base,
                              int32_t event_id, void* event_data);
 static esp_err_t perform_wifi_scan_and_cache(void);
+static void log_incoming_request(httpd_req_t *req);
+static void log_outgoing_response(const char *method, const char *uri, int status_code, const char *response_body);
+
+/**
+ * @brief Log incoming HTTP request details
+ */
+static void log_incoming_request(httpd_req_t *req)
+{
+    // Reduced stack usage - use smaller, reusable buffer
+    char buf[128] = {0};  // Single buffer for all header reads (reduced from 512)
+    
+    ESP_LOGI(TAG, "");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, ">>> INCOMING HTTP REQUEST");
+    ESP_LOGI(TAG, "========================================");
+    
+    // Log method
+    const char *method_str = "UNKNOWN";
+    if (req->method == HTTP_GET) {
+        method_str = "GET";
+    } else if (req->method == HTTP_POST) {
+        method_str = "POST";
+    } else if (req->method == HTTP_PUT) {
+        method_str = "PUT";
+    } else if (req->method == HTTP_DELETE) {
+        method_str = "DELETE";
+    }
+    ESP_LOGI(TAG, "Method: %s", method_str);
+    
+    // Log URI
+    ESP_LOGI(TAG, "URI: %s", req->uri);
+    
+    // Log query string if present
+    size_t query_len = httpd_req_get_url_query_len(req) + 1;
+    if (query_len > 1 && query_len <= sizeof(buf)) {
+        if (httpd_req_get_url_query_str(req, buf, sizeof(buf)) == ESP_OK) {
+            ESP_LOGI(TAG, "Query String: %s", buf);
+            buf[0] = '\0';  // Clear for reuse
+        }
+    }
+    
+    // Log content length
+    size_t content_len = httpd_req_get_hdr_value_len(req, "Content-Length");
+    if (content_len > 0) {
+        ESP_LOGI(TAG, "Content-Length: %d", content_len);
+    } else {
+        ESP_LOGI(TAG, "Content-Length: 0 (no body)");
+    }
+    
+    // User-Agent
+    size_t ua_len = httpd_req_get_hdr_value_len(req, "User-Agent") + 1;
+    if (ua_len > 1 && ua_len <= sizeof(buf)) {
+        if (httpd_req_get_hdr_value_str(req, "User-Agent", buf, sizeof(buf)) == ESP_OK) {
+            ESP_LOGI(TAG, "User-Agent: %s", buf);
+            buf[0] = '\0';
+        }
+    }
+    
+    // Authorization header (truncated for security)
+    size_t auth_len = httpd_req_get_hdr_value_len(req, "Authorization") + 1;
+    if (auth_len > 1 && auth_len <= sizeof(buf)) {
+        if (httpd_req_get_hdr_value_str(req, "Authorization", buf, sizeof(buf)) == ESP_OK) {
+            if (strlen(buf) > 50) {
+                buf[50] = '\0';
+                ESP_LOGI(TAG, "Authorization: %s...", buf);
+            } else {
+                ESP_LOGI(TAG, "Authorization: %s", buf);
+            }
+            buf[0] = '\0';
+        }
+    } else {
+        ESP_LOGI(TAG, "Authorization: (not present)");
+    }
+    
+    // Content-Type
+    size_t content_type_len = httpd_req_get_hdr_value_len(req, "Content-Type") + 1;
+    if (content_type_len > 1 && content_type_len <= sizeof(buf)) {
+        if (httpd_req_get_hdr_value_str(req, "Content-Type", buf, sizeof(buf)) == ESP_OK) {
+            ESP_LOGI(TAG, "Content-Type: %s", buf);
+            buf[0] = '\0';
+        }
+    }
+    
+    // Host
+    size_t host_len = httpd_req_get_hdr_value_len(req, "Host") + 1;
+    if (host_len > 1 && host_len <= sizeof(buf)) {
+        if (httpd_req_get_hdr_value_str(req, "Host", buf, sizeof(buf)) == ESP_OK) {
+            ESP_LOGI(TAG, "Host: %s", buf);
+        }
+    }
+    
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "");
+}
+
+/**
+ * @brief Log outgoing HTTP response details
+ */
+static void log_outgoing_response(const char *method, const char *uri, int status_code, const char *response_body)
+{
+    ESP_LOGI(TAG, "");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "<<< OUTGOING HTTP RESPONSE");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "Method: %s", method);
+    ESP_LOGI(TAG, "URI: %s", uri);
+    ESP_LOGI(TAG, "HTTP Status: %d", status_code);
+    
+    // Status code description
+    const char *status_desc = "";
+    if (status_code == 200) status_desc = "OK";
+    else if (status_code == 201) status_desc = "Created";
+    else if (status_code == 400) status_desc = "Bad Request";
+    else if (status_code == 401) status_desc = "Unauthorized";
+    else if (status_code == 404) status_desc = "Not Found";
+    else if (status_code == 500) status_desc = "Internal Server Error";
+    ESP_LOGI(TAG, "Status Description: %s", status_desc);
+    
+    if (response_body) {
+        size_t body_len = strlen(response_body);
+        ESP_LOGI(TAG, "Response Body Length: %d bytes", body_len);
+        
+        // Log response body (truncate if too long)
+        if (body_len > 500) {
+            char truncated[510] = {0};
+            strncpy(truncated, response_body, 500);
+            strcat(truncated, "...");
+            ESP_LOGI(TAG, "Response Body (first 500 chars): %s", truncated);
+            ESP_LOGI(TAG, "Response Body (full): [See ESP_LOGD for full body]");
+            ESP_LOGD(TAG, "Full Response Body: %s", response_body);
+        } else {
+            ESP_LOGI(TAG, "Response Body: %s", response_body);
+        }
+    } else {
+        ESP_LOGI(TAG, "Response Body: (empty)");
+    }
+    
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "");
+}
 
 /**
  * @brief Perform WiFi scan and update cache
@@ -181,7 +321,18 @@ cleanup:
  */
 static esp_err_t scan_handler(httpd_req_t *req)
 {
-    ESP_LOGI(TAG, "WiFi scan requested");
+    // Immediate logging - this should appear FIRST
+    // Using multiple log levels to ensure visibility
+    ESP_LOGE(TAG, "========================================");
+    ESP_LOGE(TAG, "SCAN_HANDLER CALLED - /local-wifi REQUEST");
+    ESP_LOGE(TAG, "========================================");
+    ESP_LOGI(TAG, "");
+    ESP_LOGI(TAG, "*** SCAN_HANDLER CALLED ***");
+    ESP_LOGI(TAG, "URI: %s", req->uri ? req->uri : "NULL");
+    ESP_LOGI(TAG, "Method: %d (1=GET, 3=POST)", req->method);
+    
+    // Log incoming request
+    log_incoming_request(req);
 
     // Check for refresh parameter
     char query[32] = {0};
@@ -205,9 +356,11 @@ static esp_err_t scan_handler(httpd_req_t *req)
         esp_err_t ret = perform_wifi_scan_and_cache();
         if (ret != ESP_OK && !s_initial_scan_done) {
             // Only fail if we have no cached data at all
+            const char *error_response = "{\"error\":\"scan_failed\",\"message\":\"No cached data available\"}";
             httpd_resp_set_status(req, "500 Internal Server Error");
             httpd_resp_set_type(req, "application/json");
-            httpd_resp_sendstr(req, "{\"error\":\"scan_failed\",\"message\":\"No cached data available\"}");
+            log_outgoing_response("GET", req->uri, 500, error_response);
+            httpd_resp_sendstr(req, error_response);
             return ESP_FAIL;
         }
     }
@@ -215,9 +368,11 @@ static esp_err_t scan_handler(httpd_req_t *req)
     // Take mutex to safely read cache
     if (s_cache_mutex == NULL || xSemaphoreTake(s_cache_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
         ESP_LOGE(TAG, "Failed to acquire cache mutex");
+        const char *error_response = "{\"error\":\"cache_busy\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"cache_busy\"}");
+        log_outgoing_response("GET", req->uri, 500, error_response);
+        httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
 
@@ -246,14 +401,20 @@ static esp_err_t scan_handler(httpd_req_t *req)
     char *json_string = cJSON_Print(root);
     if (json_string == NULL) {
         ESP_LOGE(TAG, "Failed to create JSON string");
+        const char *error_response = "{\"error\":\"json_error\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"json_error\"}");
+        log_outgoing_response("GET", req->uri, 500, error_response);
+        httpd_resp_sendstr(req, error_response);
         cJSON_Delete(root);
         return ESP_FAIL;
     }
 
     httpd_resp_set_type(req, "application/json");
+    
+    // Log outgoing response
+    log_outgoing_response("GET", req->uri, 200, json_string);
+    
     httpd_resp_sendstr(req, json_string);
 
     ESP_LOGI(TAG, "Returned %d networks (instant response)", count);
@@ -269,16 +430,19 @@ static esp_err_t scan_handler(httpd_req_t *req)
  */
 static esp_err_t provision_handler(httpd_req_t *req)
 {
-    ESP_LOGI(TAG, "Provisioning request received");
+    // Immediate logging
+    ESP_LOGI(TAG, "[PROVISION_HANDLER] Request received for URI: %s", req->uri ? req->uri : "NULL");
+    // Log incoming request (reduced stack usage version)
+    log_incoming_request(req);
 
-    // Extract Authorization header (Bearer token)
-    char auth_header[512] = {0};
+    // Extract Authorization header (Bearer token) - use smaller buffer
+    char auth_header[256] = {0};  // Reduced from 512 to save stack
     const char *bearer_token = NULL;
     size_t auth_len = httpd_req_get_hdr_value_len(req, "Authorization") + 1;
     
-    if (auth_len > 1) {
-        if (httpd_req_get_hdr_value_str(req, "Authorization", auth_header, auth_len) == ESP_OK) {
-            ESP_LOGI(TAG, "Authorization header received: %s", auth_header);
+    if (auth_len > 1 && auth_len <= sizeof(auth_header)) {
+        if (httpd_req_get_hdr_value_str(req, "Authorization", auth_header, sizeof(auth_header)) == ESP_OK) {
+            ESP_LOGI(TAG, "Authorization header received");
             
             // Extract Bearer token (skip "Bearer " prefix if present, case-insensitive)
             if (strncasecmp(auth_header, "Bearer ", 7) == 0) {
@@ -286,7 +450,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
             } else {
                 bearer_token = auth_header;  // Use as-is if no "Bearer " prefix
             }
-            ESP_LOGI(TAG, "Extracted Bearer token: %s", bearer_token);
+            ESP_LOGI(TAG, "Extracted Bearer token (len: %d)", strlen(bearer_token));
         } else {
             ESP_LOGW(TAG, "Failed to read Authorization header");
         }
@@ -294,23 +458,31 @@ static esp_err_t provision_handler(httpd_req_t *req)
         ESP_LOGW(TAG, "No Authorization header provided");
     }
 
-    char content[512];
+    // Read request body - use smaller buffer and allocate larger if needed
+    char content[384];  // Reduced from 512 to save stack
     int ret = httpd_req_recv(req, content, sizeof(content) - 1);
     if (ret <= 0) {
+        const char *error_response = "{\"error\":\"invalid_request\"}";
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"invalid_request\"}");
+        log_outgoing_response("POST", req->uri, 400, error_response);
+        httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
     content[ret] = '\0';
+    
+    // Log request body (already logged in log_incoming_request, but add here too for clarity)
+    ESP_LOGI(TAG, "Request Body: %s", content);
 
     // Parse JSON
     cJSON *root = cJSON_Parse(content);
     if (root == NULL) {
         ESP_LOGE(TAG, "Failed to parse JSON");
+        const char *error_response = "{\"error\":\"invalid_json\"}";
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"invalid_json\"}");
+        log_outgoing_response("POST", req->uri, 400, error_response);
+        httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
 
@@ -319,14 +491,87 @@ static esp_err_t provision_handler(httpd_req_t *req)
     cJSON *device_id_json = cJSON_GetObjectItem(root, "device_id");
     cJSON *token_json = cJSON_GetObjectItem(root, "provisioning_token");
 
-    if (!cJSON_IsString(ssid_json) || !cJSON_IsString(password_json) ||
-        !cJSON_IsString(device_id_json) || !cJSON_IsString(token_json)) {
-        ESP_LOGE(TAG, "Missing required fields");
-        cJSON_Delete(root);
-        httpd_resp_set_status(req, "400 Bad Request");
-        httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"missing_fields\"}");
-        return ESP_FAIL;
+    // Check which fields are missing and build detailed error response
+    cJSON *error_obj = NULL;
+    cJSON *missing_array = NULL;
+    bool has_error = false;
+    
+    // Check each required field
+    if (!cJSON_IsString(ssid_json)) {
+        if (error_obj == NULL) {
+            error_obj = cJSON_CreateObject();
+            cJSON_AddStringToObject(error_obj, "error", "missing_fields");
+            cJSON_AddStringToObject(error_obj, "message", "One or more required fields are missing");
+            missing_array = cJSON_CreateArray();
+            cJSON_AddItemToObject(error_obj, "missing_fields", missing_array);
+        }
+        cJSON_AddItemToArray(missing_array, cJSON_CreateString("ssid"));
+        has_error = true;
+        ESP_LOGE(TAG, "Missing required field: ssid");
+    }
+    
+    if (!cJSON_IsString(password_json)) {
+        if (error_obj == NULL) {
+            error_obj = cJSON_CreateObject();
+            cJSON_AddStringToObject(error_obj, "error", "missing_fields");
+            cJSON_AddStringToObject(error_obj, "message", "One or more required fields are missing");
+            missing_array = cJSON_CreateArray();
+            cJSON_AddItemToObject(error_obj, "missing_fields", missing_array);
+        }
+        cJSON_AddItemToArray(missing_array, cJSON_CreateString("password"));
+        has_error = true;
+        ESP_LOGE(TAG, "Missing required field: password");
+    }
+    
+    if (!cJSON_IsString(device_id_json)) {
+        if (error_obj == NULL) {
+            error_obj = cJSON_CreateObject();
+            cJSON_AddStringToObject(error_obj, "error", "missing_fields");
+            cJSON_AddStringToObject(error_obj, "message", "One or more required fields are missing");
+            missing_array = cJSON_CreateArray();
+            cJSON_AddItemToObject(error_obj, "missing_fields", missing_array);
+        }
+        cJSON_AddItemToArray(missing_array, cJSON_CreateString("device_id"));
+        has_error = true;
+        ESP_LOGE(TAG, "Missing required field: device_id");
+    }
+    
+    if (!cJSON_IsString(token_json)) {
+        if (error_obj == NULL) {
+            error_obj = cJSON_CreateObject();
+            cJSON_AddStringToObject(error_obj, "error", "missing_fields");
+            cJSON_AddStringToObject(error_obj, "message", "One or more required fields are missing");
+            missing_array = cJSON_CreateArray();
+            cJSON_AddItemToObject(error_obj, "missing_fields", missing_array);
+        }
+        cJSON_AddItemToArray(missing_array, cJSON_CreateString("provisioning_token"));
+        has_error = true;
+        ESP_LOGE(TAG, "Missing required field: provisioning_token");
+    }
+    
+    if (has_error) {
+        char *error_json = cJSON_Print(error_obj);
+        if (error_json) {
+            ESP_LOGE(TAG, "Missing required fields response: %s", error_json);
+            cJSON_Delete(root);
+            cJSON_Delete(error_obj);
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_set_type(req, "application/json");
+            log_outgoing_response("POST", req->uri, 400, error_json);
+            httpd_resp_sendstr(req, error_json);
+            free(error_json);
+            return ESP_FAIL;
+        } else {
+            ESP_LOGE(TAG, "Failed to create error JSON response");
+            cJSON_Delete(root);
+            cJSON_Delete(error_obj);
+            const char *fallback_error = "{\"error\":\"missing_fields\",\"message\":\"Failed to generate detailed error\"}";
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_set_type(req, "application/json");
+            log_outgoing_response("POST", req->uri, 400, fallback_error);
+            httpd_resp_sendstr(req, fallback_error);
+            return ESP_FAIL;
+        }
     }
 
     const char *ssid = ssid_json->valuestring;
@@ -341,33 +586,32 @@ static esp_err_t provision_handler(httpd_req_t *req)
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to save credentials: %s", esp_err_to_name(err));
         cJSON_Delete(root);
+        const char *error_response = "{\"error\":\"save_failed\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "{\"error\":\"save_failed\"}");
+        log_outgoing_response("POST", req->uri, 500, error_response);
+        httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
 
     cJSON_Delete(root);
 
-    // Send success response
+    // Send success response first
+    const char *success_response = "{\"status\":\"ok\",\"message\":\"Credentials saved\"}";
     httpd_resp_set_type(req, "application/json");
-    httpd_resp_sendstr(req, "{\"status\":\"ok\",\"message\":\"Credentials saved\"}");
+    log_outgoing_response("POST", req->uri, 200, success_response);
+    httpd_resp_sendstr(req, success_response);
 
-    // Stop HTTP server and switch to STA mode
-    vTaskDelay(pdMS_TO_TICKS(500)); // Give time for response to be sent
+    // Stop provisioning (this stops HTTP server and marks provisioning as inactive)
+    // Do this after sending response but before returning
+    ESP_LOGI(TAG, "Stopping provisioning and preparing for WiFi connection...");
     wifi_provisioning_stop();
 
-    // Configure and connect to WiFi
-    wifi_config_t wifi_config = {0};
-    strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
-    strncpy((char*)wifi_config.sta.password, password, sizeof(wifi_config.sta.password) - 1);
-
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    esp_wifi_start();
-    esp_wifi_connect();
-
-    ESP_LOGI(TAG, "Connecting to WiFi: %s", ssid);
+    // Note: WiFi connection will be handled by the state machine in main.c
+    // which checks wifi_provisioning_is_provisioned() and transitions to WIFI_CONNECTING
+    // The state machine will then call wifi_provisioning_connect_to_wifi()
+    
+    ESP_LOGI(TAG, "Credentials saved. State machine will handle WiFi connection.");
 
     return ESP_OK;
 }
@@ -377,6 +621,10 @@ static esp_err_t provision_handler(httpd_req_t *req)
  */
 static esp_err_t status_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "[STATUS_HANDLER] Request received for URI: %s", req->uri);
+    // Log incoming request
+    log_incoming_request(req);
+    
     cJSON *root = cJSON_CreateObject();
 
     if (s_wifi_connected) {
@@ -391,6 +639,10 @@ static esp_err_t status_handler(httpd_req_t *req)
 
     char *json_string = cJSON_Print(root);
     httpd_resp_set_type(req, "application/json");
+    
+    // Log outgoing response
+    log_outgoing_response("GET", req->uri, 200, json_string);
+    
     httpd_resp_sendstr(req, json_string);
 
     free(json_string);
@@ -510,8 +762,11 @@ static httpd_handle_t start_http_server(void)
     // Increase timeouts for long-running operations like WiFi scan (15-20 seconds)
     config.recv_wait_timeout = 30;  // 30 seconds receive timeout
     config.send_wait_timeout = 30;  // 30 seconds send timeout
+    
+    // Increase stack size to prevent stack overflow in handlers (default is often 4096)
+    config.stack_size = 8192;  // 8KB stack for HTTP server task
 
-    ESP_LOGI(TAG, "Starting HTTP server on port %d", config.server_port);
+    ESP_LOGI(TAG, "Starting HTTP server on port %d (stack: %d bytes)", config.server_port, config.stack_size);
 
     if (httpd_start(&server, &config) == ESP_OK) {
         // Register URI handlers

@@ -2034,19 +2034,6 @@ __idf_spiffs/fast:
 .PHONY : __idf_spiffs/fast
 
 #=============================================================================
-# Target rules for targets named __idf_espressif__cjson
-
-# Build rule for target.
-__idf_espressif__cjson: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 __idf_espressif__cjson
-.PHONY : __idf_espressif__cjson
-
-# fast build rule for target.
-__idf_espressif__cjson/fast:
-	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build
-.PHONY : __idf_espressif__cjson/fast
-
-#=============================================================================
 # Target rules for targets named __idf_espressif__mqtt
 
 # Build rule for target.
@@ -2058,6 +2045,19 @@ __idf_espressif__mqtt: cmake_check_build_system
 __idf_espressif__mqtt/fast:
 	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/build.make esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/build
 .PHONY : __idf_espressif__mqtt/fast
+
+#=============================================================================
+# Target rules for targets named __idf_espressif__cjson
+
+# Build rule for target.
+__idf_espressif__cjson: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 __idf_espressif__cjson
+.PHONY : __idf_espressif__cjson
+
+# fast build rule for target.
+__idf_espressif__cjson/fast:
+	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build
+.PHONY : __idf_espressif__cjson/fast
 
 #=============================================================================
 # Target rules for targets named __idf_main

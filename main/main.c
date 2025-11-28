@@ -20,7 +20,7 @@
 #include "wifi_provisioning.h"
 #include "certificate_manager.h"
 #include "internet_verification.h"
-// #include "mqtt_client.h"  // Temporarily disabled for testing
+#include "mqtt_handler.h"
 #include "device_keys.h"
 
 static const char *TAG = "main";
@@ -146,8 +146,39 @@ static void app_state_machine_task(void *pvParameters)
         case APP_STATE_WIFI_CONNECTING:
             ESP_LOGI(TAG, "State: WIFI_CONNECTING");
             {
-                // WiFi connection is handled by wifi_provisioning module
-                // Wait for connection event
+                static bool connection_attempted = false;
+                
+                if (!connection_attempted) {
+                    // Read WiFi credentials from NVS and connect
+                    nvs_handle_t nvs_handle;
+                    if (nvs_open("device_config", NVS_READONLY, &nvs_handle) == ESP_OK) {
+                        char ssid[33] = {0};
+                        char password[65] = {0};
+                        size_t required_size;
+                        
+                        required_size = sizeof(ssid);
+                        if (nvs_get_str(nvs_handle, "wifi_ssid", ssid, &required_size) == ESP_OK) {
+                            required_size = sizeof(password);
+                            nvs_get_str(nvs_handle, "wifi_password", password, &required_size);
+                            
+                            // Configure and connect to WiFi
+                            wifi_config_t wifi_config = {0};
+                            strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
+                            strncpy((char*)wifi_config.sta.password, password, sizeof(wifi_config.sta.password) - 1);
+                            
+                            ESP_LOGI(TAG, "Connecting to WiFi: %s", ssid);
+                            esp_wifi_set_mode(WIFI_MODE_STA);
+                            esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+                            esp_wifi_start();
+                            esp_wifi_connect();
+                            
+                            connection_attempted = true;
+                        }
+                        nvs_close(nvs_handle);
+                    }
+                }
+                
+                // Wait for connection event (handled by wifi_sta_event_handler)
                 vTaskDelay(pdMS_TO_TICKS(1000));
             }
             break;
@@ -215,11 +246,10 @@ static void app_state_machine_task(void *pvParameters)
 
         case APP_STATE_CHECK_CERTIFICATES:
             ESP_LOGI(TAG, "State: CHECK_CERTIFICATES");
-            // Temporarily skip MQTT for testing provisioning endpoints
-            ESP_LOGI(TAG, "Skipping MQTT connection for provisioning test");
             if (certificate_manager_has_certificates()) {
-                ESP_LOGI(TAG, "Certificates found - MQTT connection disabled for testing");
-                s_app_state = APP_STATE_MQTT_CONNECTED;  // Skip to connected state
+                ESP_LOGI(TAG, "✓ Certificates found in NVS");
+                ESP_LOGI(TAG, "Proceeding to MQTT connection...");
+                s_app_state = APP_STATE_MQTT_CONNECTING;
             } else {
                 ESP_LOGI(TAG, "Certificates not found, submitting CSR...");
                 s_app_state = APP_STATE_SUBMIT_CSR;
@@ -253,19 +283,89 @@ static void app_state_machine_task(void *pvParameters)
             break;
 
         case APP_STATE_MQTT_CONNECTING:
-            ESP_LOGI(TAG, "State: MQTT_CONNECTING - Skipped for testing");
-            // Temporarily skip MQTT for testing
-            s_app_state = APP_STATE_MQTT_CONNECTED;
+            ESP_LOGI(TAG, "State: MQTT_CONNECTING");
+            {
+                static int mqtt_connect_retries = 0;
+                const int MAX_MQTT_RETRIES = 3;
+                
+                esp_err_t ret = mqtt_handler_start();
+                if (ret == ESP_OK) {
+                    ESP_LOGI(TAG, "MQTT handler started, waiting for connection...");
+                    
+                    // Wait for connection with timeout
+                    int wait_count = 0;
+                    while (!mqtt_handler_is_connected() && wait_count < 30) {
+                        vTaskDelay(pdMS_TO_TICKS(1000));
+                        wait_count++;
+                        if (wait_count % 5 == 0) {
+                            ESP_LOGI(TAG, "Waiting for MQTT connection... (%d seconds)", wait_count);
+                        }
+                    }
+                    
+                    if (mqtt_handler_is_connected()) {
+                        ESP_LOGI(TAG, "✓ MQTT connected successfully!");
+                        mqtt_connect_retries = 0;
+                        s_app_state = APP_STATE_MQTT_CONNECTED;
+                    } else {
+                        ESP_LOGW(TAG, "MQTT connection timeout");
+                        mqtt_handler_stop();
+                        mqtt_connect_retries++;
+                        
+                        if (mqtt_connect_retries >= MAX_MQTT_RETRIES) {
+                            ESP_LOGE(TAG, "MQTT connection failed after %d retries", MAX_MQTT_RETRIES);
+                            s_app_state = APP_STATE_ERROR;
+                        } else {
+                            ESP_LOGI(TAG, "Retrying MQTT connection... (%d/%d)", mqtt_connect_retries, MAX_MQTT_RETRIES);
+                            vTaskDelay(pdMS_TO_TICKS(5000));
+                        }
+                    }
+                } else {
+                    ESP_LOGE(TAG, "Failed to start MQTT handler: %s", esp_err_to_name(ret));
+                    mqtt_connect_retries++;
+                    
+                    if (mqtt_connect_retries >= MAX_MQTT_RETRIES) {
+                        s_app_state = APP_STATE_ERROR;
+                    } else {
+                        vTaskDelay(pdMS_TO_TICKS(5000));
+                    }
+                }
+            }
             break;
 
         case APP_STATE_MQTT_CONNECTED:
-            ESP_LOGI(TAG, "State: MQTT_CONNECTED - Application running (MQTT disabled for testing)");
             {
-                // Application is fully operational
-                // MQTT disabled for provisioning endpoint testing
-                ESP_LOGI(TAG, "Provisioning endpoints ready for testing");
+                static bool connected_msg_shown = false;
+                
+                if (!connected_msg_shown) {
+                    ESP_LOGI(TAG, "========================================");
+                    ESP_LOGI(TAG, "State: MQTT_CONNECTED");
+                    ESP_LOGI(TAG, "========================================");
+                    ESP_LOGI(TAG, "✓ Device provisioning complete!");
+                    ESP_LOGI(TAG, "✓ mTLS MQTT connection established!");
+                    ESP_LOGI(TAG, "✓ Device is fully operational!");
+                    ESP_LOGI(TAG, "========================================");
+                    connected_msg_shown = true;
+                }
+                
+                // Check if still connected
+                if (!mqtt_handler_is_connected()) {
+                    ESP_LOGW(TAG, "MQTT connection lost, reconnecting...");
+                    connected_msg_shown = false;
+                    mqtt_handler_stop();
+                    s_app_state = APP_STATE_MQTT_CONNECTING;
+                    break;
+                }
+                
+                // Application is fully operational - can publish/subscribe here
+                // For now, just heartbeat log every 30 seconds
+                static int heartbeat_counter = 0;
+                heartbeat_counter++;
+                if (heartbeat_counter >= 30) {
+                    ESP_LOGI(TAG, "MQTT connection healthy - device operational");
+                    heartbeat_counter = 0;
+                }
             }
-            vTaskDelay(pdMS_TO_TICKS(10000)); // Check every 10 seconds
+            vTaskDelay(pdMS_TO_TICKS(1000));
             break;
 
         case APP_STATE_ERROR:

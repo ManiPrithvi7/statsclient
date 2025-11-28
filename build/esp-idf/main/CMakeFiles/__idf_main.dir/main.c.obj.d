@@ -138,4 +138,5 @@ esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj: \
  /home/statsnapp/Desktop/statsclient/main/wifi_provisioning.h \
  /home/statsnapp/Desktop/statsclient/main/certificate_manager.h \
  /home/statsnapp/Desktop/statsclient/main/internet_verification.h \
+ /home/statsnapp/Desktop/statsclient/main/mqtt_handler.h \
  /home/statsnapp/Desktop/statsclient/main/device_keys.h

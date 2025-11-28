@@ -184,8 +184,8 @@ wifi_ap_project.elf: esp-idf/fatfs/libfatfs.a
 wifi_ap_project.elf: esp-idf/perfmon/libperfmon.a
 wifi_ap_project.elf: esp-idf/rt/librt.a
 wifi_ap_project.elf: esp-idf/spiffs/libspiffs.a
-wifi_ap_project.elf: esp-idf/espressif__cjson/libespressif__cjson.a
 wifi_ap_project.elf: esp-idf/espressif__mqtt/libespressif__mqtt.a
+wifi_ap_project.elf: esp-idf/espressif__cjson/libespressif__cjson.a
 wifi_ap_project.elf: esp-idf/main/libmain.a
 wifi_ap_project.elf: esp-idf/unity/libunity.a
 wifi_ap_project.elf: esp-idf/esp_driver_i2c/libesp_driver_i2c.a
@@ -199,8 +199,8 @@ wifi_ap_project.elf: esp-idf/esp_driver_sdspi/libesp_driver_sdspi.a
 wifi_ap_project.elf: esp-idf/sdmmc/libsdmmc.a
 wifi_ap_project.elf: esp-idf/wear_levelling/libwear_levelling.a
 wifi_ap_project.elf: esp-idf/esp_driver_spi/libesp_driver_spi.a
-wifi_ap_project.elf: esp-idf/espressif__cjson/libespressif__cjson.a
 wifi_ap_project.elf: esp-idf/espressif__mqtt/libespressif__mqtt.a
+wifi_ap_project.elf: esp-idf/espressif__cjson/libespressif__cjson.a
 wifi_ap_project.elf: esp-idf/xtensa/libxtensa.a
 wifi_ap_project.elf: esp-idf/esp_stdio/libesp_stdio.a
 wifi_ap_project.elf: esp-idf/esp_hal_mspi/libesp_hal_mspi.a

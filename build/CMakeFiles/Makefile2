@@ -228,8 +228,8 @@ esp-idf/all: esp-idf/perfmon/all
 esp-idf/all: esp-idf/rt/all
 esp-idf/all: esp-idf/spiffs/all
 esp-idf/all: esp-idf/ulp/all
-esp-idf/all: esp-idf/espressif__cjson/all
 esp-idf/all: esp-idf/espressif__mqtt/all
+esp-idf/all: esp-idf/espressif__cjson/all
 esp-idf/all: esp-idf/main/all
 .PHONY : esp-idf/all
 
@@ -353,8 +353,8 @@ esp-idf/preinstall: esp-idf/perfmon/preinstall
 esp-idf/preinstall: esp-idf/rt/preinstall
 esp-idf/preinstall: esp-idf/spiffs/preinstall
 esp-idf/preinstall: esp-idf/ulp/preinstall
-esp-idf/preinstall: esp-idf/espressif__cjson/preinstall
 esp-idf/preinstall: esp-idf/espressif__mqtt/preinstall
+esp-idf/preinstall: esp-idf/espressif__cjson/preinstall
 esp-idf/preinstall: esp-idf/main/preinstall
 .PHONY : esp-idf/preinstall
 
@@ -478,8 +478,8 @@ esp-idf/clean: esp-idf/perfmon/clean
 esp-idf/clean: esp-idf/rt/clean
 esp-idf/clean: esp-idf/spiffs/clean
 esp-idf/clean: esp-idf/ulp/clean
-esp-idf/clean: esp-idf/espressif__cjson/clean
 esp-idf/clean: esp-idf/espressif__mqtt/clean
+esp-idf/clean: esp-idf/espressif__cjson/clean
 esp-idf/clean: esp-idf/main/clean
 .PHONY : esp-idf/clean
 
@@ -2781,8 +2781,8 @@ CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/fatfs/CMakeFiles/__idf_fatfs.dir
 CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/perfmon/CMakeFiles/__idf_perfmon.dir/all
 CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/rt/CMakeFiles/__idf_rt.dir/all
 CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/all
-CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/all
+CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 CMakeFiles/wifi_ap_project.elf.dir/all: esp-idf/main/CMakeFiles/__idf_main.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wifi_ap_project.elf.dir/build.make CMakeFiles/wifi_ap_project.elf.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wifi_ap_project.elf.dir/build.make CMakeFiles/wifi_ap_project.elf.dir/build
@@ -3051,8 +3051,8 @@ CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/fatfs/CMakeFiles/__idf_fa
 CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/perfmon/CMakeFiles/__idf_perfmon.dir/all
 CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/rt/CMakeFiles/__idf_rt.dir/all
 CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/all
-CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/all
+CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 CMakeFiles/__ldgen_output_sections.ld.dir/all: esp-idf/main/CMakeFiles/__idf_main.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/__ldgen_output_sections.ld.dir/build.make CMakeFiles/__ldgen_output_sections.ld.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/__ldgen_output_sections.ld.dir/build.make CMakeFiles/__ldgen_output_sections.ld.dir/build
@@ -6404,32 +6404,6 @@ esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/clean:
 .PHONY : esp-idf/spiffs/CMakeFiles/__idf_spiffs.dir/clean
 
 #=============================================================================
-# Target rules for target esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir
-
-# All Build rule for target.
-esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all: esp-idf/xtensa/CMakeFiles/__idf_xtensa.dir/all
-	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/depend
-	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/statsnapp/Desktop/statsclient/build/CMakeFiles --progress-num=43 "Built target __idf_espressif__cjson"
-.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
-
-# Build rule for subdir invocation for target.
-esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/statsnapp/Desktop/statsclient/build/CMakeFiles 78
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/statsnapp/Desktop/statsclient/build/CMakeFiles 0
-.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule
-
-# Convenience name for target.
-__idf_espressif__cjson: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule
-.PHONY : __idf_espressif__cjson
-
-# clean rule for target.
-esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean:
-	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean
-.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean
-
-#=============================================================================
 # Target rules for target esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir
 
 # All Build rule for target.
@@ -6456,12 +6430,38 @@ esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/clean:
 .PHONY : esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/clean
 
 #=============================================================================
+# Target rules for target esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir
+
+# All Build rule for target.
+esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all: esp-idf/xtensa/CMakeFiles/__idf_xtensa.dir/all
+	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/depend
+	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/statsnapp/Desktop/statsclient/build/CMakeFiles --progress-num=43 "Built target __idf_espressif__cjson"
+.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
+
+# Build rule for subdir invocation for target.
+esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/statsnapp/Desktop/statsclient/build/CMakeFiles 78
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/statsnapp/Desktop/statsclient/build/CMakeFiles 0
+.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule
+
+# Convenience name for target.
+__idf_espressif__cjson: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/rule
+.PHONY : __idf_espressif__cjson
+
+# clean rule for target.
+esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean:
+	$(MAKE) $(MAKESILENT) -f esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/build.make esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean
+.PHONY : esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/clean
+
+#=============================================================================
 # Target rules for target esp-idf/main/CMakeFiles/__idf_main.dir
 
 # All Build rule for target.
 esp-idf/main/CMakeFiles/__idf_main.dir/all: esp-idf/xtensa/CMakeFiles/__idf_xtensa.dir/all
-esp-idf/main/CMakeFiles/__idf_main.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 esp-idf/main/CMakeFiles/__idf_main.dir/all: esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir/all
+esp-idf/main/CMakeFiles/__idf_main.dir/all: esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir/all
 	$(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/depend
 	$(MAKE) $(MAKESILENT) -f esp-idf/main/CMakeFiles/__idf_main.dir/build.make esp-idf/main/CMakeFiles/__idf_main.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/statsnapp/Desktop/statsclient/build/CMakeFiles --progress-num=62 "Built target __idf_main"

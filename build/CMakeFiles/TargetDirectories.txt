@@ -946,13 +946,6 @@
 /home/statsnapp/Desktop/statsclient/build/esp-idf/ulp/CMakeFiles/install.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/ulp/CMakeFiles/install/local.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/ulp/CMakeFiles/install/strip.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/edit_cache.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/rebuild_cache.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/list_install_components.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install/local.dir
-/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install/strip.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/__idf_espressif__mqtt.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/edit_cache.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/rebuild_cache.dir
@@ -960,6 +953,13 @@
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/install.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/install/local.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__mqtt/CMakeFiles/install/strip.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/__idf_espressif__cjson.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/edit_cache.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/rebuild_cache.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/list_install_components.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install/local.dir
+/home/statsnapp/Desktop/statsclient/build/esp-idf/espressif__cjson/CMakeFiles/install/strip.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/main/CMakeFiles/__idf_main.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/main/CMakeFiles/edit_cache.dir
 /home/statsnapp/Desktop/statsclient/build/esp-idf/main/CMakeFiles/rebuild_cache.dir

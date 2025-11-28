@@ -1,0 +1,16 @@
+Command: make -j 18 flash
+[1;31m
+A fatal error occurred: Could not open /dev/ttyACM0, the port is busy or doesn't exist.
+([Errno 11] Could not exclusively lock port /dev/ttyACM0: [Errno 11] Resource temporarily unavailable)
+[0m
+CMake Error at esp-idf/components/esptool_py/run_serial_tool.cmake:67 (message):
+  
+  /home/statsnapp/.espressif/python_env/idf6.1_py3.12_env/bin/python;-m;esptool;--chip;esp32s3
+  failed.
+
+
+
+make[3]: *** [CMakeFiles/flash.dir/build.make:70: flash] Error 1
+make[2]: *** [CMakeFiles/Makefile2:2673: CMakeFiles/flash.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:2680: CMakeFiles/flash.dir/rule] Error 2
+make: *** [Makefile:221: flash] Error 2

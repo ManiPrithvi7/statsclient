@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/__idf_main.dir/internet_verification.c.obj.d"
   "CMakeFiles/__idf_main.dir/main.c.obj"
   "CMakeFiles/__idf_main.dir/main.c.obj.d"
+  "CMakeFiles/__idf_main.dir/mqtt_handler.c.obj"
+  "CMakeFiles/__idf_main.dir/mqtt_handler.c.obj.d"
   "CMakeFiles/__idf_main.dir/wifi_provisioning.c.obj"
   "CMakeFiles/__idf_main.dir/wifi_provisioning.c.obj.d"
   "libmain.a"

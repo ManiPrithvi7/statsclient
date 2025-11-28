@@ -38,6 +38,7 @@ esp-idf/main/CMakeFiles/__idf_main.dir/certificate_manager.c.obj: \
  /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/sys/stdio.h \
  /home/statsnapp/Desktop/statsclient/esp-idf/components/esp_common/include/esp_compiler.h \
  /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/lib/gcc/xtensa-esp-elf/15.2.0/include/stdbool.h \
+ /home/statsnapp/Desktop/statsclient/main/wifi_provisioning.h \
  /home/statsnapp/Desktop/statsclient/main/device_keys.h \
  /home/statsnapp/Desktop/statsclient/esp-idf/components/log/include/esp_log.h \
  /home/statsnapp/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20250929/xtensa-esp-elf/xtensa-esp-elf/include/inttypes.h \
