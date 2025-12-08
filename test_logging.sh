@@ -62,3 +62,7 @@ echo "2. Run: ./run.sh (to rebuild and flash)"
 echo "3. Then manually run: idf.py -p $ESP_PORT monitor"
 echo "4. In another terminal, make the curl request"
 
+
+
+
+

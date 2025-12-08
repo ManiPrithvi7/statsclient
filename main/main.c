@@ -55,22 +55,35 @@ static esp_err_t get_provisioning_credentials(char *device_id, size_t id_len,
     nvs_handle_t nvs_handle;
     size_t required_size;
 
+    ESP_LOGI(TAG, "Opening NVS namespace: %s", NVS_NAMESPACE);
     esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle);
     if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to open NVS: %s", esp_err_to_name(err));
         return err;
     }
 
+    // Read device_id
     required_size = id_len;
     err = nvs_get_str(nvs_handle, NVS_KEY_DEVICE_ID, device_id, &required_size);
     if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read %s from NVS: %s", NVS_KEY_DEVICE_ID, esp_err_to_name(err));
         nvs_close(nvs_handle);
         return err;
     }
+    ESP_LOGI(TAG, "Read device_id from NVS: %s (length: %d)", device_id, strlen(device_id));
 
+    // Read provisioning token
     required_size = token_len;
     err = nvs_get_str(nvs_handle, NVS_KEY_PROV_TOKEN, token, &required_size);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to read %s from NVS: %s", NVS_KEY_PROV_TOKEN, esp_err_to_name(err));
+        nvs_close(nvs_handle);
+        return err;
+    }
+    ESP_LOGI(TAG, "Read prov_token from NVS: %.*s... (length: %d)", 
+             20, token, strlen(token));
+    
     nvs_close(nvs_handle);
-
     return err;
 }
 
@@ -96,8 +109,21 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
 static void app_state_machine_task(void *pvParameters)
 {
     ESP_LOGI(TAG, "Application state machine started");
+    
+    // Log state transitions
+    static app_state_t last_state = APP_STATE_INIT;
+    if (s_app_state != last_state) {
+        ESP_LOGI(TAG, ">>> STATE TRANSITION: %d -> %d", last_state, s_app_state);
+        last_state = s_app_state;
+    }
 
     while (1) {
+        // Log state transitions
+        if (s_app_state != last_state) {
+            ESP_LOGI(TAG, ">>> STATE TRANSITION: %d -> %d", last_state, s_app_state);
+            last_state = s_app_state;
+        }
+        
         switch (s_app_state) {
         case APP_STATE_INIT:
             ESP_LOGI(TAG, "State: INIT");
@@ -184,7 +210,9 @@ static void app_state_machine_task(void *pvParameters)
             break;
 
         case APP_STATE_WIFI_CONNECTED:
+            ESP_LOGI(TAG, "========================================");
             ESP_LOGI(TAG, "State: WIFI_CONNECTED");
+            ESP_LOGI(TAG, "========================================");
             {
                 static bool verification_done = false;
                 static int verification_retries = 0;
@@ -192,6 +220,7 @@ static void app_state_machine_task(void *pvParameters)
                 
                 // Reset verification state if we're not provisioned (means we returned to AP mode)
                 if (!wifi_provisioning_is_provisioned()) {
+                    ESP_LOGW(TAG, "Device not provisioned, resetting to AP mode");
                     verification_done = false;
                     verification_retries = 0;
                     s_app_state = APP_STATE_AP_MODE;
@@ -201,35 +230,37 @@ static void app_state_machine_task(void *pvParameters)
                 if (!verification_done) {
                     // Verify internet connectivity after WiFi connection
                     ESP_LOGI(TAG, "WiFi connected - verifying internet access...");
+                    ESP_LOGI(TAG, "Waiting 2 seconds for network to stabilize...");
                     vTaskDelay(pdMS_TO_TICKS(2000)); // Wait 2 seconds for network to stabilize
                     
+                    ESP_LOGI(TAG, "Calling internet_verification_test()...");
                     esp_err_t ret = internet_verification_test();
+                    ESP_LOGI(TAG, "Internet verification returned: %s", esp_err_to_name(ret));
+                    
                     if (ret == ESP_OK) {
+                        ESP_LOGI(TAG, "========================================");
                         ESP_LOGI(TAG, "✓ Internet connectivity verified!");
-                        ESP_LOGI(TAG, "✓ Provisioning flow 100%% complete!");
+                        ESP_LOGI(TAG, "========================================");
                         verification_done = true;
                         verification_retries = 0; // Reset retry counter
                     } else {
                         verification_retries++;
                         ESP_LOGE(TAG, "========================================");
                         ESP_LOGE(TAG, "✗ Internet verification failed!");
+                        ESP_LOGE(TAG, "✗ Error: %s", esp_err_to_name(ret));
                         ESP_LOGE(TAG, "✗ Retry attempt: %d/%d", verification_retries, MAX_VERIFICATION_RETRIES);
                         ESP_LOGE(TAG, "========================================");
                         
                         if (verification_retries >= MAX_VERIFICATION_RETRIES) {
                             ESP_LOGE(TAG, "Maximum retries reached. Credentials may be incorrect.");
                             ESP_LOGE(TAG, "WiFi may be connected but has no internet access.");
-                            ESP_LOGI(TAG, "Clearing credentials and returning to AP mode...");
-                            ESP_LOGI(TAG, "Please send new credentials via HTTP POST /provision");
+                            ESP_LOGI(TAG, "NOTE: Proceeding to certificate check anyway...");
+                            ESP_LOGI(TAG, "CSR submission will be attempted even without internet verification.");
                             
-                            // Clear credentials and return to AP mode
-                            wifi_provisioning_clear_and_restart();
-                            
-                            // Reset state machine to AP mode
-                            verification_done = false;
+                            // Instead of clearing credentials, proceed to certificate check
+                            // This allows CSR submission to be attempted
+                            verification_done = true; // Mark as done to proceed
                             verification_retries = 0;
-                            s_app_state = APP_STATE_AP_MODE;
-                            break;
                         } else {
                             ESP_LOGW(TAG, "Retrying internet verification in 5 seconds...");
                             vTaskDelay(pdMS_TO_TICKS(5000));
@@ -239,45 +270,95 @@ static void app_state_machine_task(void *pvParameters)
                 }
                 
                 if (verification_done) {
+                    ESP_LOGI(TAG, "Internet verification complete, proceeding to certificate check...");
                     s_app_state = APP_STATE_CHECK_CERTIFICATES;
+                } else {
+                    ESP_LOGW(TAG, "Still waiting for internet verification...");
                 }
             }
             break;
 
         case APP_STATE_CHECK_CERTIFICATES:
+            ESP_LOGI(TAG, "========================================");
             ESP_LOGI(TAG, "State: CHECK_CERTIFICATES");
+            ESP_LOGI(TAG, "========================================");
+            ESP_LOGI(TAG, "Checking if certificates exist in NVS...");
             if (certificate_manager_has_certificates()) {
                 ESP_LOGI(TAG, "✓ Certificates found in NVS");
                 ESP_LOGI(TAG, "Proceeding to MQTT connection...");
                 s_app_state = APP_STATE_MQTT_CONNECTING;
             } else {
-                ESP_LOGI(TAG, "Certificates not found, submitting CSR...");
+                ESP_LOGI(TAG, "Certificates not found in NVS");
+                ESP_LOGI(TAG, "Will submit CSR to backend to obtain certificates...");
                 s_app_state = APP_STATE_SUBMIT_CSR;
             }
             break;
 
         case APP_STATE_SUBMIT_CSR:
+            ESP_LOGI(TAG, "========================================");
             ESP_LOGI(TAG, "State: SUBMIT_CSR");
+            ESP_LOGI(TAG, "========================================");
             {
-                char device_id[64] = {0};
-                char token[256] = {0};
+                static bool csr_submission_attempted = false;
+                static int csr_retry_count = 0;
+                const int MAX_CSR_RETRIES = 3;
+                
+                if (!csr_submission_attempted) {
+                    char device_id[64] = {0};
+                    char token[256] = {0};
 
-                esp_err_t ret = get_provisioning_credentials(device_id, sizeof(device_id),
-                                                             token, sizeof(token));
-                if (ret != ESP_OK) {
-                    ESP_LOGE(TAG, "Failed to get provisioning credentials: %s", esp_err_to_name(ret));
-                    s_app_state = APP_STATE_ERROR;
-                    break;
-                }
+                    ESP_LOGI(TAG, "Reading provisioning credentials from NVS...");
+                    esp_err_t ret = get_provisioning_credentials(device_id, sizeof(device_id),
+                                                                 token, sizeof(token));
+                    if (ret != ESP_OK) {
+                        ESP_LOGE(TAG, "========================================");
+                        ESP_LOGE(TAG, "FAILED to get provisioning credentials from NVS!");
+                        ESP_LOGE(TAG, "Error: %s", esp_err_to_name(ret));
+                        ESP_LOGE(TAG, "========================================");
+                        ESP_LOGE(TAG, "This means device_id or prov_token was not saved during provisioning.");
+                        ESP_LOGE(TAG, "Check if /provision endpoint saved credentials correctly.");
+                        s_app_state = APP_STATE_ERROR;
+                        break;
+                    }
 
-                ret = certificate_manager_submit_csr(device_id, token);
-                if (ret == ESP_OK) {
-                    ESP_LOGI(TAG, "CSR submitted successfully, certificates saved");
-                    s_app_state = APP_STATE_MQTT_CONNECTING;
+                    ESP_LOGI(TAG, "✓ Credentials retrieved from NVS:");
+                    ESP_LOGI(TAG, "  Device ID: %s", device_id);
+                    ESP_LOGI(TAG, "  Provisioning Token: %.*s... (length: %d)", 
+                             token[0] ? 20 : 0, token, strlen(token));
+                    ESP_LOGI(TAG, "========================================");
+                    ESP_LOGI(TAG, "Submitting CSR to backend server...");
+                    ESP_LOGI(TAG, "========================================");
+
+                    ret = certificate_manager_submit_csr(device_id, token);
+                    csr_submission_attempted = true;
+                    
+                    if (ret == ESP_OK) {
+                        ESP_LOGI(TAG, "========================================");
+                        ESP_LOGI(TAG, "✓ CSR submitted successfully!");
+                        ESP_LOGI(TAG, "✓ Certificates saved to NVS");
+                        ESP_LOGI(TAG, "========================================");
+                        csr_retry_count = 0;
+                        s_app_state = APP_STATE_MQTT_CONNECTING;
+                    } else {
+                        csr_retry_count++;
+                        ESP_LOGE(TAG, "========================================");
+                        ESP_LOGE(TAG, "✗ CSR submission failed!");
+                        ESP_LOGE(TAG, "Error: %s", esp_err_to_name(ret));
+                        ESP_LOGE(TAG, "Retry count: %d/%d", csr_retry_count, MAX_CSR_RETRIES);
+                        ESP_LOGE(TAG, "========================================");
+                        
+                        if (csr_retry_count >= MAX_CSR_RETRIES) {
+                            ESP_LOGE(TAG, "Maximum retries reached. Moving to error state.");
+                            s_app_state = APP_STATE_ERROR;
+                        } else {
+                            ESP_LOGI(TAG, "Retrying CSR submission in 5 seconds...");
+                            csr_submission_attempted = false; // Allow retry
+                            vTaskDelay(pdMS_TO_TICKS(5000));
+                        }
+                    }
                 } else {
-                    ESP_LOGE(TAG, "Failed to submit CSR: %s", esp_err_to_name(ret));
-                    // Retry after delay
-                    vTaskDelay(pdMS_TO_TICKS(5000));
+                    // Already attempted, wait before retry
+                    vTaskDelay(pdMS_TO_TICKS(1000));
                 }
             }
             break;
@@ -381,6 +462,14 @@ static void app_state_machine_task(void *pvParameters)
         }
 
         vTaskDelay(pdMS_TO_TICKS(100)); // Small delay to prevent tight loop
+        
+        // Heartbeat log every 30 seconds to show state machine is alive
+        static int heartbeat_counter = 0;
+        heartbeat_counter++;
+        if (heartbeat_counter >= 300) { // 300 * 100ms = 30 seconds
+            ESP_LOGI(TAG, "[HEARTBEAT] State machine running, current state: %d", s_app_state);
+            heartbeat_counter = 0;
+        }
     }
 }
 
@@ -406,6 +495,8 @@ void app_main(void)
     ESP_LOGI(TAG, "========================================");
     ESP_LOGI(TAG, "DEVELOPMENT MODE: Clearing provisioning");
     ESP_LOGI(TAG, "========================================");
+    ESP_LOGW(TAG, "NOTE: This clears WiFi credentials, device_id, and prov_token");
+    ESP_LOGW(TAG, "NOTE: Certificates are also cleared to force CSR submission");
     nvs_handle_t nvs_handle;
     if (nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle) == ESP_OK) {
         ESP_LOGI(TAG, "Clearing all provisioning data...");
@@ -426,6 +517,7 @@ void app_main(void)
         
         ESP_LOGI(TAG, "✓ All provisioning data cleared");
         ESP_LOGI(TAG, "✓ Device will start in AP mode");
+        ESP_LOGI(TAG, "✓ After provisioning, CSR will be submitted");
         ESP_LOGI(TAG, "========================================");
     } else {
         ESP_LOGW(TAG, "Failed to open NVS for clearing (may be first boot)");

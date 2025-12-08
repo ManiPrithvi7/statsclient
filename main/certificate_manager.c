@@ -138,6 +138,20 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
     ESP_LOGI(TAG, "CSR Submission to Backend");
     ESP_LOGI(TAG, "========================================");
     ESP_LOGI(TAG, "Device ID: %s", device_id);
+    ESP_LOGI(TAG, "Provisioning Token: %.*s... (length: %d)", 
+             prov_token && strlen(prov_token) > 0 ? 20 : 0, 
+             prov_token ? prov_token : "(null)", 
+             prov_token ? strlen(prov_token) : 0);
+    
+    // Validate inputs
+    if (device_id == NULL || strlen(device_id) == 0) {
+        ESP_LOGE(TAG, "ERROR: device_id is NULL or empty!");
+        return ESP_ERR_INVALID_ARG;
+    }
+    if (prov_token == NULL || strlen(prov_token) == 0) {
+        ESP_LOGE(TAG, "ERROR: prov_token is NULL or empty!");
+        return ESP_ERR_INVALID_ARG;
+    }
 
     // Note: Server extracts userId from provisioning_token, so we don't need to send auth_token
     // The provisioning_token contains all necessary information for server validation
@@ -145,7 +159,18 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
     // Build request URL (correct endpoint path: /api/v1/sign-csr)
     char url[256];
     snprintf(url, sizeof(url), "%s/api/v1/sign-csr", BACKEND_URL);
-    ESP_LOGI(TAG, "Endpoint: %s", url);
+    ESP_LOGI(TAG, "Backend URL (from config): %s", BACKEND_URL);
+    ESP_LOGI(TAG, "Full Endpoint URL: %s", url);
+    
+    // Check if BACKEND_URL is still the default placeholder
+    if (strcmp(BACKEND_URL, "https://your-backend.com") == 0) {
+        ESP_LOGE(TAG, "========================================");
+        ESP_LOGE(TAG, "ERROR: BACKEND_URL is still set to default placeholder!");
+        ESP_LOGE(TAG, "Please configure BACKEND_URL in menuconfig:");
+        ESP_LOGE(TAG, "  idf.py menuconfig -> Backend Configuration -> Backend URL");
+        ESP_LOGE(TAG, "========================================");
+        return ESP_ERR_INVALID_STATE;
+    }
 
     // Build JSON request body with CSR, device_id, and provisioning_token
     // Note: Server extracts userId from provisioning_token and validates user-device association

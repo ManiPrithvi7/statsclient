@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "wifi_ap_project",
-    "project_version":    "7518ba2-dirty",
+    "project_version":    "9e4707b-dirty",
     "project_path":       "/home/statsnapp/Desktop/statsclient",
     "idf_path":           "/home/statsnapp/Desktop/statsclient/esp-idf",
     "build_dir":          "/home/statsnapp/Desktop/statsclient/build",
