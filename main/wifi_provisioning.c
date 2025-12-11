@@ -54,13 +54,17 @@ static bool s_initial_scan_done = false;
 static esp_err_t scan_handler(httpd_req_t *req);
 static esp_err_t provision_handler(httpd_req_t *req);
 static esp_err_t status_handler(httpd_req_t *req);
+static esp_err_t scan_options_handler(httpd_req_t *req);
+static esp_err_t provision_options_handler(httpd_req_t *req);
+static esp_err_t status_options_handler(httpd_req_t *req);
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                int32_t event_id, void* event_data);
 static void ip_event_handler(void* arg, esp_event_base_t event_base,
-                             int32_t event_id, void* event_data);
+                              int32_t event_id, void* event_data);
 static esp_err_t perform_wifi_scan_and_cache(void);
 static void log_incoming_request(httpd_req_t *req);
 static void log_outgoing_response(const char *method, const char *uri, int status_code, const char *response_body);
+static esp_err_t add_cors_headers(httpd_req_t *req);
 
 /**
  * @brief Log incoming HTTP request details
@@ -152,6 +156,21 @@ static void log_incoming_request(httpd_req_t *req)
     
     ESP_LOGI(TAG, "========================================");
     ESP_LOGI(TAG, "");
+}
+
+/**
+ * @brief Add CORS headers to HTTP response
+ * 
+ * Adds required CORS headers to allow cross-origin requests from web browsers.
+ * This is essential for direct client-to-device communication during provisioning.
+ */
+static esp_err_t add_cors_headers(httpd_req_t *req)
+{
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Content-Type, Authorization");
+    httpd_resp_set_hdr(req, "Access-Control-Max-Age", "3600");
+    return ESP_OK;
 }
 
 /**
@@ -359,6 +378,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
             const char *error_response = "{\"error\":\"scan_failed\",\"message\":\"No cached data available\"}";
             httpd_resp_set_status(req, "500 Internal Server Error");
             httpd_resp_set_type(req, "application/json");
+            add_cors_headers(req);
             log_outgoing_response("GET", req->uri, 500, error_response);
             httpd_resp_sendstr(req, error_response);
             return ESP_FAIL;
@@ -371,6 +391,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
         const char *error_response = "{\"error\":\"cache_busy\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
+        add_cors_headers(req);
         log_outgoing_response("GET", req->uri, 500, error_response);
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
@@ -404,6 +425,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
         const char *error_response = "{\"error\":\"json_error\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
+        add_cors_headers(req);
         log_outgoing_response("GET", req->uri, 500, error_response);
         httpd_resp_sendstr(req, error_response);
         cJSON_Delete(root);
@@ -411,6 +433,9 @@ static esp_err_t scan_handler(httpd_req_t *req)
     }
 
     httpd_resp_set_type(req, "application/json");
+    
+    // Add CORS headers before sending response
+    add_cors_headers(req);
     
     // Log outgoing response
     log_outgoing_response("GET", req->uri, 200, json_string);
@@ -465,6 +490,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
         const char *error_response = "{\"error\":\"invalid_request\"}";
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
+        add_cors_headers(req);
         log_outgoing_response("POST", req->uri, 400, error_response);
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
@@ -481,6 +507,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
         const char *error_response = "{\"error\":\"invalid_json\"}";
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
+        add_cors_headers(req);
         log_outgoing_response("POST", req->uri, 400, error_response);
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
@@ -557,6 +584,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
             cJSON_Delete(error_obj);
             httpd_resp_set_status(req, "400 Bad Request");
             httpd_resp_set_type(req, "application/json");
+            add_cors_headers(req);
             log_outgoing_response("POST", req->uri, 400, error_json);
             httpd_resp_sendstr(req, error_json);
             free(error_json);
@@ -568,6 +596,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
             const char *fallback_error = "{\"error\":\"missing_fields\",\"message\":\"Failed to generate detailed error\"}";
             httpd_resp_set_status(req, "400 Bad Request");
             httpd_resp_set_type(req, "application/json");
+            add_cors_headers(req);
             log_outgoing_response("POST", req->uri, 400, fallback_error);
             httpd_resp_sendstr(req, fallback_error);
             return ESP_FAIL;
@@ -589,6 +618,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
         const char *error_response = "{\"error\":\"save_failed\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
+        add_cors_headers(req);
         log_outgoing_response("POST", req->uri, 500, error_response);
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
@@ -599,6 +629,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
     // Send success response first
     const char *success_response = "{\"status\":\"ok\",\"message\":\"Credentials saved\"}";
     httpd_resp_set_type(req, "application/json");
+    add_cors_headers(req);
     log_outgoing_response("POST", req->uri, 200, success_response);
     httpd_resp_sendstr(req, success_response);
 
@@ -640,6 +671,9 @@ static esp_err_t status_handler(httpd_req_t *req)
     char *json_string = cJSON_Print(root);
     httpd_resp_set_type(req, "application/json");
     
+    // Add CORS headers before sending response
+    add_cors_headers(req);
+    
     // Log outgoing response
     log_outgoing_response("GET", req->uri, 200, json_string);
     
@@ -648,6 +682,42 @@ static esp_err_t status_handler(httpd_req_t *req)
     free(json_string);
     cJSON_Delete(root);
 
+    return ESP_OK;
+}
+
+/**
+ * @brief HTTP OPTIONS handler for /local-wifi endpoint (CORS preflight)
+ */
+static esp_err_t scan_options_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "OPTIONS /local-wifi - CORS preflight request");
+    add_cors_headers(req);
+    httpd_resp_set_status(req, HTTPD_204);
+    httpd_resp_send(req, NULL, 0);
+    return ESP_OK;
+}
+
+/**
+ * @brief HTTP OPTIONS handler for /provision endpoint (CORS preflight)
+ */
+static esp_err_t provision_options_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "OPTIONS /provision - CORS preflight request");
+    add_cors_headers(req);
+    httpd_resp_set_status(req, HTTPD_204);
+    httpd_resp_send(req, NULL, 0);
+    return ESP_OK;
+}
+
+/**
+ * @brief HTTP OPTIONS handler for /status endpoint (CORS preflight)
+ */
+static esp_err_t status_options_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "OPTIONS /status - CORS preflight request");
+    add_cors_headers(req);
+    httpd_resp_set_status(req, HTTPD_204);
+    httpd_resp_send(req, NULL, 0);
     return ESP_OK;
 }
 
@@ -770,6 +840,8 @@ static httpd_handle_t start_http_server(void)
 
     if (httpd_start(&server, &config) == ESP_OK) {
         // Register URI handlers
+        
+        // GET /local-wifi
         httpd_uri_t scan_uri = {
             .uri = "/local-wifi",
             .method = HTTP_GET,
@@ -777,6 +849,15 @@ static httpd_handle_t start_http_server(void)
         };
         httpd_register_uri_handler(server, &scan_uri);
 
+        // OPTIONS /local-wifi (CORS preflight)
+        httpd_uri_t scan_options_uri = {
+            .uri = "/local-wifi",
+            .method = HTTP_OPTIONS,
+            .handler = scan_options_handler,
+        };
+        httpd_register_uri_handler(server, &scan_options_uri);
+
+        // POST /provision
         httpd_uri_t provision_uri = {
             .uri = "/provision",
             .method = HTTP_POST,
@@ -784,12 +865,29 @@ static httpd_handle_t start_http_server(void)
         };
         httpd_register_uri_handler(server, &provision_uri);
 
+        // OPTIONS /provision (CORS preflight)
+        httpd_uri_t provision_options_uri = {
+            .uri = "/provision",
+            .method = HTTP_OPTIONS,
+            .handler = provision_options_handler,
+        };
+        httpd_register_uri_handler(server, &provision_options_uri);
+
+        // GET /status
         httpd_uri_t status_uri = {
             .uri = "/status",
             .method = HTTP_GET,
             .handler = status_handler,
         };
         httpd_register_uri_handler(server, &status_uri);
+
+        // OPTIONS /status (CORS preflight)
+        httpd_uri_t status_options_uri = {
+            .uri = "/status",
+            .method = HTTP_OPTIONS,
+            .handler = status_options_handler,
+        };
+        httpd_register_uri_handler(server, &status_options_uri);
 
         ESP_LOGI(TAG, "HTTP server started");
         return server;

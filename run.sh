@@ -102,10 +102,26 @@ setup_esp_idf() {
 build_project() {
     print_step "Building project"
     cd "$PROJECT_DIR"
-    if idf.py build >/dev/null 2>&1; then
+    
+    # Try to build and capture output
+    BUILD_OUTPUT=$(idf.py build 2>&1)
+    BUILD_EXIT_CODE=$?
+    
+    # Check if build directory is misconfigured (configured for different project)
+    if echo "$BUILD_OUTPUT" | grep -qi "configured for project.*not"; then
+        print_warning "Build directory misconfigured for different project, cleaning..."
+        idf.py fullclean >/dev/null 2>&1
+        print_info "Build directory cleaned, rebuilding..."
+        BUILD_OUTPUT=$(idf.py build 2>&1)
+        BUILD_EXIT_CODE=$?
+    fi
+    
+    if [ $BUILD_EXIT_CODE -eq 0 ]; then
         print_success "Build completed"
     else
-        print_error "Build failed. Check errors above."
+        # Show actual build errors
+        print_error "Build failed. Showing errors:"
+        echo "$BUILD_OUTPUT" | tail -30
         exit 1
     fi
 }
