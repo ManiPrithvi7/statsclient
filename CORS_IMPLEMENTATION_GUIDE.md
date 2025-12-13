@@ -384,3 +384,5 @@ If you have questions or need clarification, please contact the development team
 - [MDN: CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 - [ESP-IDF HTTP Server API](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/protocols/esp_http_server.html)
 
+
+

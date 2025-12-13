@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "wifi_ap_project",
-    "project_version":    "a3b82f7-dirty",
+    "project_version":    "834877c-dirty",
     "project_path":       "/home/muthuselvan/esp",
     "idf_path":           "/home/muthuselvan/esp/esp-idf",
     "build_dir":          "/home/muthuselvan/esp/build",
