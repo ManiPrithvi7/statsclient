@@ -13,6 +13,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_http_server.h"
+#include "esp_timer.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "cJSON.h"
@@ -54,6 +55,9 @@ static bool s_initial_scan_done = false;
 static esp_err_t scan_handler(httpd_req_t *req);
 static esp_err_t provision_handler(httpd_req_t *req);
 static esp_err_t status_handler(httpd_req_t *req);
+static esp_err_t options_handler(httpd_req_t *req);
+static esp_err_t root_handler(httpd_req_t *req);
+static esp_err_t middleware_wrapper(httpd_req_t *req, esp_err_t (*handler)(httpd_req_t *));
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                                int32_t event_id, void* event_data);
 static void ip_event_handler(void* arg, esp_event_base_t event_base,
@@ -65,6 +69,117 @@ static void log_outgoing_response(const char *method, const char *uri, int statu
 /**
  * @brief Log incoming HTTP request details
  */
+/**
+ * @brief Set CORS headers for HTTP response
+ * 
+ * Allows requests from:
+ * - http://localhost:3000 (development)
+ * - https://localhost:3000 (development with HTTPS)
+ * - http://127.0.0.1:3000 (development)
+ * - https://statsnapp.vercel.app (production deployment)
+ * 
+ * IMPORTANT: Uses static string constants for header values to ensure
+ * they remain valid until the response is sent (httpd_resp_set_hdr only
+ * stores pointers, not copies of the strings).
+ */
+static void set_cors_headers(httpd_req_t *req)
+{
+    // Static string constants - these remain valid for the lifetime of the program
+    static const char *cors_origin_wildcard = "*";
+    static const char *cors_origin_localhost = "http://localhost:3000";
+    static const char *cors_origin_localhost_https = "https://localhost:3000";
+    static const char *cors_origin_127 = "http://127.0.0.1:3000";
+    static const char *cors_origin_vercel = "https://statsnapp.vercel.app";
+    
+    // Get the Origin header from the request
+    char origin[128] = {0};
+    size_t origin_len = httpd_req_get_hdr_value_len(req, "Origin") + 1;
+    
+    const char *allowed_origin = NULL;
+    
+    if (origin_len > 1 && origin_len <= sizeof(origin)) {
+        if (httpd_req_get_hdr_value_str(req, "Origin", origin, sizeof(origin)) == ESP_OK) {
+            ESP_LOGI(TAG, "Request Origin: %s", origin);
+            
+            // Check if origin is in allowed list and use static string constants
+            // Allow localhost:3000 (with or without protocol)
+            if (strstr(origin, "localhost:3000") != NULL) {
+                // Check if HTTPS or HTTP
+                if (strstr(origin, "https://") != NULL) {
+                    allowed_origin = cors_origin_localhost_https;
+                } else {
+                    allowed_origin = cors_origin_localhost;
+                }
+                ESP_LOGI(TAG, "Origin allowed (localhost): %s -> using %s", origin, allowed_origin);
+            }
+            // Allow 127.0.0.1:3000
+            else if (strstr(origin, "127.0.0.1:3000") != NULL) {
+                allowed_origin = cors_origin_127;
+                ESP_LOGI(TAG, "Origin allowed (127.0.0.1): %s -> using %s", origin, allowed_origin);
+            }
+            // Allow statsnapp.vercel.app (production)
+            else if (strstr(origin, "statsnapp.vercel.app") != NULL) {
+                allowed_origin = cors_origin_vercel;
+                ESP_LOGI(TAG, "Origin allowed (Vercel): %s -> using %s", origin, allowed_origin);
+            } else {
+                ESP_LOGW(TAG, "Origin not in allowed list: %s", origin);
+            }
+        }
+    } else {
+        ESP_LOGD(TAG, "No Origin header in request");
+    }
+    
+    // Set Access-Control-Allow-Origin header
+    // Use static string constants to ensure they remain valid
+    if (allowed_origin != NULL) {
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", allowed_origin);
+        ESP_LOGI(TAG, "Setting CORS header: Access-Control-Allow-Origin: %s", allowed_origin);
+    } else {
+        // Use wildcard as fallback to allow any origin (useful for development)
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", cors_origin_wildcard);
+        ESP_LOGD(TAG, "Using wildcard CORS origin: *");
+    }
+    
+    // Set other CORS headers (using static string literals)
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Content-Type, Authorization");
+    httpd_resp_set_hdr(req, "Access-Control-Max-Age", "3600");
+}
+
+/**
+ * @brief HTTP Middleware - Logs all requests and responses
+ * 
+ * Wraps handler execution to ensure consistent logging of all HTTP traffic
+ */
+static esp_err_t middleware_wrapper(httpd_req_t *req, esp_err_t (*handler)(httpd_req_t *))
+{
+    // Log incoming request
+    log_incoming_request(req);
+    
+    // Record start time for performance tracking
+    int64_t start_time = esp_timer_get_time();
+    
+    // Call the actual handler
+    esp_err_t result = handler(req);
+    
+    // Calculate processing time
+    int64_t end_time = esp_timer_get_time();
+    int64_t duration_ms = (end_time - start_time) / 1000;
+    
+    // Log handler execution result
+    ESP_LOGI(TAG, "");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "<<< REQUEST PROCESSED");
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "URI: %s", req->uri ? req->uri : "NULL");
+    ESP_LOGI(TAG, "Result: %s", (result == ESP_OK) ? "ESP_OK" : esp_err_to_name(result));
+    ESP_LOGI(TAG, "Processing Time: %lld ms", duration_ms);
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "");
+    
+    return result;
+}
+
 static void log_incoming_request(httpd_req_t *req)
 {
     // Reduced stack usage - use smaller, reusable buffer
@@ -319,20 +434,11 @@ cleanup:
  * 
  * Optional: /local-wifi?refresh=true to force a new scan (will briefly disrupt connection)
  */
-static esp_err_t scan_handler(httpd_req_t *req)
+/**
+ * @brief Internal scan handler (called by middleware wrapper)
+ */
+static esp_err_t scan_handler_internal(httpd_req_t *req)
 {
-    // Immediate logging - this should appear FIRST
-    // Using multiple log levels to ensure visibility
-    ESP_LOGE(TAG, "========================================");
-    ESP_LOGE(TAG, "SCAN_HANDLER CALLED - /local-wifi REQUEST");
-    ESP_LOGE(TAG, "========================================");
-    ESP_LOGI(TAG, "");
-    ESP_LOGI(TAG, "*** SCAN_HANDLER CALLED ***");
-    ESP_LOGI(TAG, "URI: %s", req->uri ? req->uri : "NULL");
-    ESP_LOGI(TAG, "Method: %d (1=GET, 3=POST)", req->method);
-    
-    // Log incoming request
-    log_incoming_request(req);
 
     // Check for refresh parameter
     char query[32] = {0};
@@ -357,6 +463,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
         if (ret != ESP_OK && !s_initial_scan_done) {
             // Only fail if we have no cached data at all
             const char *error_response = "{\"error\":\"scan_failed\",\"message\":\"No cached data available\"}";
+            set_cors_headers(req);
             httpd_resp_set_status(req, "500 Internal Server Error");
             httpd_resp_set_type(req, "application/json");
             log_outgoing_response("GET", req->uri, 500, error_response);
@@ -369,6 +476,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
     if (s_cache_mutex == NULL || xSemaphoreTake(s_cache_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
         ESP_LOGE(TAG, "Failed to acquire cache mutex");
         const char *error_response = "{\"error\":\"cache_busy\"}";
+        set_cors_headers(req);
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
         log_outgoing_response("GET", req->uri, 500, error_response);
@@ -402,6 +510,7 @@ static esp_err_t scan_handler(httpd_req_t *req)
     if (json_string == NULL) {
         ESP_LOGE(TAG, "Failed to create JSON string");
         const char *error_response = "{\"error\":\"json_error\"}";
+        set_cors_headers(req);
         httpd_resp_set_status(req, "500 Internal Server Error");
         httpd_resp_set_type(req, "application/json");
         log_outgoing_response("GET", req->uri, 500, error_response);
@@ -409,6 +518,9 @@ static esp_err_t scan_handler(httpd_req_t *req)
         cJSON_Delete(root);
         return ESP_FAIL;
     }
+
+    // Set CORS headers
+    set_cors_headers(req);
 
     httpd_resp_set_type(req, "application/json");
     
@@ -426,14 +538,18 @@ static esp_err_t scan_handler(httpd_req_t *req)
 }
 
 /**
- * @brief HTTP POST handler for /provision endpoint
+ * @brief HTTP GET handler for /local-wifi endpoint (wrapped with middleware)
  */
-static esp_err_t provision_handler(httpd_req_t *req)
+static esp_err_t scan_handler(httpd_req_t *req)
 {
-    // Immediate logging
-    ESP_LOGI(TAG, "[PROVISION_HANDLER] Request received for URI: %s", req->uri ? req->uri : "NULL");
-    // Log incoming request (reduced stack usage version)
-    log_incoming_request(req);
+    return middleware_wrapper(req, scan_handler_internal);
+}
+
+/**
+ * @brief Internal provision handler (called by middleware wrapper)
+ */
+static esp_err_t provision_handler_internal(httpd_req_t *req)
+{
 
     // Extract Authorization header (Bearer token) - use smaller buffer
     char auth_header[256] = {0};  // Reduced from 512 to save stack
@@ -463,6 +579,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
     int ret = httpd_req_recv(req, content, sizeof(content) - 1);
     if (ret <= 0) {
         const char *error_response = "{\"error\":\"invalid_request\"}";
+        set_cors_headers(req);
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
         log_outgoing_response("POST", req->uri, 400, error_response);
@@ -479,6 +596,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
     if (root == NULL) {
         ESP_LOGE(TAG, "Failed to parse JSON");
         const char *error_response = "{\"error\":\"invalid_json\"}";
+        set_cors_headers(req);
         httpd_resp_set_status(req, "400 Bad Request");
         httpd_resp_set_type(req, "application/json");
         log_outgoing_response("POST", req->uri, 400, error_response);
@@ -553,6 +671,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
         char *error_json = cJSON_Print(error_obj);
         if (error_json) {
             ESP_LOGE(TAG, "Missing required fields response: %s", error_json);
+            set_cors_headers(req);
             cJSON_Delete(root);
             cJSON_Delete(error_obj);
             httpd_resp_set_status(req, "400 Bad Request");
@@ -563,6 +682,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
             return ESP_FAIL;
         } else {
             ESP_LOGE(TAG, "Failed to create error JSON response");
+            set_cors_headers(req);
             cJSON_Delete(root);
             cJSON_Delete(error_obj);
             const char *fallback_error = "{\"error\":\"missing_fields\",\"message\":\"Failed to generate detailed error\"}";
@@ -585,6 +705,7 @@ static esp_err_t provision_handler(httpd_req_t *req)
     esp_err_t err = save_wifi_credentials(ssid, password, device_id, prov_token, bearer_token);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to save credentials: %s", esp_err_to_name(err));
+        set_cors_headers(req);
         cJSON_Delete(root);
         const char *error_response = "{\"error\":\"save_failed\"}";
         httpd_resp_set_status(req, "500 Internal Server Error");
@@ -595,6 +716,9 @@ static esp_err_t provision_handler(httpd_req_t *req)
     }
 
     cJSON_Delete(root);
+
+    // Set CORS headers
+    set_cors_headers(req);
 
     // Send success response first
     const char *success_response = "{\"status\":\"ok\",\"message\":\"Credentials saved\"}";
@@ -617,13 +741,69 @@ static esp_err_t provision_handler(httpd_req_t *req)
 }
 
 /**
- * @brief HTTP GET handler for /status endpoint
+ * @brief HTTP POST handler for /provision endpoint (wrapped with middleware)
  */
-static esp_err_t status_handler(httpd_req_t *req)
+static esp_err_t provision_handler(httpd_req_t *req)
 {
-    ESP_LOGI(TAG, "[STATUS_HANDLER] Request received for URI: %s", req->uri);
-    // Log incoming request
-    log_incoming_request(req);
+    return middleware_wrapper(req, provision_handler_internal);
+}
+
+/**
+ * @brief Internal OPTIONS handler (called by middleware wrapper)
+ */
+static esp_err_t options_handler_internal(httpd_req_t *req)
+{
+    // Set CORS headers
+    set_cors_headers(req);
+    
+    // Log outgoing response
+    log_outgoing_response("OPTIONS", req->uri, 204, "(empty - CORS preflight)");
+    
+    // Send empty response with 204 No Content
+    httpd_resp_set_status(req, "204 No Content");
+    httpd_resp_send(req, NULL, 0);
+    
+    return ESP_OK;
+}
+
+/**
+ * @brief HTTP OPTIONS handler for CORS preflight requests (wrapped with middleware)
+ */
+static esp_err_t options_handler(httpd_req_t *req)
+{
+    return middleware_wrapper(req, options_handler_internal);
+}
+
+/**
+ * @brief Internal root handler (called by middleware wrapper)
+ */
+static esp_err_t root_handler_internal(httpd_req_t *req)
+{
+    // Set CORS headers
+    set_cors_headers(req);
+    
+    // Return JSON with available endpoints
+    const char *response = "{\"status\":\"ok\",\"message\":\"ESP32 Provisioning Server\",\"endpoints\":[\"/local-wifi\",\"/provision\",\"/status\"]}";
+    httpd_resp_set_type(req, "application/json");
+    log_outgoing_response("GET", req->uri, 200, response);
+    httpd_resp_sendstr(req, response);
+    
+    return ESP_OK;
+}
+
+/**
+ * @brief HTTP GET handler for root path "/" (wrapped with middleware)
+ */
+static esp_err_t root_handler(httpd_req_t *req)
+{
+    return middleware_wrapper(req, root_handler_internal);
+}
+
+/**
+ * @brief Internal status handler (called by middleware wrapper)
+ */
+static esp_err_t status_handler_internal(httpd_req_t *req)
+{
     
     cJSON *root = cJSON_CreateObject();
 
@@ -638,6 +818,10 @@ static esp_err_t status_handler(httpd_req_t *req)
     }
 
     char *json_string = cJSON_Print(root);
+    
+    // Set CORS headers
+    set_cors_headers(req);
+    
     httpd_resp_set_type(req, "application/json");
     
     // Log outgoing response
@@ -649,6 +833,14 @@ static esp_err_t status_handler(httpd_req_t *req)
     cJSON_Delete(root);
 
     return ESP_OK;
+}
+
+/**
+ * @brief HTTP GET handler for /status endpoint (wrapped with middleware)
+ */
+static esp_err_t status_handler(httpd_req_t *req)
+{
+    return middleware_wrapper(req, status_handler_internal);
 }
 
 /**
@@ -769,6 +961,14 @@ static httpd_handle_t start_http_server(void)
     ESP_LOGI(TAG, "Starting HTTP server on port %d (stack: %d bytes)", config.server_port, config.stack_size);
 
     if (httpd_start(&server, &config) == ESP_OK) {
+        // Register root handler for "/"
+        httpd_uri_t root_uri = {
+            .uri = "/",
+            .method = HTTP_GET,
+            .handler = root_handler,
+        };
+        httpd_register_uri_handler(server, &root_uri);
+        
         // Register URI handlers
         httpd_uri_t scan_uri = {
             .uri = "/local-wifi",
@@ -791,7 +991,30 @@ static httpd_handle_t start_http_server(void)
         };
         httpd_register_uri_handler(server, &status_uri);
 
-        ESP_LOGI(TAG, "HTTP server started");
+        // Register OPTIONS handlers for CORS preflight requests for each endpoint
+        httpd_uri_t options_scan_uri = {
+            .uri = "/local-wifi",
+            .method = HTTP_OPTIONS,
+            .handler = options_handler,
+        };
+        httpd_register_uri_handler(server, &options_scan_uri);
+
+        httpd_uri_t options_provision_uri = {
+            .uri = "/provision",
+            .method = HTTP_OPTIONS,
+            .handler = options_handler,
+        };
+        httpd_register_uri_handler(server, &options_provision_uri);
+
+        httpd_uri_t options_status_uri = {
+            .uri = "/status",
+            .method = HTTP_OPTIONS,
+            .handler = options_handler,
+        };
+        httpd_register_uri_handler(server, &options_status_uri);
+
+        ESP_LOGI(TAG, "HTTP server started with CORS support");
+        ESP_LOGI(TAG, "Registered endpoints: /, /local-wifi, /provision, /status");
         return server;
     }
 
