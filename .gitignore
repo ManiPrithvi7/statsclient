@@ -1,0 +1,35 @@
+# Build artifacts
+build/
+.pio/
+
+# ESP-IDF build files
+sdkconfig
+sdkconfig.old
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Compiled binaries
+*.bin
+*.elf
+*.map
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PlatformIO
+.pioenvs/
+.piolibdeps/
