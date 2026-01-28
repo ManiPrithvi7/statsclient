@@ -1,0 +1,571 @@
+{
+	"info": {
+		"_postman_id": "esp32-provisioning-collection",
+		"name": "ESP32 Provisioning Endpoints",
+		"description": "Collection for ESP32 device provisioning and backend certificate signing endpoints.\n\n**CORS Support:** All ESP32 endpoints include CORS headers to allow direct browser-to-device communication:\n- `Access-Control-Allow-Origin: *`\n- `Access-Control-Allow-Methods: GET, POST, OPTIONS`\n- `Access-Control-Allow-Headers: Content-Type, Authorization`\n- `Access-Control-Max-Age: 3600`\n\n**Preflight Requests:** All endpoints support OPTIONS method for CORS preflight requests.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Device Provisioning (ESP32)",
+			"item": [
+				{
+					"name": "Scan WiFi Networks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.4.1/local-wifi",
+							"protocol": "http",
+							"host": [
+								"192.168.4.1"
+							],
+							"path": [
+								"local-wifi"
+							],
+							"query": [
+								{
+									"key": "refresh",
+									"value": "false",
+									"description": "Set to true to force a new scan (may disrupt connection)"
+								}
+							]
+						},
+						"description": "Scans for available WiFi networks. Returns cached results instantly for better UX.\n\n**CORS:** This endpoint includes CORS headers and supports OPTIONS preflight requests."
+					},
+					"response": [
+						{
+							"name": "Success - WiFi Networks",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.4.1/local-wifi",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"local-wifi"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"networks\": [\n    {\n      \"ssid\": \"Statsnapp\",\n      \"rssi\": -45,\n      \"channel\": 6,\n      \"secure\": true\n    },\n    {\n      \"ssid\": \"MyHomeWiFi\",\n      \"rssi\": -67,\n      \"channel\": 11,\n      \"secure\": true\n    },\n    {\n      \"ssid\": \"GuestNetwork\",\n      \"rssi\": -78,\n      \"channel\": 1,\n      \"secure\": false\n    }\n  ],\n  \"count\": 3,\n  \"cached\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Provision Device",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyXzEyMyIsImV4cCI6MTY5OTk5OTk5OX0.example",
+								"description": "Bearer token for ESP32 to use for authenticated API calls to the server"
+							}
+						],
+						"description": "Submits WiFi credentials, device ID, and provisioning token. The Authorization header contains the Bearer token that the ESP32 will use for authenticated API calls to the server. CORS: This endpoint includes CORS headers and supports OPTIONS preflight requests. Browsers will send an OPTIONS request before the POST request.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ssid\": \"Statsnapp\",\n  \"password\": \"1q2w3e4r\",\n  \"device_id\": \"device_0070\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://192.168.4.1/provision",
+							"protocol": "http",
+							"host": [
+								"192.168.4.1"
+							],
+							"path": [
+								"provision"
+							]
+						},
+						"description": "Submits WiFi credentials, device ID, and provisioning token. The Authorization header contains the Bearer token that the ESP32 will use for authenticated API calls to the server."
+					},
+					"response": [
+						{
+							"name": "Success - Credentials Saved",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"ssid\": \"Statsnapp\",\n  \"password\": \"1q2w3e4r\",\n  \"device_id\": \"device_0070\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.4.1/provision",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"provision"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"ok\",\n  \"message\": \"Credentials saved\"\n}"
+						},
+						{
+							"name": "Error - Missing Fields",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"ssid\": \"Statsnapp\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.4.1/provision",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"provision"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"error\": \"missing_fields\",\n  \"message\": \"One or more required fields are missing\",\n  \"missing_fields\": [\n    \"password\",\n    \"device_id\",\n    \"provisioning_token\"\n  ]\n}"
+						},
+						{
+							"name": "Error - Invalid JSON",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "invalid json",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.4.1/provision",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"provision"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"error\": \"invalid_json\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Provisioning Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.4.1/status",
+							"protocol": "http",
+							"host": [
+								"192.168.4.1"
+							],
+							"path": [
+								"status"
+							]
+						},
+						"description": "Returns current provisioning status and IP address.\n\n**CORS:** This endpoint includes CORS headers and supports OPTIONS preflight requests."
+					},
+					"response": [
+						{
+							"name": "Status - Provisioning (AP Mode)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.4.1/status",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"provisioning\",\n  \"ip\": \"192.168.4.1\"\n}"
+						},
+						{
+							"name": "Status - Connected (WiFi)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.4.1/status",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"connected\",\n  \"ip\": \"192.168.1.100\"\n}"
+						},
+						{
+							"name": "Status - Disconnected",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.4.1/status",
+									"protocol": "http",
+									"host": [
+										"192.168.4.1"
+									],
+									"path": [
+										"status"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": \"disconnected\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Backend Certificate Signing",
+			"item": [
+				{
+					"name": "Sign CSR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"device_id\": \"device_0070\",\n  \"csr\": \"-----BEGIN CERTIFICATE REQUEST-----\\nMIICXjCCAUYCAQAwFjEUMBIGA1UEAwwLZGV2aWNlXzAwNzAwggEiMA0GCSqGSIb3\\nDQEBAQUAA4IBDwAwggEKAoIBAQC...\\n-----END CERTIFICATE REQUEST-----\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BACKEND_URL}}/api/v1/sign-csr",
+							"protocol": "https",
+							"host": [
+								"{{BACKEND_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sign-csr"
+							],
+							"variable": [
+								{
+									"key": "BACKEND_URL",
+									"value": "https://your-backend.com",
+									"description": "Backend server base URL"
+								}
+							]
+						},
+						"description": "Submits Certificate Signing Request (CSR) to backend for signing. The server extracts userId from the provisioning_token and validates user-device association. Returns signed device certificate and CA certificate."
+					},
+					"response": [
+						{
+							"name": "Success - Certificates Signed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"device_id\": \"device_0070\",\n  \"csr\": \"-----BEGIN CERTIFICATE REQUEST-----\\n...\\n-----END CERTIFICATE REQUEST-----\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://your-backend.com/api/v1/sign-csr",
+									"protocol": "https",
+									"host": [
+										"your-backend.com"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sign-csr"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"certificate\": {\n    \"content\": \"-----BEGIN CERTIFICATE-----\\nMIIDXTCCAkWgAwIBAgIJAKZ7Z3Z3Z3Z3MA0GCSqGSIb3DQEBCQUAMEUxCzAJBgNV\\nBAYTAlVTMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX\\naWRnaXRzIFB0eSBMdGQwHhcNMjQwMTAxMDAwMDAwWhcNMjUwMTAxMDAwMDAwWjAW\\nMRQwEgYDVQQDDAtkZXZpY2VfMDA3MDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\\nAQoCggEBAQC...\\n-----END CERTIFICATE-----\"\n  },\n  \"ca_certificate\": {\n    \"content\": \"-----BEGIN CERTIFICATE-----\\nMIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\\nADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\\nb24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\\nMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\\nb3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\\nca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\\n9O6II8c+6f1hcF1XQJB0lHukcLSSkEykZK4cwxpSUnJwq8uWjK9V55uLGGX36GXU\\nCCJm+3kqJT3xNGxScdhhcPT0yjuy1xaPYYk4e98ccULd7D1y2bxYjzBqQ3brN34T\\n8g2PIGBIZC7J4kdptFqKs1c1qzbx4M7K9Uc8GT4I7Ax0ISotc/8A1U8Y+3gSk9Tvb\\nSHt9ybkkmgYoEeS8uYfZi4MRDKwSBlC2E06KQZtB1rVxTjZpmhy4Qr+1rFywM2N4o\\nzJmyj5P8UjWlXQIDAQABo0IwQDAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQE\\nAwIBBjAdBgNVHQ4EFgQUiRqsHHYcq0FzFfGJhhdiI5fQ7o8wDQYJKoZIhvcNAQEL\\nBQADggEBAGnTDPV+LUe3WXaA+EPaZWmNxye5tmg1V2eZpORZJ3LNG10lZ0yElWEq\\nQzi6oDREsxYmrOeY9egY+e8+JkfutWyNE2f7Rx2PaPaAVLCX0YXSiUQc9N6xsaMv\\nUPZtmpjHNHp7oHD2VJ4dXlJuvs5Zy1Z09jLX4bAtx6foiAsiShdkuR5u8BT6XurvJ\\nW3SrHp09/YYdqoZ6qYDNk3c0W9uVrpFpylUIoZFb6JuhnDFn8k2FH2T6sJ1Yryix\\nLY23mZaNNMwClWrvM362IzfYjE4jMyNWdN5d2XUZjyICNdJXnm+NZy2bwB4ziMEzk\\nYjqphf5QS+EJxXa23DMdeNSdhZkuxSqxeJloE13jPNVpUYA0kgZ6mPOONWq/2GqD\\n...\\n-----END CERTIFICATE-----\"\n  }\n}"
+						},
+						{
+							"name": "Error - Invalid CSR",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"device_id\": \"device_0070\",\n  \"csr\": \"invalid_csr\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://your-backend.com/api/v1/sign-csr",
+									"protocol": "https",
+									"host": [
+										"your-backend.com"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sign-csr"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"error\": \"invalid_csr\",\n  \"message\": \"Invalid Certificate Signing Request format\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"device_id\": \"device_0070\",\n  \"csr\": \"-----BEGIN CERTIFICATE REQUEST-----\\n...\\n-----END CERTIFICATE REQUEST-----\",\n  \"provisioning_token\": \"invalid_token\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://your-backend.com/api/v1/sign-csr",
+									"protocol": "https",
+									"host": [
+										"your-backend.com"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sign-csr"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"error\": \"unauthorized\",\n  \"message\": \"Invalid or expired provisioning token\"\n}"
+						},
+						{
+							"name": "Error - Device Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"device_id\": \"device_9999\",\n  \"csr\": \"-----BEGIN CERTIFICATE REQUEST-----\\n...\\n-----END CERTIFICATE REQUEST-----\",\n  \"provisioning_token\": \"your_provisioning_token_here\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://your-backend.com/api/v1/sign-csr",
+									"protocol": "https",
+									"host": [
+										"your-backend.com"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sign-csr"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"error\": \"device_not_found\",\n  \"message\": \"Device not found or not associated with user\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "BACKEND_URL",
+			"value": "https://your-backend.com",
+			"type": "string"
+		},
+		{
+			"key": "DEVICE_IP",
+			"value": "192.168.4.1",
+			"type": "string",
+			"description": "ESP32 device IP address when in AP mode"
+		}
+	]
+}
+
