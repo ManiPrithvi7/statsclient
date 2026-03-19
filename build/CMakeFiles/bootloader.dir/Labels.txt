@@ -1,13 +1,13 @@
 # Target labels
  bootloader
 # Source files and their labels
-/home/muthuselvan/esp/build/CMakeFiles/bootloader
-/home/muthuselvan/esp/build/CMakeFiles/bootloader.rule
-/home/muthuselvan/esp/build/CMakeFiles/bootloader-complete.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
-/home/muthuselvan/esp/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader
+/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader.rule
+/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader-complete.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

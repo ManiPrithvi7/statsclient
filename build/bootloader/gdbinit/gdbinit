@@ -1,2 +1,2 @@
-source /home/muthuselvan/esp/build/bootloader/gdbinit/symbols
-source /home/muthuselvan/esp/build/bootloader/gdbinit/connect
+source /home/statsnapp/Desktop/statsclient/build/bootloader/gdbinit/symbols
+source /home/statsnapp/Desktop/statsclient/build/bootloader/gdbinit/connect

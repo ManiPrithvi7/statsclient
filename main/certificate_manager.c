@@ -31,6 +31,29 @@ static const char *TAG = "cert_mgr";
 static char *s_http_response_buffer = NULL;
 static size_t s_http_response_len = 0;
 
+static const char *extract_cert_pem_from_json(cJSON *node)
+{
+    if (node == NULL) {
+        return NULL;
+    }
+
+    // Supports both formats:
+    // 1) "certificate": "-----BEGIN CERTIFICATE-----..."
+    // 2) "certificate": { "content": "-----BEGIN CERTIFICATE-----..." }
+    if (cJSON_IsString(node)) {
+        return node->valuestring;
+    }
+
+    if (cJSON_IsObject(node)) {
+        cJSON *content = cJSON_GetObjectItem(node, "content");
+        if (cJSON_IsString(content)) {
+            return content->valuestring;
+        }
+    }
+
+    return NULL;
+}
+
 /**
  * @brief HTTP event handler for esp_http_client
  */
@@ -192,8 +215,11 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
     ESP_LOGI(TAG, "Request body prepared (device_id + csr + provisioning_token)");
     ESP_LOGD(TAG, "Request body: %s", json_string);
 
-    // Note: Authorization header not required - server extracts userId from provisioning_token
-    // But we can optionally include it if needed for other server-side processing
+    // Optional user bearer token (stored during provisioning).
+    // If present, include it in Authorization header for backend-side user validation.
+    char bearer_token[512] = {0};
+    bool has_bearer_token = (wifi_provisioning_get_bearer_token(bearer_token, sizeof(bearer_token)) == ESP_OK &&
+                             strlen(bearer_token) > 0);
 
     // Configure HTTP client
     esp_http_client_config_t config = {
@@ -220,7 +246,11 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
     // Set headers
     esp_http_client_set_method(client, HTTP_METHOD_POST);
     esp_http_client_set_header(client, "Content-Type", "application/json");
-    // Authorization header removed - server extracts userId from provisioning_token
+    if (has_bearer_token) {
+        char auth_header[600] = {0};
+        snprintf(auth_header, sizeof(auth_header), "Bearer %s", bearer_token);
+        esp_http_client_set_header(client, "Authorization", auth_header);
+    }
     esp_http_client_set_post_field(client, json_string, strlen(json_string));
 
     // Free response buffer if exists
@@ -240,7 +270,11 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
     ESP_LOGD(TAG, "Request Body: %s", json_string);
     ESP_LOGI(TAG, "Headers:");
     ESP_LOGI(TAG, "  Content-Type: application/json");
-    ESP_LOGI(TAG, "  (Authorization header not sent - server extracts userId from provisioning_token)");
+    if (has_bearer_token) {
+        ESP_LOGI(TAG, "  Authorization: Bearer <redacted>");
+    } else {
+        ESP_LOGI(TAG, "  Authorization: (not present; continuing with provisioning_token only)");
+    }
     ESP_LOGI(TAG, "========================================");
     
     // Perform request
@@ -264,14 +298,14 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
                     cJSON *ca_obj = cJSON_GetObjectItem(response, "ca_certificate");
 
                     if (cert_obj && ca_obj) {
-                        cJSON *cert_content = cJSON_GetObjectItem(cert_obj, "content");
-                        cJSON *ca_content = cJSON_GetObjectItem(ca_obj, "content");
+                        const char *cert_pem = extract_cert_pem_from_json(cert_obj);
+                        const char *ca_pem = extract_cert_pem_from_json(ca_obj);
 
-                        if (cJSON_IsString(cert_content) && cJSON_IsString(ca_content)) {
+                        if (cert_pem != NULL && ca_pem != NULL) {
                             // Save certificates to NVS
-                            err = save_certificate_to_nvs(NVS_KEY_DEVICE_CERT, cert_content->valuestring);
+                            err = save_certificate_to_nvs(NVS_KEY_DEVICE_CERT, cert_pem);
                             if (err == ESP_OK) {
-                                err = save_certificate_to_nvs(NVS_KEY_CA_CERT, ca_content->valuestring);
+                                err = save_certificate_to_nvs(NVS_KEY_CA_CERT, ca_pem);
                             }
 
                             if (err == ESP_OK) {

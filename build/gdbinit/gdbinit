@@ -1,2 +1,2 @@
-source /home/muthuselvan/esp/build/gdbinit/symbols
-source /home/muthuselvan/esp/build/gdbinit/connect
+source /home/statsnapp/Desktop/statsclient/build/gdbinit/symbols
+source /home/statsnapp/Desktop/statsclient/build/gdbinit/connect

@@ -2,7 +2,7 @@
 # ESP32 WiFi Provisioning - Build, Flash, and Test Script
 # This single script handles everything: build → flash → connect → test
 
-set -e
+set -euo pipefail
 
 # Configuration
 ESP_PORT="/dev/ttyACM0"
@@ -10,6 +10,11 @@ AP_SSID="ESP32-Prov"
 AP_PASSWORD="prov12345678"
 ESP_IP="192.168.4.1"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Timeouts (override via env if desired)
+: "${IDF_BUILD_TIMEOUT:=20m}"
+: "${IDF_FLASH_TIMEOUT:=10m}"
+: "${CURL_TIMEOUT:=30}"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -90,10 +95,17 @@ cleanup_serial_port() {
 setup_esp_idf() {
     print_step "Setting up ESP-IDF environment"
     if [ -f "$PROJECT_DIR/esp-idf/export.sh" ]; then
+        # shellcheck disable=SC1091
         source "$PROJECT_DIR/esp-idf/export.sh" >/dev/null 2>&1
         print_success "ESP-IDF environment loaded"
     else
         print_error "ESP-IDF not found. Please install ESP-IDF first."
+        exit 1
+    fi
+
+    if ! command -v idf.py >/dev/null 2>&1; then
+        print_error "idf.py not found in PATH after sourcing ESP-IDF environment"
+        print_info "Expected: source \"$PROJECT_DIR/esp-idf/export.sh\" to provide idf.py"
         exit 1
     fi
 }
@@ -103,25 +115,46 @@ build_project() {
     print_step "Building project"
     cd "$PROJECT_DIR"
     
-    # Try to build and capture output
-    BUILD_OUTPUT=$(idf.py build 2>&1)
-    BUILD_EXIT_CODE=$?
+    local build_log
+    build_log="$(mktemp)"
+    print_info "Running build (timeout: $IDF_BUILD_TIMEOUT)..."
+
+    # Avoid command-substitution + set -e interactions; stream output live and keep a log.
+    set +e
+    timeout "$IDF_BUILD_TIMEOUT" idf.py build 2>&1 | tee "$build_log"
+    local build_exit=${PIPESTATUS[0]}
+    set -e
     
     # Check if build directory is misconfigured (configured for different project)
-    if echo "$BUILD_OUTPUT" | grep -qi "configured for project.*not"; then
+    if grep -qi "configured for project.*not" "$build_log"; then
         print_warning "Build directory misconfigured for different project, cleaning..."
         idf.py fullclean >/dev/null 2>&1
         print_info "Build directory cleaned, rebuilding..."
-        BUILD_OUTPUT=$(idf.py build 2>&1)
-        BUILD_EXIT_CODE=$?
+        set +e
+        timeout "$IDF_BUILD_TIMEOUT" idf.py build 2>&1 | tee "$build_log"
+        build_exit=${PIPESTATUS[0]}
+        set -e
+    fi
+
+    # Recover from corrupted build metadata (common after interrupted builds)
+    if [ "$build_exit" -ne 0 ] && (grep -q "Failed to read component info from project_description.json" "$build_log" || grep -q "JSONDecodeError" "$build_log"); then
+        print_warning "Build metadata appears corrupted (project_description.json). Running fullclean and rebuilding..."
+        idf.py fullclean >/dev/null 2>&1
+        print_info "Rebuilding after fullclean..."
+        set +e
+        timeout "$IDF_BUILD_TIMEOUT" idf.py build 2>&1 | tee "$build_log"
+        build_exit=${PIPESTATUS[0]}
+        set -e
     fi
     
-    if [ $BUILD_EXIT_CODE -eq 0 ]; then
+    if [ "$build_exit" -eq 0 ]; then
         print_success "Build completed"
+        rm -f "$build_log"
     else
         # Show actual build errors
         print_error "Build failed. Showing errors:"
-        echo "$BUILD_OUTPUT" | tail -30
+        tail -50 "$build_log" || true
+        print_info "Full build log: $build_log"
         exit 1
     fi
 }
@@ -174,24 +207,30 @@ flash_esp32() {
     
     # Try to flash (show errors for debugging)
     print_info "Flashing to $ESP_PORT..."
-    FLASH_OUTPUT=$(mktemp)
-    if idf.py -p "$ESP_PORT" flash > "$FLASH_OUTPUT" 2>&1; then
+    local flash_log
+    flash_log="$(mktemp)"
+    set +e
+    timeout "$IDF_FLASH_TIMEOUT" idf.py -p "$ESP_PORT" flash >"$flash_log" 2>&1
+    local flash_exit=$?
+    set -e
+
+    if [ "$flash_exit" -eq 0 ]; then
         # Check for success indicators
-        if grep -q "Hash of data verified" "$FLASH_OUTPUT" || grep -q "Leaving" "$FLASH_OUTPUT"; then
+        if grep -q "Hash of data verified" "$flash_log" || grep -q "Leaving" "$flash_log"; then
             print_success "Firmware flashed successfully"
-            rm -f "$FLASH_OUTPUT"
+            rm -f "$flash_log"
         else
             print_error "Flash may have failed - no success indicator found"
             print_info "Flash output:"
-            tail -15 "$FLASH_OUTPUT"
-            rm -f "$FLASH_OUTPUT"
+            tail -40 "$flash_log" || true
+            print_info "Full flash log: $flash_log"
             exit 1
         fi
     else
         print_error "Flash failed"
         print_info "Flash output:"
-        tail -20 "$FLASH_OUTPUT"
-        rm -f "$FLASH_OUTPUT"
+        tail -80 "$flash_log" || true
+        print_info "Full flash log: $flash_log"
         exit 1
     fi
 }
@@ -248,15 +287,12 @@ connect_to_ap() {
     done
     
     if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-        print_error "ESP32 AP '$AP_SSID' not found after $MAX_RETRIES attempts"
+        print_warning "ESP32 AP '$AP_SSID' not found after $MAX_RETRIES attempts"
         print_info "Possible reasons:"
-        print_info "  1. Device needs more time to boot (try waiting 10-15 more seconds)"
-        print_info "  2. Device encountered an error during boot"
-        print_info "  3. WiFi initialization failed"
-        print_info ""
-        print_info "Check serial monitor for details:"
-        print_info "  idf.py -p $ESP_PORT monitor"
-        return 1
+        print_info "  1. Device needs more time to boot"
+        print_info "  2. Device error during boot"
+        print_info "  3. Device is reusing persisted credentials and skipped AP mode"
+        return 2
     fi
     
     # Connect to AP
@@ -273,180 +309,77 @@ connect_to_ap() {
     return 1
 }
 
-# Step 6: Interactive WiFi provisioning
+# Step 6: Captive portal provisioning flow
 wait_for_http_provisioning() {
-    print_step "WiFi Provisioning via HTTP POST"
-    
-    # Verify ESP32 is ready
-    print_info "Verifying ESP32 is ready..."
+    print_step "WiFi Provisioning via Captive Portal"
+    : "${PROVISIONING_WAIT_TIMEOUT:=300}" # seconds
+
+    # Verify ESP32 portal is reachable
+    print_info "Verifying ESP32 provisioning portal..."
     if STATUS=$(curl -s --max-time 5 "http://$ESP_IP/status" 2>/dev/null); then
         if echo "$STATUS" | grep -q "status"; then
-            print_success "ESP32 is ready and waiting for HTTP POST /provision"
+            print_success "ESP32 portal is reachable"
         else
-            print_error "ESP32 not responding correctly"
+            print_error "ESP32 not responding correctly on /status"
             return 1
         fi
     else
-        print_error "Cannot connect to ESP32"
+        print_error "Cannot reach ESP32 at $ESP_IP"
         return 1
     fi
-    
-    echo ""
-    print_info "Scanning for available WiFi networks (optional reference)..."
-    print_info "This may take 15-20 seconds, please wait..."
-    
-    # Scan for WiFi networks (optional, for user reference)
-    WIFI_SCAN=$(timeout 30 curl -s --max-time 30 "http://$ESP_IP/local-wifi" 2>/dev/null)
-    
-    if [ $? -eq 0 ] && echo "$WIFI_SCAN" | grep -q "networks"; then
-        echo ""
-        print_success "Available WiFi Networks:"
-        echo ""
-        
-        # Display networks using Python
-        python3 << PYEOF
-import json
-import sys
 
-try:
-    wifi_scan = '''$WIFI_SCAN'''
-    data = json.loads(wifi_scan)
-    networks = data.get('networks', [])
-    
-    if not networks:
-        print("  No networks found")
-    else:
-        print(f"  {'#':<4} {'SSID':<30} {'RSSI':<8} {'Channel':<8} {'Security':<10}")
-        print("  " + "-" * 70)
-        for i, net in enumerate(networks, 1):
-            ssid = net.get('ssid', 'Unknown')
-            rssi = net.get('rssi', 0)
-            channel = net.get('channel', 0)
-            secure = "Yes" if net.get('secure', False) else "No"
-            print(f"  {i:<4} {ssid:<30} {rssi:<8} {channel:<8} {secure:<10}")
-except Exception as e:
-    print(f"  Error parsing networks: {e}")
-PYEOF
-    else
-        print_warning "Could not scan networks (optional - you can still provision)"
-    fi
-    
-    echo ""
     echo ""
     print_info "========================================"
-    print_info "Send Credentials via HTTP POST"
+    print_info "Use Web Portal (new flow)"
     print_info "========================================"
+    print_info "1) Keep a phone/laptop connected to: $AP_SSID"
+    print_info "2) Open: http://proof-setup.local/  (fallback: http://$ESP_IP/)"
+    print_info "3) Paste provisioning token in portal URL/field"
+    print_info "4) Submit WiFi credentials from the portal"
+    print_info ""
+    print_info "Script will wait up to ${PROVISIONING_WAIT_TIMEOUT}s for transition."
+    print_info "Success indicators:"
+    print_info "  - /status returns connected"
+    print_info "  - OR AP disappears (device switched to STA)"
     echo ""
-    print_info "The device is waiting for credentials via HTTP POST request."
-    print_info "Send a POST request to: http://$ESP_IP/provision"
-    echo ""
-    print_info "Example using curl:"
-    echo ""
-    echo "  curl -X POST http://$ESP_IP/provision \\"
-    echo "    -H \"Content-Type: application/json\" \\"
-    echo "    -H \"Authorization: Bearer YOUR_BEARER_TOKEN\" \\"
-    echo "    -d '{"
-    echo "      \"ssid\": \"YourWiFiSSID\","
-    echo "      \"password\": \"YourWiFiPassword\","
-    echo "      \"device_id\": \"device_0070\","
-    echo "      \"provisioning_token\": \"your_prov_token\""
-    echo "    }'"
-    echo ""
-    print_info "Or use any HTTP client (Postman, browser extension, etc.)"
-    echo ""
-    print_info "Required JSON payload:"
-    echo "  {"
-    echo "    \"ssid\": \"WiFi network name\","
-    echo "    \"password\": \"WiFi password (empty string for open networks)\","
-    echo "    \"device_id\": \"device identifier\","
-    echo "    \"provisioning_token\": \"provisioning token\""
-    echo "  }"
-    echo ""
-    print_info "Required HTTP header:"
-    echo "  Authorization: Bearer YOUR_BEARER_TOKEN"
-    echo ""
-    print_info "Waiting for HTTP POST /provision request..."
-    print_info "The device will automatically process the request when received."
-    echo ""
-    
-    # State variable: true if credentials are present and device is connected
-    CREDENTIALS_PRESENT=false
-    
-    # Check initial state
-    print_info "Checking initial device provisioning status..."
-    INITIAL_STATUS=$(curl -s --max-time 3 "http://$ESP_IP/status" 2>/dev/null)
-    
-    if echo "$INITIAL_STATUS" | grep -q "\"status\":\"connected\""; then
-        CREDENTIALS_PRESENT=true
-        print_success "Device is already connected to WiFi!"
-        echo ""
-        print_info "Device Status Response (via HTTP):"
-        echo "$INITIAL_STATUS" | python3 -m json.tool 2>/dev/null || echo "$INITIAL_STATUS"
-        return 0
-    else
-        CREDENTIALS_PRESENT=false
-        print_info "Device is in provisioning mode - waiting for credentials"
-    fi
-    
-    echo ""
-    print_info "Waiting for state change (checking every 10 seconds)..."
-    print_info "Press Ctrl+C to exit"
-    echo ""
-    
-    # Wait for state change - check less frequently to avoid CPU burn
-    local check_interval=0
-    while [ "$CREDENTIALS_PRESENT" = false ]; do
-        # Wait 10 seconds between checks (less frequent = less CPU usage)
-        sleep 10
-        check_interval=$((check_interval + 1))
-        
-        # Check if state has changed
-        CURRENT_STATUS=$(curl -s --max-time 3 "http://$ESP_IP/status" 2>/dev/null)
-        
-        if echo "$CURRENT_STATUS" | grep -q "\"status\":\"connected\""; then
-            # State changed! Credentials are now present
-            CREDENTIALS_PRESENT=true
-            
-            echo ""
-            print_success "========================================"
-            print_success "State Changed - Credentials Present!"
-            print_success "========================================"
-            echo ""
-            print_info "Fetching device status via HTTP call..."
-            
-            # Make HTTP call to get full status and print response
-            FINAL_STATUS=$(curl -s --max-time 5 "http://$ESP_IP/status" 2>/dev/null)
-            
-            if [ -n "$FINAL_STATUS" ]; then
-                print_success "Device Status Response (via HTTP):"
-                echo ""
-                # Pretty print JSON if possible
-                echo "$FINAL_STATUS" | python3 -m json.tool 2>/dev/null || echo "$FINAL_STATUS"
-                echo ""
-                
-                # Extract and display key information
-                if echo "$FINAL_STATUS" | grep -q "\"ip\""; then
-                    DEVICE_IP=$(echo "$FINAL_STATUS" | python3 -c "import sys, json; d=json.load(sys.stdin); print(d.get('ip', 'N/A'))" 2>/dev/null)
-                    if [ -n "$DEVICE_IP" ] && [ "$DEVICE_IP" != "N/A" ]; then
-                        print_success "Device IP Address: $DEVICE_IP"
-                    fi
-                fi
-            else
-                print_warning "Could not fetch status via HTTP, but device appears connected"
-            fi
-            
-            print_success "Provisioning successful!"
+
+    local elapsed=0
+    local interval=5
+    while [ "$elapsed" -lt "$PROVISIONING_WAIT_TIMEOUT" ]; do
+        sleep "$interval"
+        elapsed=$((elapsed + interval))
+
+        # If status says connected, provisioning is definitely done
+        local current_status=""
+        current_status=$(curl -s --max-time 3 "http://$ESP_IP/status" 2>/dev/null || true)
+        if echo "$current_status" | grep -q "\"status\":\"connected\""; then
+            print_success "Provisioning accepted by device (/status=connected)"
+            echo "$current_status" | python3 -m json.tool 2>/dev/null || true
             return 0
         fi
-        
-        # Show progress indicator every 6 checks (60 seconds) - minimal CPU usage
-        if [ $((check_interval % 6)) -eq 0 ]; then
-            print_info "Still waiting... ($((check_interval * 10)) seconds elapsed)"
-            print_info "Send HTTP POST to http://$ESP_IP/provision when ready"
+
+        # If AP is gone, this usually means credentials were submitted and device switched network
+        if ! ping -c 1 -W 1 "$ESP_IP" >/dev/null 2>&1; then
+            print_success "Provisioning likely completed (AP no longer reachable; device switched to STA)"
+            return 0
+        fi
+
+        if [ $((elapsed % 30)) -eq 0 ]; then
+            print_info "Still waiting... (${elapsed}s elapsed)"
         fi
     done
-    
-    return 0
+
+    print_warning "Timed out waiting for provisioning transition."
+    print_info "If you already submitted in portal, continue and verify via serial monitor."
+    return 1
+}
+
+monitor_serial() {
+    print_step "Starting serial monitor (shows MQTT topic data)"
+    print_info "Press Ctrl+C to stop monitoring"
+    print_info "Port: $ESP_PORT"
+    print_info ""
+    idf.py -p "$ESP_PORT" monitor
 }
 
 # Main execution
@@ -465,7 +398,10 @@ main() {
     flash_esp32
     wait_for_boot
     
-    if connect_to_ap; then
+    local ap_result=0
+    connect_to_ap || ap_result=$?
+
+    if [ "$ap_result" -eq 0 ]; then
         # Wait for HTTP POST provisioning (no CLI input)
         if wait_for_http_provisioning; then
             echo ""
@@ -499,21 +435,20 @@ main() {
         print_info "  - Full API response from endpoint"
         print_info ""
         print_info "========================================"
-        print_info "Development Mode - Script Running"
+        print_info "Development Mode - Handing off to monitor"
         print_info "========================================"
-        print_info "Press Ctrl+C to stop"
-        print_info ""
-        print_info "Monitor serial output for internet verification:"
-        print_info "  idf.py -p $ESP_PORT monitor"
-        print_info ""
-        
-        # Keep script running until Ctrl+C
-        trap 'echo ""; print_info "Stopping..."; exit 0' INT TERM
-        
-        # Wait indefinitely (until Ctrl+C)
-        while true; do
-            sleep 1
-        done
+        echo ""
+        monitor_serial
+    elif [ "$ap_result" -eq 2 ]; then
+        echo ""
+        print_info "AP not found. Assuming credential-reuse boot path (STA mode)."
+        print_info "Handing off to serial monitor to observe:"
+        print_info "  - WiFi STA connect"
+        print_info "  - CSR submission"
+        print_info "  - Certificate download/save"
+        print_info "  - MQTT mTLS connect"
+        echo ""
+        monitor_serial
     else
         print_error "Could not connect to ESP32 AP"
         print_info "Check serial monitor for errors:"

@@ -431,7 +431,7 @@
 #define CONFIG_PARTITION_TABLE_MD5 1
 #define CONFIG_AP_SSID_PREFIX "ESP32-Prov"
 #define CONFIG_AP_PASSWORD "prov12345678"
-#define CONFIG_BACKEND_URL "https://your-backend.com"
+#define CONFIG_BACKEND_URL "https://task-bd0u.onrender.com"
 #define CONFIG_MQTT_BROKER_URI "mqtts://your-broker.com:8883"
 #define CONFIG_COMPILER_OPTIMIZATION_DEBUG 1
 #define CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE 1

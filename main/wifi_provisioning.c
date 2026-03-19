@@ -14,6 +14,9 @@
 #include "esp_netif.h"
 #include "esp_http_server.h"
 #include "esp_timer.h"
+#include "lwip/sockets.h"
+#include "lwip/inet.h"
+#include "lwip/ip_addr.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "cJSON.h"
@@ -22,6 +25,9 @@
 #include "freertos/semphr.h"
 
 static const char *TAG = "wifi_prov";
+
+// Milestone logging (high-signal, human-friendly)
+#define STEP_LOG(fmt, ...) ESP_LOGI(TAG, "✅ STEP: " fmt, ##__VA_ARGS__)
 
 // WiFi scan cache configuration
 #define WIFI_SCAN_MAX_APS        20     // Maximum APs to cache
@@ -44,12 +50,18 @@ static httpd_handle_t s_httpd = NULL;
 static bool s_provisioning_active = false;
 static bool s_wifi_connected = false;
 static char s_sta_ip[16] = {0};
+static TaskHandle_t s_mdns_task = NULL;
+static TaskHandle_t s_dns_task = NULL;
+static esp_timer_handle_t s_deferred_stop_timer = NULL;
 
 // WiFi scan cache (for instant /local-wifi responses)
 static wifi_ap_record_t s_cached_networks[WIFI_SCAN_MAX_APS];
 static uint16_t s_cached_network_count = 0;
 static SemaphoreHandle_t s_cache_mutex = NULL;
 static bool s_initial_scan_done = false;
+
+// mDNS config for provisioning UX
+#define PROVISIONING_MDNS_HOSTNAME "proof-setup"
 
 // Forward declarations
 static esp_err_t scan_handler(httpd_req_t *req);
@@ -65,6 +77,550 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
 static esp_err_t perform_wifi_scan_and_cache(void);
 static void log_incoming_request(httpd_req_t *req);
 static void log_outgoing_response(const char *method, const char *uri, int status_code, const char *response_body);
+
+static esp_err_t provisioning_mdns_start(void);
+static void provisioning_mdns_stop(void);
+static esp_err_t provisioning_dns_start(void);
+static void provisioning_dns_stop(void);
+static const char* provisioning_setup_page_html(void);
+
+static void deferred_stop_cb(void *arg)
+{
+    (void)arg;
+    ESP_LOGI(TAG, "Deferred stop timer fired; stopping provisioning now");
+    wifi_provisioning_stop();
+}
+
+static int dns_read_qname(const uint8_t *msg, int msg_len, int offset, char *out, int out_len)
+{
+    int o = offset;
+    int w = 0;
+    while (o < msg_len) {
+        uint8_t len = msg[o++];
+        if (len == 0) {
+            if (w == 0) {
+                if (out_len > 0) out[0] = '\0';
+            } else {
+                out[w] = '\0';
+            }
+            return o;
+        }
+        if ((len & 0xC0) != 0) {
+            // compression not supported in queries we expect
+            return -1;
+        }
+        if (o + len > msg_len) return -1;
+        if (w && w < out_len - 1) out[w++] = '.';
+        for (int i = 0; i < len && w < out_len - 1; i++) {
+            char c = (char)msg[o++];
+            out[w++] = (c >= 'A' && c <= 'Z') ? (char)(c - 'A' + 'a') : c;
+        }
+        // Skip remaining bytes if output buffer filled
+        if (w >= out_len - 1) {
+            o += (len - (len < (uint8_t)(out_len) ? 0 : 0));
+        }
+    }
+    return -1;
+}
+
+static int dns_write_name(uint8_t *buf, int buf_len, int offset, const char *name)
+{
+    int o = offset;
+    const char *p = name;
+    while (*p) {
+        const char *dot = strchr(p, '.');
+        int labellen = dot ? (int)(dot - p) : (int)strlen(p);
+        if (labellen <= 0 || labellen > 63) return -1;
+        if (o + 1 + labellen >= buf_len) return -1;
+        buf[o++] = (uint8_t)labellen;
+        memcpy(&buf[o], p, labellen);
+        o += labellen;
+        if (!dot) break;
+        p = dot + 1;
+    }
+    if (o + 1 >= buf_len) return -1;
+    buf[o++] = 0;
+    return o;
+}
+
+static void mdns_responder_task(void *arg)
+{
+    (void)arg;
+    const uint16_t mdns_port = 5353;
+    const in_addr_t mdns_mcast_addr = inet_addr("224.0.0.251");
+
+    int sock = lwip_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock < 0) {
+        ESP_LOGW(TAG, "mDNS socket create failed");
+        vTaskDelete(NULL);
+        return;
+    }
+
+    int reuse = 1;
+    lwip_setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+
+    struct sockaddr_in bind_addr = {0};
+    bind_addr.sin_family = AF_INET;
+    bind_addr.sin_port = htons(mdns_port);
+    bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (lwip_bind(sock, (struct sockaddr *)&bind_addr, sizeof(bind_addr)) != 0) {
+        ESP_LOGW(TAG, "mDNS bind failed");
+        lwip_close(sock);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    struct ip_mreq mreq = {0};
+    mreq.imr_multiaddr.s_addr = mdns_mcast_addr;
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    if (lwip_setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) != 0) {
+        ESP_LOGW(TAG, "mDNS multicast join failed");
+        lwip_close(sock);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI(TAG, "mDNS responder active for %s.local", PROVISIONING_MDNS_HOSTNAME);
+
+    uint8_t rx[512];
+    uint8_t tx[512];
+    while (1) {
+        struct sockaddr_in from = {0};
+        socklen_t from_len = sizeof(from);
+        int n = lwip_recvfrom(sock, rx, sizeof(rx), 0, (struct sockaddr *)&from, &from_len);
+        if (n <= 0) continue;
+        if (n < 12) continue;
+
+        // DNS header
+        uint16_t id = (rx[0] << 8) | rx[1];
+        uint16_t flags = (rx[2] << 8) | rx[3];
+        uint16_t qdcount = (rx[4] << 8) | rx[5];
+        if (qdcount == 0) continue;
+
+        // Only handle standard queries (QR=0)
+        if (flags & 0x8000) continue;
+
+        int off = 12;
+        char qname[256];
+        int next = dns_read_qname(rx, n, off, qname, sizeof(qname));
+        if (next < 0) continue;
+        off = next;
+        if (off + 4 > n) continue;
+        uint16_t qtype = (rx[off] << 8) | rx[off + 1];
+        uint16_t qclass = (rx[off + 2] << 8) | rx[off + 3];
+        (void)qclass;
+
+        // Match proof-setup.local (case-insensitive; we lowercased)
+        char expected[300];
+        snprintf(expected, sizeof(expected), "%s.local", PROVISIONING_MDNS_HOSTNAME);
+        if (strcmp(qname, expected) != 0) continue;
+        if (qtype != 1 && qtype != 255) continue; // A or ANY
+
+        // Build response: header + question echo + one A answer
+        memset(tx, 0, sizeof(tx));
+        tx[0] = (uint8_t)(id >> 8);
+        tx[1] = (uint8_t)(id & 0xff);
+        tx[2] = 0x84; // QR=1, AA=1
+        tx[3] = 0x00;
+        tx[4] = 0x00; tx[5] = 0x01; // QDCOUNT
+        tx[6] = 0x00; tx[7] = 0x01; // ANCOUNT
+        tx[8] = 0x00; tx[9] = 0x00; // NSCOUNT
+        tx[10]= 0x00; tx[11]= 0x00; // ARCOUNT
+
+        int to = 12;
+        int wrote = dns_write_name(tx, sizeof(tx), to, expected);
+        if (wrote < 0) continue;
+        to = wrote;
+        if (to + 4 >= (int)sizeof(tx)) continue;
+        tx[to++] = 0x00; tx[to++] = 0x01; // QTYPE A
+        tx[to++] = 0x00; tx[to++] = 0x01; // QCLASS IN
+
+        // Answer: name as pointer to question (0xC00C)
+        if (to + 16 >= (int)sizeof(tx)) continue;
+        tx[to++] = 0xC0; tx[to++] = 0x0C;
+        tx[to++] = 0x00; tx[to++] = 0x01; // TYPE A
+        tx[to++] = 0x80; tx[to++] = 0x01; // CLASS IN with cache-flush bit
+        tx[to++] = 0x00; tx[to++] = 0x00; tx[to++] = 0x00; tx[to++] = 0x3C; // TTL 60s
+        tx[to++] = 0x00; tx[to++] = 0x04; // RDLENGTH
+        // IP 192.168.4.1
+        tx[to++] = 192; tx[to++] = 168; tx[to++] = 4; tx[to++] = 1;
+
+        struct sockaddr_in dst = {0};
+        dst.sin_family = AF_INET;
+        dst.sin_port = htons(mdns_port);
+        dst.sin_addr.s_addr = mdns_mcast_addr;
+        lwip_sendto(sock, tx, to, 0, (struct sockaddr *)&dst, sizeof(dst));
+    }
+}
+
+static esp_err_t provisioning_mdns_start(void)
+{
+    if (s_mdns_task != NULL) {
+        return ESP_OK;
+    }
+    if (xTaskCreate(mdns_responder_task, "mdns_responder", 4096, NULL, 3, &s_mdns_task) != pdPASS) {
+        s_mdns_task = NULL;
+        return ESP_ERR_NO_MEM;
+    }
+    ESP_LOGI(TAG, "mDNS task started: http://%s.local/", PROVISIONING_MDNS_HOSTNAME);
+    return ESP_OK;
+}
+
+static void provisioning_mdns_stop(void)
+{
+    if (s_mdns_task) {
+        vTaskDelete(s_mdns_task);
+        s_mdns_task = NULL;
+    }
+}
+
+// Simple DNS server for AP mode to make proof-setup.local resolve reliably.
+// Many clients do not use mDNS on captive/AP networks; this answers standard DNS queries on port 53.
+static void dns_server_task(void *arg)
+{
+    (void)arg;
+    const uint16_t dns_port = 53;
+
+    int sock = lwip_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock < 0) {
+        ESP_LOGW(TAG, "DNS socket create failed");
+        vTaskDelete(NULL);
+        return;
+    }
+
+    int reuse = 1;
+    lwip_setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+
+    struct sockaddr_in bind_addr = {0};
+    bind_addr.sin_family = AF_INET;
+    bind_addr.sin_port = htons(dns_port);
+    bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (lwip_bind(sock, (struct sockaddr *)&bind_addr, sizeof(bind_addr)) != 0) {
+        ESP_LOGW(TAG, "DNS bind failed");
+        lwip_close(sock);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI(TAG, "DNS server active on UDP/%u for %s.local -> 192.168.4.1", dns_port, PROVISIONING_MDNS_HOSTNAME);
+
+    uint8_t rx[512];
+    uint8_t tx[512];
+    while (1) {
+        struct sockaddr_in from = {0};
+        socklen_t from_len = sizeof(from);
+        int n = lwip_recvfrom(sock, rx, sizeof(rx), 0, (struct sockaddr *)&from, &from_len);
+        if (n <= 0) continue;
+        if (n < 12) continue;
+
+        uint16_t id = (rx[0] << 8) | rx[1];
+        uint16_t flags = (rx[2] << 8) | rx[3];
+        uint16_t qdcount = (rx[4] << 8) | rx[5];
+        if (qdcount == 0) continue;
+        if (flags & 0x8000) continue; // ignore responses
+
+        int off = 12;
+        char qname[256];
+        int next = dns_read_qname(rx, n, off, qname, sizeof(qname));
+        if (next < 0) continue;
+        off = next;
+        if (off + 4 > n) continue;
+        uint16_t qtype = (rx[off] << 8) | rx[off + 1];
+        uint16_t qclass = (rx[off + 2] << 8) | rx[off + 3];
+        (void)qclass;
+
+        // Only A/ANY
+        if (qtype != 1 && qtype != 255) continue;
+
+        char expected[300];
+        snprintf(expected, sizeof(expected), "%s.local", PROVISIONING_MDNS_HOSTNAME);
+
+        // Answer proof-setup.local. Also accept any name ending with .local as a captive convenience.
+        bool should_answer = false;
+        if (strcmp(qname, expected) == 0) {
+            should_answer = true;
+        } else {
+            const char *suffix = ".local";
+            size_t qlen = strlen(qname);
+            size_t slen = strlen(suffix);
+            if (qlen > slen && strcmp(qname + (qlen - slen), suffix) == 0) {
+                should_answer = true;
+            }
+        }
+        if (!should_answer) continue;
+
+        memset(tx, 0, sizeof(tx));
+        tx[0] = (uint8_t)(id >> 8);
+        tx[1] = (uint8_t)(id & 0xff);
+        tx[2] = 0x81; // QR=1, RD copied later, RA=0
+        tx[3] = 0x80; // standard no-error response
+        tx[4] = 0x00; tx[5] = 0x01; // QDCOUNT
+        tx[6] = 0x00; tx[7] = 0x01; // ANCOUNT
+        tx[8] = 0x00; tx[9] = 0x00;
+        tx[10]= 0x00; tx[11]= 0x00;
+
+        int to = 12;
+        int wrote = dns_write_name(tx, sizeof(tx), to, qname);
+        if (wrote < 0) continue;
+        to = wrote;
+        if (to + 4 >= (int)sizeof(tx)) continue;
+        tx[to++] = 0x00; tx[to++] = 0x01; // QTYPE A
+        tx[to++] = 0x00; tx[to++] = 0x01; // QCLASS IN
+
+        // Answer: pointer to question name (0xC00C)
+        if (to + 16 >= (int)sizeof(tx)) continue;
+        tx[to++] = 0xC0; tx[to++] = 0x0C;
+        tx[to++] = 0x00; tx[to++] = 0x01; // TYPE A
+        tx[to++] = 0x00; tx[to++] = 0x01; // CLASS IN
+        tx[to++] = 0x00; tx[to++] = 0x00; tx[to++] = 0x00; tx[to++] = 0x3C; // TTL 60s
+        tx[to++] = 0x00; tx[to++] = 0x04; // RDLENGTH
+        tx[to++] = 192; tx[to++] = 168; tx[to++] = 4; tx[to++] = 1;
+
+        lwip_sendto(sock, tx, to, 0, (struct sockaddr *)&from, sizeof(from));
+    }
+}
+
+static esp_err_t provisioning_dns_start(void)
+{
+    if (s_dns_task != NULL) {
+        return ESP_OK;
+    }
+    if (xTaskCreate(dns_server_task, "dns_server", 4096, NULL, 3, &s_dns_task) != pdPASS) {
+        s_dns_task = NULL;
+        return ESP_ERR_NO_MEM;
+    }
+    return ESP_OK;
+}
+
+static void provisioning_dns_stop(void)
+{
+    if (s_dns_task) {
+        vTaskDelete(s_dns_task);
+        s_dns_task = NULL;
+    }
+}
+
+static const char* provisioning_setup_page_html(void)
+{
+    // Single-page provisioning UI:
+    // - Reads ?token=... from URL (JWT)
+    // - Decodes payload to get device_id (if present)
+    // - Fetches /local-wifi and renders SSID list
+    // - POSTs /provision with {ssid,password,device_id,provisioning_token}
+    // - Also sets Authorization: Bearer <token> to store bearer_token (optional)
+    return
+        "<!doctype html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "  <meta charset=\"utf-8\" />\n"
+        "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n"
+        "  <title>PROOF Setup</title>\n"
+        "  <style>\n"
+        "    :root{--bg:#0b0d10;--card:#12161c;--muted:#93a1b1;--text:#e6edf3;--accent:#3ccf91;--danger:#ff6b6b;--border:#273241}\n"
+        "    html,body{height:100%}\n"
+        "    body{margin:0;background:radial-gradient(1200px 700px at 20% 10%,#13202a 0%,var(--bg) 60%);color:var(--text);font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif}\n"
+        "    .wrap{max-width:860px;margin:0 auto;padding:28px 18px 40px}\n"
+        "    .brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}\n"
+        "    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent);box-shadow:0 0 0 6px rgba(60,207,145,.12)}\n"
+        "    h1{font-size:22px;margin:0}\n"
+        "    .sub{color:var(--muted);margin:6px 0 0}\n"
+        "    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}\n"
+        "    @media (min-width:860px){.grid{grid-template-columns:1.2fr .8fr}}\n"
+        "    .card{background:rgba(18,22,28,.92);border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;box-shadow:0 16px 50px rgba(0,0,0,.35)}\n"
+        "    label{display:block;color:var(--muted);margin:10px 0 6px}\n"
+        "    input,select,button{width:100%;box-sizing:border-box;border-radius:10px;border:1px solid var(--border);background:#0f1318;color:var(--text);padding:10px 12px}\n"
+        "    input[readonly]{opacity:.85}\n"
+        "    button{cursor:pointer;background:linear-gradient(180deg, rgba(60,207,145,.95), rgba(36,164,110,.95));border:none;color:#04120b;font-weight:700;margin-top:14px}\n"
+        "    button:disabled{opacity:.55;cursor:not-allowed}\n"
+        "    .row{display:grid;grid-template-columns:1fr;gap:10px}\n"
+        "    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:12px}\n"
+        "    .status{margin-top:12px;border-left:3px solid var(--border);padding:10px 12px;background:rgba(15,19,24,.65);border-radius:10px}\n"
+        "    .ok{border-left-color:var(--accent)}\n"
+        "    .bad{border-left-color:var(--danger)}\n"
+        "    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;font-size:12px;word-break:break-all}\n"
+        "    a{color:var(--accent);text-decoration:none}\n"
+        "    a:hover{text-decoration:underline}\n"
+        "  </style>\n"
+        "</head>\n"
+        "<body>\n"
+        "<div class=\"wrap\">\n"
+        "  <div class=\"brand\"><div class=\"dot\"></div><div>\n"
+        "    <h1>PROOF device setup</h1>\n"
+        "    <div class=\"sub\">Connect this device to Wi‑Fi and store provisioning credentials.</div>\n"
+        "  </div></div>\n"
+        "\n"
+        "  <div class=\"grid\">\n"
+        "    <div class=\"card\">\n"
+        "      <div class=\"pill\">Hostname: <span class=\"mono\">proof-setup.local</span> · Fallback: <span class=\"mono\">192.168.4.1</span></div>\n"
+        "\n"
+        "      <label>Provisioning token (from URL)</label>\n"
+        "      <input id=\"token\" class=\"mono\" readonly />\n"
+        "\n"
+        "      <label>Device ID (decoded from token if present)</label>\n"
+        "      <input id=\"deviceId\" class=\"mono\" placeholder=\"device id\" />\n"
+        "\n"
+        "      <label>Wi‑Fi network</label>\n"
+        "      <select id=\"ssid\"></select>\n"
+        "\n"
+        "      <label>Wi‑Fi password</label>\n"
+        "      <input id=\"pass\" type=\"password\" placeholder=\"(leave blank for open networks)\" />\n"
+        "\n"
+        "      <button id=\"refresh\">Refresh networks</button>\n"
+        "      <button id=\"submit\">Provision device</button>\n"
+        "\n"
+        "      <div id=\"status\" class=\"status\">Loading…</div>\n"
+        "    </div>\n"
+        "\n"
+        "    <div class=\"card\">\n"
+        "      <div style=\"color:var(--muted);font-size:12px;margin-bottom:8px\">What happens next</div>\n"
+        "      <div>\n"
+        "        <div>1) ESP32 stores Wi‑Fi + token</div>\n"
+        "        <div>2) ESP32 switches to STA mode and connects</div>\n"
+        "        <div>3) ESP32 submits CSR and fetches certs</div>\n"
+        "        <div>4) ESP32 connects to MQTT with mTLS</div>\n"
+        "      </div>\n"
+        "      <div style=\"margin-top:12px;color:var(--muted);font-size:12px\">API endpoints:</div>\n"
+        "      <div class=\"mono\" style=\"margin-top:6px\">GET /local-wifi</div>\n"
+        "      <div class=\"mono\">POST /provision</div>\n"
+        "      <div class=\"mono\">GET /status</div>\n"
+        "    </div>\n"
+        "  </div>\n"
+        "</div>\n"
+        "\n"
+        "<script>\n"
+        "const $ = (id) => document.getElementById(id);\n"
+        "const statusEl = $('status');\n"
+        "\n"
+        "function setStatus(msg, ok=true){\n"
+        "  statusEl.textContent = msg;\n"
+        "  statusEl.className = 'status ' + (ok ? 'ok' : 'bad');\n"
+        "}\n"
+        "\n"
+        "function base64UrlDecode(str){\n"
+        "  str = str.replace(/-/g,'+').replace(/_/g,'/');\n"
+        "  while (str.length % 4) str += '=';\n"
+        "  const bin = atob(str);\n"
+        "  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));\n"
+        "  const dec = new TextDecoder();\n"
+        "  return dec.decode(bytes);\n"
+        "}\n"
+        "\n"
+        "function tryDecodeJwt(token){\n"
+        "  const parts = token.split('.');\n"
+        "  if (parts.length < 2) return null;\n"
+        "  try { return JSON.parse(base64UrlDecode(parts[1])); } catch { return null; }\n"
+        "}\n"
+        "\n"
+        "async function fetchNetworks(force=false){\n"
+        "  setStatus(force ? 'Refreshing Wi‑Fi networks…' : 'Loading Wi‑Fi networks…');\n"
+        "  const url = force ? '/local-wifi?refresh=true' : '/local-wifi';\n"
+        "  const res = await fetch(url, {cache:'no-store'});\n"
+        "  if (!res.ok) throw new Error('Failed to scan networks');\n"
+        "  const data = await res.json();\n"
+        "  const list = data.networks || [];\n"
+        "  const sel = $('ssid');\n"
+        "  sel.innerHTML = '';\n"
+        "  if (!list.length){\n"
+        "    const opt = document.createElement('option');\n"
+        "    opt.value = '';\n"
+        "    opt.textContent = '(no networks found)';\n"
+        "    sel.appendChild(opt);\n"
+        "  } else {\n"
+        "    for (const n of list){\n"
+        "      const opt = document.createElement('option');\n"
+        "      opt.value = n.ssid;\n"
+        "      const sec = n.secure ? '🔒' : 'open';\n"
+        "      opt.textContent = `${n.ssid} (${n.rssi} dBm, ch ${n.channel}, ${sec})`;\n"
+        "      sel.appendChild(opt);\n"
+        "    }\n"
+        "  }\n"
+        "  setStatus(`Loaded ${list.length} networks.`);\n"
+        "}\n"
+        "\n"
+        "async function waitForProvisioningTransition(seconds){\n"
+        "  const deadline = Date.now() + (seconds * 1000);\n"
+        "  while (Date.now() < deadline){\n"
+        "    try {\n"
+        "      const r = await fetch('/status', {cache:'no-store'});\n"
+        "      if (r.ok){\n"
+        "        const s = await r.json();\n"
+        "        if (s && s.status === 'connected') return {ok:true, reason:'connected'};\n"
+        "      }\n"
+        "    } catch (_) {\n"
+        "      // If AP vanished, the device may be switching to STA after successful submit.\n"
+        "      return {ok:true, reason:'ap_gone'};\n"
+        "    }\n"
+        "    await new Promise(res => setTimeout(res, 1200));\n"
+        "  }\n"
+        "  return {ok:false, reason:'timeout'};\n"
+        "}\n"
+        "\n"
+        "async function provision(){\n"
+        "  const token = $('token').value.trim();\n"
+        "  const deviceId = $('deviceId').value.trim();\n"
+        "  const ssid = $('ssid').value;\n"
+        "  const pass = $('pass').value;\n"
+        "\n"
+        "  if (!token){ setStatus('Missing token in URL. Open: http://proof-setup.local/?token=...', false); return; }\n"
+        "  if (!deviceId){ setStatus('Device ID is missing (token decode failed and field is empty).', false); return; }\n"
+        "  if (!ssid){ setStatus('Please select a Wi‑Fi network.', false); return; }\n"
+        "\n"
+        "  $('submit').disabled = true;\n"
+        "  setStatus('Submitting provisioning request…');\n"
+        "\n"
+        "  const payload = { ssid, password: pass, device_id: deviceId, provisioning_token: token };\n"
+        "  const ctrl = new AbortController();\n"
+        "  const t = setTimeout(() => ctrl.abort(), 12000);\n"
+        "  try {\n"
+        "    const res = await fetch('/provision', {\n"
+        "      method: 'POST',\n"
+        "      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },\n"
+        "      body: JSON.stringify(payload),\n"
+        "      signal: ctrl.signal\n"
+        "    });\n"
+        "    clearTimeout(t);\n"
+        "    const text = await res.text();\n"
+        "    if (!res.ok){\n"
+        "      setStatus('Provisioning failed: ' + text, false);\n"
+        "      $('submit').disabled = false;\n"
+        "      return;\n"
+        "    }\n"
+        "    setStatus('Provisioning accepted by device. Verifying transition…');\n"
+        "    const tr = await waitForProvisioningTransition(15);\n"
+        "    if (tr.ok){\n"
+        "      setStatus('Provisioning successful. Device is switching/connected to target Wi‑Fi. You can return to your app.');\n"
+        "      return;\n"
+        "    }\n"
+        "    setStatus('Provision request reached device, but transition not confirmed yet. Check serial logs for STEP milestones.', false);\n"
+        "    $('submit').disabled = false;\n"
+        "  } catch (e) {\n"
+        "    clearTimeout(t);\n"
+        "    const tr = await waitForProvisioningTransition(8);\n"
+        "    if (tr.ok){\n"
+        "      setStatus('Device transitioned after submit (AP likely dropped). Return to your app and continue.', true);\n"
+        "      return;\n"
+        "    }\n"
+        "    setStatus('Provisioning request did not complete. Keep connected to ESP32 AP and retry submit.', false);\n"
+        "    $('submit').disabled = false;\n"
+        "  }\n"
+        "}\n"
+        "\n"
+        "(async function init(){\n"
+        "  const u = new URL(window.location.href);\n"
+        "  const token = u.searchParams.get('token') || '';\n"
+        "  $('token').value = token;\n"
+        "  if (token){\n"
+        "    const decoded = tryDecodeJwt(token);\n"
+        "    if (decoded && decoded.device_id && !$('deviceId').value){ $('deviceId').value = decoded.device_id; }\n"
+        "  }\n"
+        "  $('refresh').addEventListener('click', (e) => { e.preventDefault(); fetchNetworks(true).catch(err => setStatus(err.message, false)); });\n"
+        "  $('submit').addEventListener('click', (e) => { e.preventDefault(); provision().catch(err => { setStatus(err.message, false); $('submit').disabled=false; }); });\n"
+        "  await fetchNetworks(false);\n"
+        "})();\n"
+        "</script>\n"
+        "</body>\n"
+        "</html>\n";
+}
 
 /**
  * @brief Log incoming HTTP request details
@@ -574,10 +1130,60 @@ static esp_err_t provision_handler_internal(httpd_req_t *req)
         ESP_LOGW(TAG, "No Authorization header provided");
     }
 
-    // Read request body - use smaller buffer and allocate larger if needed
-    char content[384];  // Reduced from 512 to save stack
-    int ret = httpd_req_recv(req, content, sizeof(content) - 1);
-    if (ret <= 0) {
+    // Read full request body based on Content-Length.
+    // Tokens can be long; fixed small buffers may truncate JSON and break provisioning.
+    int total_len = req->content_len;
+    if (total_len <= 0 || total_len > 4096) {
+        ESP_LOGE(TAG, "Invalid content length: %d", total_len);
+        const char *error_response = "{\"error\":\"invalid_request\",\"message\":\"invalid_content_length\"}";
+        set_cors_headers(req);
+        httpd_resp_set_status(req, "400 Bad Request");
+        httpd_resp_set_type(req, "application/json");
+        log_outgoing_response("POST", req->uri, 400, error_response);
+        httpd_resp_sendstr(req, error_response);
+        return ESP_FAIL;
+    }
+
+    char *content = (char *)malloc((size_t)total_len + 1);
+    if (content == NULL) {
+        ESP_LOGE(TAG, "Out of memory allocating request body (%d bytes)", total_len);
+        const char *error_response = "{\"error\":\"oom\"}";
+        set_cors_headers(req);
+        httpd_resp_set_status(req, "500 Internal Server Error");
+        httpd_resp_set_type(req, "application/json");
+        log_outgoing_response("POST", req->uri, 500, error_response);
+        httpd_resp_sendstr(req, error_response);
+        return ESP_FAIL;
+    }
+
+    int received = 0;
+    while (received < total_len) {
+        int ret = httpd_req_recv(req, content + received, total_len - received);
+        if (ret <= 0) {
+            free(content);
+            if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+                const char *error_response = "{\"error\":\"request_timeout\"}";
+                set_cors_headers(req);
+                httpd_resp_set_status(req, "408 Request Timeout");
+                httpd_resp_set_type(req, "application/json");
+                log_outgoing_response("POST", req->uri, 408, error_response);
+                httpd_resp_sendstr(req, error_response);
+                return ESP_FAIL;
+            }
+            const char *error_response = "{\"error\":\"invalid_request\"}";
+            set_cors_headers(req);
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_set_type(req, "application/json");
+            log_outgoing_response("POST", req->uri, 400, error_response);
+            httpd_resp_sendstr(req, error_response);
+            return ESP_FAIL;
+        }
+        received += ret;
+    }
+    content[received] = '\0';
+
+    if (received <= 0) {
+        free(content);
         const char *error_response = "{\"error\":\"invalid_request\"}";
         set_cors_headers(req);
         httpd_resp_set_status(req, "400 Bad Request");
@@ -586,15 +1192,15 @@ static esp_err_t provision_handler_internal(httpd_req_t *req)
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
-    content[ret] = '\0';
     
     // Log request body (already logged in log_incoming_request, but add here too for clarity)
-    ESP_LOGI(TAG, "Request Body: %s", content);
+    ESP_LOGI(TAG, "Request Body (%d bytes): %s", received, content);
 
     // Parse JSON
     cJSON *root = cJSON_Parse(content);
     if (root == NULL) {
         ESP_LOGE(TAG, "Failed to parse JSON");
+        free(content);
         const char *error_response = "{\"error\":\"invalid_json\"}";
         set_cors_headers(req);
         httpd_resp_set_status(req, "400 Bad Request");
@@ -603,6 +1209,7 @@ static esp_err_t provision_handler_internal(httpd_req_t *req)
         httpd_resp_sendstr(req, error_response);
         return ESP_FAIL;
     }
+    free(content);
 
     cJSON *ssid_json = cJSON_GetObjectItem(root, "ssid");
     cJSON *password_json = cJSON_GetObjectItem(root, "password");
@@ -726,10 +1333,17 @@ static esp_err_t provision_handler_internal(httpd_req_t *req)
     log_outgoing_response("POST", req->uri, 200, success_response);
     httpd_resp_sendstr(req, success_response);
 
-    // Stop provisioning (this stops HTTP server and marks provisioning as inactive)
-    // Do this after sending response but before returning
-    ESP_LOGI(TAG, "Stopping provisioning and preparing for WiFi connection...");
-    wifi_provisioning_stop();
+    STEP_LOG("Credentials stored. Scheduling AP shutdown and STA connect.");
+
+    // IMPORTANT: do NOT stop the AP immediately, otherwise browsers often hang on fetch()
+    // because the TCP connection is cut before the response is fully received.
+    if (s_deferred_stop_timer) {
+        esp_timer_stop(s_deferred_stop_timer);
+        esp_timer_start_once(s_deferred_stop_timer, 800 * 1000); // 800ms
+    } else {
+        ESP_LOGW(TAG, "Deferred stop timer missing; stopping immediately");
+        wifi_provisioning_stop();
+    }
 
     // Note: WiFi connection will be handled by the state machine in main.c
     // which checks wifi_provisioning_is_provisioned() and transitions to WIFI_CONNECTING
@@ -779,15 +1393,16 @@ static esp_err_t options_handler(httpd_req_t *req)
  */
 static esp_err_t root_handler_internal(httpd_req_t *req)
 {
-    // Set CORS headers
+    // Serve provisioning HTML page (web app-style flow).
+    // Token is passed by your web app via: http://proof-setup.local/?token=...
     set_cors_headers(req);
-    
-    // Return JSON with available endpoints
-    const char *response = "{\"status\":\"ok\",\"message\":\"ESP32 Provisioning Server\",\"endpoints\":[\"/local-wifi\",\"/provision\",\"/status\"]}";
-    httpd_resp_set_type(req, "application/json");
-    log_outgoing_response("GET", req->uri, 200, response);
-    httpd_resp_sendstr(req, response);
-    
+
+    httpd_resp_set_type(req, "text/html; charset=utf-8");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
+
+    const char *html = provisioning_setup_page_html();
+    log_outgoing_response("GET", req->uri, 200, "(html)");
+    httpd_resp_send(req, html, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -921,9 +1536,9 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base,
 {
     if (event_base == IP_EVENT) {
         switch (event_id) {
-        case IP_EVENT_AP_STAIPASSIGNED:
+        case IP_EVENT_ASSIGNED_IP_TO_CLIENT:
             {
-                ip_event_ap_staipassigned_t* event = (ip_event_ap_staipassigned_t*) event_data;
+                ip_event_assigned_ip_to_client_t* event = (ip_event_assigned_ip_to_client_t*) event_data;
                 ESP_LOGI(TAG, "AP assigned IP " IPSTR " to station", IP2STR(&event->ip));
             }
             break;
@@ -1031,7 +1646,10 @@ static esp_err_t wifi_init_ap(void)
     esp_netif_create_default_wifi_ap();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    esp_err_t err = esp_wifi_init(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "esp_wifi_init: %s (continuing; may already be inited)", esp_err_to_name(err));
+    }
 
     // Register event handlers
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
@@ -1101,6 +1719,32 @@ esp_err_t wifi_provisioning_start(void)
     if (ret != ESP_OK) {
         return ret;
     }
+    STEP_LOG("AP ready. Open portal: http://%s.local/?token=... (or http://192.168.4.1/)", PROVISIONING_MDNS_HOSTNAME);
+
+    // Start mDNS so clients can use http://proof-setup.local/
+    esp_err_t mdns_ret = provisioning_mdns_start();
+    if (mdns_ret != ESP_OK) {
+        // Non-fatal: client can still use 192.168.4.1
+        ESP_LOGW(TAG, "Continuing without mDNS (fallback to 192.168.4.1)");
+    }
+    // Start DNS server on AP so proof-setup.local resolves even without mDNS support
+    esp_err_t dns_ret = provisioning_dns_start();
+    if (dns_ret != ESP_OK) {
+        ESP_LOGW(TAG, "DNS server not started (fallback to 192.168.4.1): %s", esp_err_to_name(dns_ret));
+    }
+
+    if (s_deferred_stop_timer == NULL) {
+        esp_timer_create_args_t targs = {
+            .callback = &deferred_stop_cb,
+            .arg = NULL,
+            .dispatch_method = ESP_TIMER_TASK,
+            .name = "prov_stop",
+            .skip_unhandled_events = true,
+        };
+        if (esp_timer_create(&targs, &s_deferred_stop_timer) == ESP_OK) {
+            ESP_LOGD(TAG, "Deferred stop timer created");
+        }
+    }
 
     // Perform initial WiFi scan BEFORE starting HTTP server
     // This ensures cache is populated before any client connects
@@ -1123,6 +1767,7 @@ esp_err_t wifi_provisioning_start(void)
     ESP_LOGI(TAG, "AP is stable - no background scanning");
     ESP_LOGI(TAG, "/local-wifi returns cached results instantly");
     ESP_LOGI(TAG, "Use /local-wifi?refresh=true to rescan");
+    ESP_LOGI(TAG, "Setup UI: http://%s.local/?token=...", PROVISIONING_MDNS_HOSTNAME);
     ESP_LOGI(TAG, "========================================");
     return ESP_OK;
 }
@@ -1141,11 +1786,19 @@ esp_err_t wifi_provisioning_stop(void)
         s_httpd = NULL;
     }
 
+    provisioning_mdns_stop();
+    provisioning_dns_stop();
+
+    if (s_deferred_stop_timer) {
+        esp_timer_stop(s_deferred_stop_timer);
+    }
+
     // Reset scan cache state
     s_initial_scan_done = false;
     s_cached_network_count = 0;
 
     s_provisioning_active = false;
+    STEP_LOG("Provisioning services stopped. Proceeding to WiFi STA connect.");
     return ESP_OK;
 }
 

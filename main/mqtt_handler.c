@@ -42,6 +42,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base,
         ESP_LOGI(TAG, "✓ mTLS handshake successful!");
         ESP_LOGI(TAG, "✓ Connected to MQTT broker");
         ESP_LOGI(TAG, "========================================");
+        ESP_LOGI(TAG, "✅ STEP: MQTT mTLS connection established");
         s_mqtt_connected = true;
         break;
 

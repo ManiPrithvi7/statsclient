@@ -29,6 +29,8 @@ static const char *TAG = "main";
 #define NVS_NAMESPACE "device_config"
 #define NVS_KEY_DEVICE_ID "device_id"
 #define NVS_KEY_PROV_TOKEN "prov_token"
+#define NVS_KEY_WIFI_SSID "wifi_ssid"
+#define NVS_KEY_WIFI_PASS "wifi_pass"
 
 // Application states
 typedef enum {
@@ -45,6 +47,34 @@ typedef enum {
 } app_state_t;
 
 static app_state_t s_app_state = APP_STATE_INIT;
+
+/**
+ * @brief Check if required provisioning credentials already exist in NVS
+ *
+ * This allows the app to proceed without waiting for another /provision HTTP call
+ * when credentials were already stored by the captive portal.
+ */
+static bool has_local_provisioning_credentials(void)
+{
+    nvs_handle_t nvs_handle;
+    size_t required = 0;
+
+    if (nvs_open(NVS_NAMESPACE, NVS_READONLY, &nvs_handle) != ESP_OK) {
+        return false;
+    }
+
+    bool has_ssid = (nvs_get_str(nvs_handle, NVS_KEY_WIFI_SSID, NULL, &required) == ESP_OK);
+    required = 0;
+    bool has_pass = (nvs_get_str(nvs_handle, NVS_KEY_WIFI_PASS, NULL, &required) == ESP_OK);
+    required = 0;
+    bool has_device_id = (nvs_get_str(nvs_handle, NVS_KEY_DEVICE_ID, NULL, &required) == ESP_OK);
+    required = 0;
+    bool has_prov_token = (nvs_get_str(nvs_handle, NVS_KEY_PROV_TOKEN, NULL, &required) == ESP_OK);
+
+    nvs_close(nvs_handle);
+
+    return has_ssid && has_pass && has_device_id && has_prov_token;
+}
 
 /**
  * @brief Get device ID and provisioning token from NVS
@@ -73,7 +103,22 @@ static esp_err_t get_provisioning_credentials(char *device_id, size_t id_len,
     ESP_LOGI(TAG, "Read device_id from NVS: %s (length: %d)", device_id, strlen(device_id));
 
     // Read provisioning token
-    required_size = token_len;
+    // First query required size so we can provide clear diagnostics for long JWTs
+    required_size = 0;
+    err = nvs_get_str(nvs_handle, NVS_KEY_PROV_TOKEN, NULL, &required_size);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to query size of %s from NVS: %s", NVS_KEY_PROV_TOKEN, esp_err_to_name(err));
+        nvs_close(nvs_handle);
+        return err;
+    }
+
+    if (required_size > token_len) {
+        ESP_LOGE(TAG, "Provisioning token buffer too small: need %d bytes, have %d bytes",
+                 (int)required_size, (int)token_len);
+        nvs_close(nvs_handle);
+        return ESP_ERR_NVS_INVALID_LENGTH;
+    }
+
     err = nvs_get_str(nvs_handle, NVS_KEY_PROV_TOKEN, token, &required_size);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to read %s from NVS: %s", NVS_KEY_PROV_TOKEN, esp_err_to_name(err));
@@ -144,6 +189,14 @@ static void app_state_machine_task(void *pvParameters)
         case APP_STATE_AP_MODE:
             ESP_LOGI(TAG, "State: AP_MODE");
             {
+                // If credentials already exist, do not wait for another incoming /provision call.
+                if (has_local_provisioning_credentials()) {
+                    ESP_LOGI(TAG, "✅ STEP: Found local provisioning credentials in NVS");
+                    ESP_LOGI(TAG, "✅ STEP: Skipping AP wait and moving to WiFi connect");
+                    s_app_state = APP_STATE_WIFI_CONNECTING;
+                    break;
+                }
+
                 // Check if provisioning is already active
                 // If not, start it (handles both initial start and restart after failure)
                 if (!wifi_provisioning_is_provisioned()) {
@@ -173,37 +226,90 @@ static void app_state_machine_task(void *pvParameters)
             ESP_LOGI(TAG, "State: WIFI_CONNECTING");
             {
                 static bool connection_attempted = false;
-                
+                static bool wifi_sta_inited = false;
+
                 if (!connection_attempted) {
+                    // When we skip AP mode (credential reuse), WiFi was never initialized.
+                    // Ensure STA netif exists and esp_wifi_init() has been called before connecting.
+                    if (!wifi_sta_inited) {
+                        esp_netif_create_default_wifi_sta();
+                        wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+                        esp_err_t err = esp_wifi_init(&cfg);
+                        if (err != ESP_OK) {
+                            ESP_LOGW(TAG, "esp_wifi_init: %s (continuing in case already inited)", esp_err_to_name(err));
+                        }
+                        wifi_sta_inited = true;
+                        ESP_LOGI(TAG, "✅ STEP: WiFi driver initialized for STA");
+                    }
+
                     // Read WiFi credentials from NVS and connect
                     nvs_handle_t nvs_handle;
                     if (nvs_open("device_config", NVS_READONLY, &nvs_handle) == ESP_OK) {
                         char ssid[33] = {0};
                         char password[65] = {0};
                         size_t required_size;
-                        
+
                         required_size = sizeof(ssid);
                         if (nvs_get_str(nvs_handle, "wifi_ssid", ssid, &required_size) == ESP_OK) {
                             required_size = sizeof(password);
-                            nvs_get_str(nvs_handle, "wifi_password", password, &required_size);
-                            
-                            // Configure and connect to WiFi
+                            nvs_get_str(nvs_handle, "wifi_pass", password, &required_size);
+
+                            // Trim leading/trailing whitespace (can prevent connection)
+                            size_t n = strlen(ssid);
+                            while (n > 0 && (ssid[n - 1] == ' ' || ssid[n - 1] == '\t')) { ssid[--n] = '\0'; }
+                            for (char *p = ssid; *p == ' ' || *p == '\t'; p++) {
+                                n = strlen(p + 1);
+                                memmove(ssid, p + 1, n + 1);
+                            }
+                            n = strlen(password);
+                            while (n > 0 && (password[n - 1] == ' ' || password[n - 1] == '\t')) { password[--n] = '\0'; }
+                            for (char *p = password; *p == ' ' || *p == '\t'; p++) {
+                                n = strlen(p + 1);
+                                memmove(password, p + 1, n + 1);
+                            }
+
                             wifi_config_t wifi_config = {0};
                             strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
                             strncpy((char*)wifi_config.sta.password, password, sizeof(wifi_config.sta.password) - 1);
-                            
+
                             ESP_LOGI(TAG, "Connecting to WiFi: %s", ssid);
-                            esp_wifi_set_mode(WIFI_MODE_STA);
-                            esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-                            esp_wifi_start();
-                            esp_wifi_connect();
-                            
+                            ESP_LOGI(TAG, "✅ STEP: WiFi credentials loaded; attempting STA connection");
+
+                            esp_err_t err = esp_wifi_set_mode(WIFI_MODE_STA);
+                            if (err != ESP_OK) {
+                                ESP_LOGE(TAG, "esp_wifi_set_mode failed: %s", esp_err_to_name(err));
+                                vTaskDelay(pdMS_TO_TICKS(2000));
+                                nvs_close(nvs_handle);
+                                break;
+                            }
+                            err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+                            if (err != ESP_OK) {
+                                ESP_LOGE(TAG, "esp_wifi_set_config failed: %s", esp_err_to_name(err));
+                                vTaskDelay(pdMS_TO_TICKS(2000));
+                                nvs_close(nvs_handle);
+                                break;
+                            }
+                            err = esp_wifi_start();
+                            if (err != ESP_OK) {
+                                ESP_LOGE(TAG, "esp_wifi_start failed: %s", esp_err_to_name(err));
+                                vTaskDelay(pdMS_TO_TICKS(2000));
+                                nvs_close(nvs_handle);
+                                break;
+                            }
+                            err = esp_wifi_connect();
+                            if (err != ESP_OK) {
+                                ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
+                                vTaskDelay(pdMS_TO_TICKS(2000));
+                                nvs_close(nvs_handle);
+                                break;
+                            }
+
                             connection_attempted = true;
                         }
                         nvs_close(nvs_handle);
                     }
                 }
-                
+
                 // Wait for connection event (handled by wifi_sta_event_handler)
                 vTaskDelay(pdMS_TO_TICKS(1000));
             }
@@ -241,6 +347,7 @@ static void app_state_machine_task(void *pvParameters)
                         ESP_LOGI(TAG, "========================================");
                         ESP_LOGI(TAG, "✓ Internet connectivity verified!");
                         ESP_LOGI(TAG, "========================================");
+                        ESP_LOGI(TAG, "✅ STEP: Internet verified; proceeding to certificate check");
                         verification_done = true;
                         verification_retries = 0; // Reset retry counter
                     } else {
@@ -305,7 +412,8 @@ static void app_state_machine_task(void *pvParameters)
                 
                 if (!csr_submission_attempted) {
                     char device_id[64] = {0};
-                    char token[256] = {0};
+                    // JWT provisioning tokens can exceed 256 bytes.
+                    char token[1024] = {0};
 
                     ESP_LOGI(TAG, "Reading provisioning credentials from NVS...");
                     esp_err_t ret = get_provisioning_credentials(device_id, sizeof(device_id),
@@ -337,6 +445,7 @@ static void app_state_machine_task(void *pvParameters)
                         ESP_LOGI(TAG, "✓ CSR submitted successfully!");
                         ESP_LOGI(TAG, "✓ Certificates saved to NVS");
                         ESP_LOGI(TAG, "========================================");
+                        ESP_LOGI(TAG, "✅ STEP: Certificates stored; proceeding to MQTT mTLS connect");
                         csr_retry_count = 0;
                         s_app_state = APP_STATE_MQTT_CONNECTING;
                     } else {
@@ -490,38 +599,10 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
     ESP_LOGI(TAG, "NVS initialized");
 
-    // DEVELOPMENT MODE: Clear all provisioning data on every boot
-    // This ensures a fresh start for development/testing
-    ESP_LOGI(TAG, "========================================");
-    ESP_LOGI(TAG, "DEVELOPMENT MODE: Clearing provisioning");
-    ESP_LOGI(TAG, "========================================");
-    ESP_LOGW(TAG, "NOTE: This clears WiFi credentials, device_id, and prov_token");
-    ESP_LOGW(TAG, "NOTE: Certificates are also cleared to force CSR submission");
-    nvs_handle_t nvs_handle;
-    if (nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle) == ESP_OK) {
-        ESP_LOGI(TAG, "Clearing all provisioning data...");
-        
-        // Erase all provisioning-related keys
-        nvs_erase_key(nvs_handle, "provisioned");  // Provisioning status flag
-        nvs_erase_key(nvs_handle, "wifi_ssid");     // WiFi SSID
-        nvs_erase_key(nvs_handle, "wifi_pass");     // WiFi password
-        nvs_erase_key(nvs_handle, NVS_KEY_DEVICE_ID);  // Device ID
-        nvs_erase_key(nvs_handle, NVS_KEY_PROV_TOKEN); // Provisioning token
-        nvs_erase_key(nvs_handle, "bearer_token");  // Bearer token
-        nvs_erase_key(nvs_handle, "device_cert");   // Device certificate
-        nvs_erase_key(nvs_handle, "ca_cert");       // CA certificate
-        
-        // Commit changes
-        nvs_commit(nvs_handle);
-        nvs_close(nvs_handle);
-        
-        ESP_LOGI(TAG, "✓ All provisioning data cleared");
-        ESP_LOGI(TAG, "✓ Device will start in AP mode");
-        ESP_LOGI(TAG, "✓ After provisioning, CSR will be submitted");
-        ESP_LOGI(TAG, "========================================");
-    } else {
-        ESP_LOGW(TAG, "Failed to open NVS for clearing (may be first boot)");
-    }
+    // IMPORTANT: Do not clear provisioning data on every boot.
+    // Credentials/tokens saved by captive portal must persist so the device can
+    // directly proceed to backend CSR + mTLS connection.
+    ESP_LOGI(TAG, "Provisioning data persistence enabled (no auto-clear on boot)");
 
     // Initialize network interface
     ESP_ERROR_CHECK(esp_netif_init());

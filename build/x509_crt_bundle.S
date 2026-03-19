@@ -1,4 +1,4 @@
-/* * Data converted from /home/muthuselvan/esp/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from /home/statsnapp/Desktop/statsclient/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)

@@ -1048,8 +1048,7 @@ CONFIG_AP_PASSWORD="prov12345678"
 #
 # Backend Configuration
 #
-# default:
-CONFIG_BACKEND_URL="https://your-backend.com"
+CONFIG_BACKEND_URL="https://task-bd0u.onrender.com"
 # end of Backend Configuration
 
 #
