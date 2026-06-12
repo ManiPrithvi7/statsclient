@@ -28,6 +28,13 @@ extern "C" {
 esp_err_t certificate_manager_submit_csr(const char *device_id, const char *token);
 
 /**
+ * @brief Remove device + CA certificates from NVS (e.g. full reprovision)
+ *
+ * @return ESP_OK on success
+ */
+esp_err_t certificate_manager_erase_stored_certificates(void);
+
+/**
  * @brief Check if certificates are stored in NVS
  * 
  * @return true if both device certificate and CA certificate exist, false otherwise

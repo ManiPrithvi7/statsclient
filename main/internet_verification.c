@@ -10,6 +10,7 @@
 #include "esp_log.h"
 #include "esp_http_client.h"
 #include "esp_tls.h"
+#include "esp_crt_bundle.h"
 
 static const char *TAG = "inet_verify";
 
@@ -99,8 +100,8 @@ esp_err_t internet_verification_test(void)
     esp_http_client_config_t config = {
         .url = TEST_ENDPOINT_URL,
         .event_handler = http_event_handler,
-        .timeout_ms = 15000,  // 15 second timeout
-        .skip_cert_common_name_check = true,  // Skip cert check for development
+        .timeout_ms = 15000,
+        .crt_bundle_attach = esp_crt_bundle_attach,
     };
     
     esp_http_client_handle_t client = esp_http_client_init(&config);

@@ -20,6 +20,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Embedded device mTLS material (copy from mtls_client locally)
+main/mtls_client/certs/primary/
+main/mtls_client/certs/root_certifacite.txt
+
 # Compiled binaries
 *.bin
 *.elf

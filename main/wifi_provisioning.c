@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "wifi_provisioning.h"
+#include "device_keys.h"
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_wifi.h"
@@ -1802,6 +1803,33 @@ esp_err_t wifi_provisioning_stop(void)
     return ESP_OK;
 }
 
+esp_err_t wifi_provisioning_seed_dev_wifi_if_configured(void)
+{
+    if (wifi_provisioning_is_provisioned()) {
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    const char *ssid = CONFIG_DEV_WIFI_SSID;
+    const char *password = CONFIG_DEV_WIFI_PASSWORD;
+    if (ssid == NULL || ssid[0] == '\0') {
+        return ESP_ERR_NOT_FOUND;
+    }
+
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+    const char *device_id = CONFIG_MTLS_CLIENT_DEVICE_ID;
+#else
+    const char *device_id = DEVICE_ID;
+#endif
+    const char *prov_token = "dev-embedded";
+
+    ESP_LOGI(TAG, "Auto-provisioning dev WiFi: SSID=%s device_id=%s", ssid, device_id);
+    esp_err_t err = save_wifi_credentials(ssid, password, device_id, prov_token, NULL);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "Dev WiFi credentials saved to NVS");
+    }
+    return err;
+}
+
 bool wifi_provisioning_is_provisioned(void)
 {
     nvs_handle_t nvs_handle;
@@ -1856,6 +1884,31 @@ esp_err_t wifi_provisioning_get_bearer_token(char *token, size_t token_len)
     return err;
 }
 
+esp_err_t wifi_provisioning_erase_stored_credentials(void)
+{
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to open NVS for credential erase: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    ESP_LOGI(TAG, "Erasing provisioning keys from NVS...");
+    nvs_erase_key(nvs_handle, NVS_KEY_PROVISIONED);
+    nvs_erase_key(nvs_handle, NVS_KEY_WIFI_SSID);
+    nvs_erase_key(nvs_handle, NVS_KEY_WIFI_PASS);
+    nvs_erase_key(nvs_handle, NVS_KEY_DEVICE_ID);
+    nvs_erase_key(nvs_handle, NVS_KEY_PROV_TOKEN);
+    nvs_erase_key(nvs_handle, NVS_KEY_BEARER_TOKEN);
+    err = nvs_commit(nvs_handle);
+    nvs_close(nvs_handle);
+
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "✓ Provisioning credentials erased from NVS");
+    }
+    return err;
+}
+
 esp_err_t wifi_provisioning_clear_and_restart(void)
 {
     ESP_LOGI(TAG, "========================================");
@@ -1876,24 +1929,9 @@ esp_err_t wifi_provisioning_clear_and_restart(void)
     // Reset provisioning active flag
     s_provisioning_active = false;
 
-    // Clear all provisioning data from NVS
-    nvs_handle_t nvs_handle;
-    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
-    if (err == ESP_OK) {
-        ESP_LOGI(TAG, "Erasing provisioning data from NVS...");
-        
-        nvs_erase_key(nvs_handle, NVS_KEY_PROVISIONED);
-        nvs_erase_key(nvs_handle, NVS_KEY_WIFI_SSID);
-        nvs_erase_key(nvs_handle, NVS_KEY_WIFI_PASS);
-        nvs_erase_key(nvs_handle, NVS_KEY_DEVICE_ID);
-        nvs_erase_key(nvs_handle, NVS_KEY_PROV_TOKEN);
-        nvs_erase_key(nvs_handle, NVS_KEY_BEARER_TOKEN);
-        
-        nvs_commit(nvs_handle);
-        nvs_close(nvs_handle);
-        ESP_LOGI(TAG, "✓ Provisioning data cleared");
-    } else {
-        ESP_LOGW(TAG, "Failed to open NVS for clearing: %s", esp_err_to_name(err));
+    esp_err_t err = wifi_provisioning_erase_stored_credentials();
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "NVS erase returned: %s", esp_err_to_name(err));
     }
 
     // Stop WiFi STA mode

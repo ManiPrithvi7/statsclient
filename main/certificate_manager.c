@@ -8,6 +8,7 @@
 #include "certificate_manager.h"
 #include "wifi_provisioning.h"
 #include "device_keys.h"
+#include "mtls_client_certs.h"
 #include "esp_log.h"
 #include "esp_http_client.h"
 #include "esp_tls.h"
@@ -367,8 +368,34 @@ esp_err_t certificate_manager_submit_csr(const char *device_id, const char *prov
 /**
  * @brief Check if certificates exist in NVS
  */
+esp_err_t certificate_manager_erase_stored_certificates(void)
+{
+    nvs_handle_t nvs_handle;
+    esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "erase certs: NVS open failed: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    nvs_erase_key(nvs_handle, NVS_KEY_DEVICE_CERT);
+    nvs_erase_key(nvs_handle, NVS_KEY_CA_CERT);
+    err = nvs_commit(nvs_handle);
+    nvs_close(nvs_handle);
+
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "Erased device + CA certificates from NVS");
+    }
+    return err;
+}
+
 bool certificate_manager_has_certificates(void)
 {
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+    if (mtls_client_certs_available()) {
+        return true;
+    }
+#endif
+
     nvs_handle_t nvs_handle;
     size_t required_size = 0;
 
@@ -376,10 +403,8 @@ bool certificate_manager_has_certificates(void)
         return false;
     }
 
-    // Check if device cert exists
     esp_err_t err1 = nvs_get_str(nvs_handle, NVS_KEY_DEVICE_CERT, NULL, &required_size);
-    
-    // Check if CA cert exists
+
     required_size = 0;
     esp_err_t err2 = nvs_get_str(nvs_handle, NVS_KEY_CA_CERT, NULL, &required_size);
 
@@ -416,16 +441,40 @@ static esp_err_t load_certificate_from_nvs(const char *key, char *cert_buffer, s
 
 esp_err_t certificate_manager_load_device_cert(char *cert_buffer, size_t buffer_size)
 {
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+    if (mtls_client_certs_available()) {
+        esp_err_t err = mtls_client_certs_load_device_cert(cert_buffer, buffer_size);
+        if (err == ESP_OK) {
+            ESP_LOGI(TAG, "Loaded device cert from embedded mtls_client/certs");
+        }
+        return err;
+    }
+#endif
     return load_certificate_from_nvs(NVS_KEY_DEVICE_CERT, cert_buffer, buffer_size);
 }
 
 esp_err_t certificate_manager_load_ca_cert(char *cert_buffer, size_t buffer_size)
 {
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+    if (mtls_client_certs_available()) {
+        esp_err_t err = mtls_client_certs_load_ca_cert(cert_buffer, buffer_size);
+        if (err == ESP_OK) {
+            ESP_LOGI(TAG, "Loaded CA cert from embedded mtls_client/certs");
+        }
+        return err;
+    }
+#endif
     return load_certificate_from_nvs(NVS_KEY_CA_CERT, cert_buffer, buffer_size);
 }
 
 const char* certificate_manager_get_private_key(void)
 {
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+    const char *embedded_key = mtls_client_certs_get_private_key();
+    if (embedded_key != NULL) {
+        return embedded_key;
+    }
+#endif
     return DEVICE_PRIVATE_KEY_PEM;
 }
 

@@ -14,13 +14,26 @@ menu "WiFi Provisioning Configuration"
             Password for the provisioning Access Point.
             Minimum 8 characters for WPA2.
 
+    config DEV_WIFI_SSID
+        string "Dev WiFi SSID (auto-provision when NVS empty)"
+        default "Statsnapp"
+        help
+            When set, saved to NVS on first boot if no credentials exist.
+            Leave empty to disable auto-provisioning.
+
+    config DEV_WIFI_PASSWORD
+        string "Dev WiFi password"
+        default "1q2w3e4r"
+        help
+            Password paired with DEV_WIFI_SSID for auto-provisioning.
+
 endmenu
 
 menu "Backend Configuration"
 
     config BACKEND_URL
         string "Backend URL for CSR signing"
-        default "https://your-backend.com"
+        default "https://server.withproof.io"
         help
             Base URL of the backend server for CSR signing.
             Should include protocol (https://) but not the endpoint path.
@@ -31,9 +44,69 @@ menu "MQTT Configuration"
 
     config MQTT_BROKER_URI
         string "MQTT Broker URI"
-        default "mqtts://your-broker.com:8883"
+        default "mqtts://broker.withproof.io:8883"
         help
             MQTT broker URI with mTLS (mqtts://).
             Format: mqtts://hostname:port
+
+    config MQTT_TOPIC_ROOT
+        string "MQTT topic root"
+        default "proof.mqtt"
+        help
+            Must match server MQTT_TOPIC_ROOT for OTA cmd/ack/status topics.
+
+    config USE_EMBEDDED_MTLS_CERTS
+        bool "Use embedded mTLS certs from mtls_client/certs"
+        default y
+        help
+            Load client.crt, client.key, and CA from main/mtls_client/certs/
+            (copied from the Node mtlsclient reference). Skips NVS cert requirement
+            for broker mTLS when enabled.
+
+    config MTLS_CLIENT_DEVICE_ID
+        string "Device ID when using embedded mTLS certs"
+        depends on USE_EMBEDDED_MTLS_CERTS
+        default "DEVICE-17"
+        help
+            MQTT client_id and topic prefix when NVS device_id is absent.
+            Must match the CN of the embedded client certificate.
+
+    config MQTT_SUBSCRIBE_ALL
+        bool "Subscribe to all device topics (wildcard)"
+        default y
+        help
+            When enabled, subscribe to {MQTT_TOPIC_ROOT}/{device_id}/# plus
+            {MQTT_TOPIC_ROOT}/broadcast/cmd (matches Node mtlsclient SUBSCRIBE_ALL=1).
+            When disabled, subscribe to the explicit per-screen topic list.
+
+endmenu
+
+menu "OTA Configuration"
+
+    config FIRMWARE_VERSION
+        string "Firmware version string"
+        default "4.3.0-mvp"
+        help
+            Sent as current_version on GET /api/v1/ota/check and in /active registration.
+
+    config OTA_POLL_INTERVAL_HOURS
+        int "OTA poll interval (hours)"
+        default 6
+        range 1 168
+        help
+            Periodic HTTP OTA check interval when OTA_POLL_INTERVAL_SEC is 0.
+
+    config OTA_POLL_INTERVAL_SEC
+        int "OTA poll interval override (seconds, dev/E2E)"
+        default 0
+        range 0 86400
+        help
+            If > 0, overrides OTA_POLL_INTERVAL_HOURS (e.g. 300 for E2E testing).
+
+    config OTA_ED25519_PUBLIC_KEY_HEX
+        string "OTA Ed25519 public key (64 hex chars)"
+        default ""
+        help
+            Raw 32-byte Ed25519 public key as lowercase hex (matches server signing key).
 
 endmenu

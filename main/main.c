@@ -9,11 +9,13 @@
  */
 
 #include <string.h>
+#include <time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "esp_netif_sntp.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "nvs.h"
@@ -21,9 +23,78 @@
 #include "certificate_manager.h"
 #include "internet_verification.h"
 #include "mqtt_handler.h"
+#include "ota_handler.h"
 #include "device_keys.h"
+#include "prov_token_validate.h"
 
 static const char *TAG = "main";
+
+/** State-machine flags (reset together when forcing captive-portal reprovision). */
+static bool s_wifi_connection_attempted;
+static bool s_wifi_sta_inited;
+static bool s_verification_done;
+static int s_verification_retries;
+static bool s_prov_token_expiry_checked;
+static bool s_csr_submission_attempted;
+static int s_csr_retry_count;
+static int s_mqtt_connect_retries;
+static bool s_mqtt_connected_msg_shown;
+static bool s_ota_started;
+static int s_wifi_connect_wait_seconds;
+static const int WIFI_CONNECT_TIMEOUT_SECONDS = 50;
+
+static void main_reset_cycle_for_reprovision(void)
+{
+    s_wifi_connection_attempted = false;
+    s_wifi_sta_inited = false;
+    s_verification_done = false;
+    s_verification_retries = 0;
+    s_prov_token_expiry_checked = false;
+    s_csr_submission_attempted = false;
+    s_csr_retry_count = 0;
+    s_mqtt_connect_retries = 0;
+    s_mqtt_connected_msg_shown = false;
+    s_ota_started = false;
+    s_wifi_connect_wait_seconds = 0;
+}
+
+static void ota_verify_task(void *arg)
+{
+    (void)arg;
+    ota_handler_run_pending_verify();
+    vTaskDelete(NULL);
+}
+
+static void trim_spaces_in_place(char *s)
+{
+    if (s == NULL || s[0] == '\0') {
+        return;
+    }
+
+    char *start = s;
+    while (*start == ' ' || *start == '\t') {
+        start++;
+    }
+    if (start != s) {
+        memmove(s, start, strlen(start) + 1);
+    }
+
+    size_t n = strlen(s);
+    while (n > 0 && (s[n - 1] == ' ' || s[n - 1] == '\t')) {
+        s[--n] = '\0';
+    }
+}
+
+static void force_reprovision_due_to_token(const char *reason)
+{
+    ESP_LOGW(TAG, "Provisioning token check failed: %s", reason);
+    ESP_LOGI(TAG, "✅ STEP: Clearing NVS and restarting captive portal (AP)");
+    (void)certificate_manager_erase_stored_certificates();
+    (void)wifi_provisioning_erase_stored_credentials();
+    main_reset_cycle_for_reprovision();
+    esp_wifi_stop();
+    vTaskDelay(pdMS_TO_TICKS(500));
+}
 
 // NVS keys
 #define NVS_NAMESPACE "device_config"
@@ -140,10 +211,12 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
         ESP_LOGI(TAG, "WiFi STA connected");
+        s_wifi_connect_wait_seconds = 0;
         s_app_state = APP_STATE_WIFI_CONNECTED;
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
+        s_wifi_connect_wait_seconds = 0;
         s_app_state = APP_STATE_WIFI_CONNECTED;
     }
 }
@@ -181,14 +254,29 @@ static void app_state_machine_task(void *pvParameters)
                 ESP_LOGI(TAG, "Device is provisioned, connecting to WiFi...");
                 s_app_state = APP_STATE_WIFI_CONNECTING;
             } else {
-                ESP_LOGI(TAG, "Device not provisioned, starting AP mode...");
-                s_app_state = APP_STATE_AP_MODE;
+                esp_err_t seed = wifi_provisioning_seed_dev_wifi_if_configured();
+                if (seed == ESP_OK) {
+                    ESP_LOGI(TAG, "Dev WiFi auto-provisioned; connecting to WiFi...");
+                    s_app_state = APP_STATE_WIFI_CONNECTING;
+                } else {
+                    ESP_LOGI(TAG, "Device not provisioned, starting AP mode...");
+                    s_app_state = APP_STATE_AP_MODE;
+                }
             }
             break;
 
         case APP_STATE_AP_MODE:
             ESP_LOGI(TAG, "State: AP_MODE");
             {
+                // If provisioning handler saved credentials, it sets `provisioned=1`.
+                // This should be the primary signal to leave AP_MODE.
+                if (wifi_provisioning_is_provisioned()) {
+                    ESP_LOGI(TAG, "✅ STEP: provisioning flag found in NVS; skipping AP wait");
+                    (void)wifi_provisioning_stop(); // stop HTTP/DNS side of provisioning
+                    s_app_state = APP_STATE_WIFI_CONNECTING;
+                    break;
+                }
+
                 // If credentials already exist, do not wait for another incoming /provision call.
                 if (has_local_provisioning_credentials()) {
                     ESP_LOGI(TAG, "✅ STEP: Found local provisioning credentials in NVS");
@@ -223,22 +311,19 @@ static void app_state_machine_task(void *pvParameters)
             break;
 
         case APP_STATE_WIFI_CONNECTING:
-            ESP_LOGI(TAG, "State: WIFI_CONNECTING");
             {
-                static bool connection_attempted = false;
-                static bool wifi_sta_inited = false;
-
-                if (!connection_attempted) {
+                if (!s_wifi_connection_attempted) {
+                    ESP_LOGI(TAG, "State: WIFI_CONNECTING");
                     // When we skip AP mode (credential reuse), WiFi was never initialized.
                     // Ensure STA netif exists and esp_wifi_init() has been called before connecting.
-                    if (!wifi_sta_inited) {
+                    if (!s_wifi_sta_inited) {
                         esp_netif_create_default_wifi_sta();
                         wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
                         esp_err_t err = esp_wifi_init(&cfg);
                         if (err != ESP_OK) {
                             ESP_LOGW(TAG, "esp_wifi_init: %s (continuing in case already inited)", esp_err_to_name(err));
                         }
-                        wifi_sta_inited = true;
+                        s_wifi_sta_inited = true;
                         ESP_LOGI(TAG, "✅ STEP: WiFi driver initialized for STA");
                     }
 
@@ -254,19 +339,9 @@ static void app_state_machine_task(void *pvParameters)
                             required_size = sizeof(password);
                             nvs_get_str(nvs_handle, "wifi_pass", password, &required_size);
 
-                            // Trim leading/trailing whitespace (can prevent connection)
-                            size_t n = strlen(ssid);
-                            while (n > 0 && (ssid[n - 1] == ' ' || ssid[n - 1] == '\t')) { ssid[--n] = '\0'; }
-                            for (char *p = ssid; *p == ' ' || *p == '\t'; p++) {
-                                n = strlen(p + 1);
-                                memmove(ssid, p + 1, n + 1);
-                            }
-                            n = strlen(password);
-                            while (n > 0 && (password[n - 1] == ' ' || password[n - 1] == '\t')) { password[--n] = '\0'; }
-                            for (char *p = password; *p == ' ' || *p == '\t'; p++) {
-                                n = strlen(p + 1);
-                                memmove(password, p + 1, n + 1);
-                            }
+                            // Trim accidental spaces copied from UI or paste.
+                            trim_spaces_in_place(ssid);
+                            trim_spaces_in_place(password);
 
                             wifi_config_t wifi_config = {0};
                             strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
@@ -304,9 +379,33 @@ static void app_state_machine_task(void *pvParameters)
                                 break;
                             }
 
-                            connection_attempted = true;
+                            s_wifi_connection_attempted = true;
                         }
                         nvs_close(nvs_handle);
+                    }
+                } else {
+                    s_wifi_connect_wait_seconds++;
+                    if ((s_wifi_connect_wait_seconds % 5) == 0) {
+                        ESP_LOGI(TAG, "State: WIFI_CONNECTING (%d s elapsed)", s_wifi_connect_wait_seconds);
+                    }
+                    if ((s_wifi_connect_wait_seconds % 10) == 0) {
+                        esp_err_t retry = esp_wifi_connect();
+                        if (retry != ESP_OK) {
+                            ESP_LOGW(TAG, "WiFi reconnect nudge failed: %s", esp_err_to_name(retry));
+                        }
+                    }
+                    if (s_wifi_connect_wait_seconds >= WIFI_CONNECT_TIMEOUT_SECONDS) {
+                        ESP_LOGW(TAG, "WiFi connect timeout (%d s). Restarting AP provisioning for new credentials.",
+                                 WIFI_CONNECT_TIMEOUT_SECONDS);
+                        main_reset_cycle_for_reprovision();
+                        esp_err_t prov_ret = wifi_provisioning_clear_and_restart();
+                        if (prov_ret != ESP_OK) {
+                            ESP_LOGE(TAG, "Failed to restart provisioning AP: %s", esp_err_to_name(prov_ret));
+                            s_app_state = APP_STATE_ERROR;
+                        } else {
+                            s_app_state = APP_STATE_AP_MODE;
+                        }
+                        break;
                     }
                 }
 
@@ -320,20 +419,78 @@ static void app_state_machine_task(void *pvParameters)
             ESP_LOGI(TAG, "State: WIFI_CONNECTED");
             ESP_LOGI(TAG, "========================================");
             {
-                static bool verification_done = false;
-                static int verification_retries = 0;
                 const int MAX_VERIFICATION_RETRIES = 2; // Try 2 times before giving up
-                
+
                 // Reset verification state if we're not provisioned (means we returned to AP mode)
                 if (!wifi_provisioning_is_provisioned()) {
                     ESP_LOGW(TAG, "Device not provisioned, resetting to AP mode");
-                    verification_done = false;
-                    verification_retries = 0;
+                    main_reset_cycle_for_reprovision();
                     s_app_state = APP_STATE_AP_MODE;
                     break;
                 }
-                
-                if (!verification_done) {
+
+                /* Short-lived provisioning JWT: after SNTP, drop stale tokens and reopen portal. */
+                if (!s_prov_token_expiry_checked) {
+                    s_prov_token_expiry_checked = true;
+
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+                    ESP_LOGI(TAG, "Embedded mTLS certs enabled — skipping JWT expiry check");
+#else
+                    esp_sntp_config_t sntp_cfg = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+                    esp_err_t sn_init = esp_netif_sntp_init(&sntp_cfg);
+                    esp_err_t sn = ESP_FAIL;
+                    if (sn_init != ESP_OK) {
+                        ESP_LOGW(TAG, "SNTP init failed: %s — skipping JWT expiry check",
+                                 esp_err_to_name(sn_init));
+                    } else {
+                        sn = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(15000));
+                        esp_netif_sntp_deinit();
+                        if (sn != ESP_OK) {
+                            ESP_LOGW(TAG, "SNTP sync via pool.ntp.org failed (%s), retrying with time.google.com",
+                                     esp_err_to_name(sn));
+                            esp_sntp_config_t sntp_cfg_fallback = ESP_NETIF_SNTP_DEFAULT_CONFIG("time.google.com");
+                            if (esp_netif_sntp_init(&sntp_cfg_fallback) == ESP_OK) {
+                                sn = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(5000));
+                                esp_netif_sntp_deinit();
+                            }
+                        }
+                    }
+
+                    time_t now = time(NULL);
+                    const time_t k_min_plausible_utc = 1577836800; /* 2020-01-01 */
+                    bool time_trusted = (sn == ESP_OK && now > k_min_plausible_utc);
+
+                    if (time_trusted) {
+                        char token[1024] = {0};
+                        char device_id[64] = {0};
+                        esp_err_t cr = get_provisioning_credentials(device_id, sizeof(device_id),
+                                                                  token, sizeof(token));
+                        if (cr == ESP_OK) {
+                            prov_token_status_t st = prov_token_check_expiry(token, now);
+                            if (st == PROV_TOKEN_STATUS_EXPIRED) {
+                                force_reprovision_due_to_token("token expired; need fresh token from web app");
+                                s_app_state = APP_STATE_AP_MODE;
+                                break;
+                            }
+                            if (st == PROV_TOKEN_STATUS_MALFORMED) {
+                                force_reprovision_due_to_token("token malformed (missing/invalid exp/iat)");
+                                s_app_state = APP_STATE_AP_MODE;
+                                break;
+                            }
+                        } else {
+                            force_reprovision_due_to_token("unable to read provisioning token from NVS");
+                            s_app_state = APP_STATE_AP_MODE;
+                            break;
+                        }
+                    } else {
+                        force_reprovision_due_to_token("time not trusted after SNTP; cannot validate token age");
+                        s_app_state = APP_STATE_AP_MODE;
+                        break;
+                    }
+#endif
+                }
+
+                if (!s_verification_done) {
                     // Verify internet connectivity after WiFi connection
                     ESP_LOGI(TAG, "WiFi connected - verifying internet access...");
                     ESP_LOGI(TAG, "Waiting 2 seconds for network to stabilize...");
@@ -348,17 +505,17 @@ static void app_state_machine_task(void *pvParameters)
                         ESP_LOGI(TAG, "✓ Internet connectivity verified!");
                         ESP_LOGI(TAG, "========================================");
                         ESP_LOGI(TAG, "✅ STEP: Internet verified; proceeding to certificate check");
-                        verification_done = true;
-                        verification_retries = 0; // Reset retry counter
+                        s_verification_done = true;
+                        s_verification_retries = 0; // Reset retry counter
                     } else {
-                        verification_retries++;
+                        s_verification_retries++;
                         ESP_LOGE(TAG, "========================================");
                         ESP_LOGE(TAG, "✗ Internet verification failed!");
                         ESP_LOGE(TAG, "✗ Error: %s", esp_err_to_name(ret));
-                        ESP_LOGE(TAG, "✗ Retry attempt: %d/%d", verification_retries, MAX_VERIFICATION_RETRIES);
+                        ESP_LOGE(TAG, "✗ Retry attempt: %d/%d", s_verification_retries, MAX_VERIFICATION_RETRIES);
                         ESP_LOGE(TAG, "========================================");
                         
-                        if (verification_retries >= MAX_VERIFICATION_RETRIES) {
+                        if (s_verification_retries >= MAX_VERIFICATION_RETRIES) {
                             ESP_LOGE(TAG, "Maximum retries reached. Credentials may be incorrect.");
                             ESP_LOGE(TAG, "WiFi may be connected but has no internet access.");
                             ESP_LOGI(TAG, "NOTE: Proceeding to certificate check anyway...");
@@ -366,8 +523,8 @@ static void app_state_machine_task(void *pvParameters)
                             
                             // Instead of clearing credentials, proceed to certificate check
                             // This allows CSR submission to be attempted
-                            verification_done = true; // Mark as done to proceed
-                            verification_retries = 0;
+                            s_verification_done = true; // Mark as done to proceed
+                            s_verification_retries = 0;
                         } else {
                             ESP_LOGW(TAG, "Retrying internet verification in 5 seconds...");
                             vTaskDelay(pdMS_TO_TICKS(5000));
@@ -376,7 +533,7 @@ static void app_state_machine_task(void *pvParameters)
                     }
                 }
                 
-                if (verification_done) {
+                if (s_verification_done) {
                     ESP_LOGI(TAG, "Internet verification complete, proceeding to certificate check...");
                     s_app_state = APP_STATE_CHECK_CERTIFICATES;
                 } else {
@@ -389,9 +546,9 @@ static void app_state_machine_task(void *pvParameters)
             ESP_LOGI(TAG, "========================================");
             ESP_LOGI(TAG, "State: CHECK_CERTIFICATES");
             ESP_LOGI(TAG, "========================================");
-            ESP_LOGI(TAG, "Checking if certificates exist in NVS...");
+            ESP_LOGI(TAG, "Checking for mTLS certificates (embedded mtls_client/certs or NVS)...");
             if (certificate_manager_has_certificates()) {
-                ESP_LOGI(TAG, "✓ Certificates found in NVS");
+                ESP_LOGI(TAG, "✓ mTLS certificates available");
                 ESP_LOGI(TAG, "Proceeding to MQTT connection...");
                 s_app_state = APP_STATE_MQTT_CONNECTING;
             } else {
@@ -406,11 +563,9 @@ static void app_state_machine_task(void *pvParameters)
             ESP_LOGI(TAG, "State: SUBMIT_CSR");
             ESP_LOGI(TAG, "========================================");
             {
-                static bool csr_submission_attempted = false;
-                static int csr_retry_count = 0;
                 const int MAX_CSR_RETRIES = 3;
                 
-                if (!csr_submission_attempted) {
+                if (!s_csr_submission_attempted) {
                     char device_id[64] = {0};
                     // JWT provisioning tokens can exceed 256 bytes.
                     char token[1024] = {0};
@@ -438,7 +593,7 @@ static void app_state_machine_task(void *pvParameters)
                     ESP_LOGI(TAG, "========================================");
 
                     ret = certificate_manager_submit_csr(device_id, token);
-                    csr_submission_attempted = true;
+                    s_csr_submission_attempted = true;
                     
                     if (ret == ESP_OK) {
                         ESP_LOGI(TAG, "========================================");
@@ -446,22 +601,22 @@ static void app_state_machine_task(void *pvParameters)
                         ESP_LOGI(TAG, "✓ Certificates saved to NVS");
                         ESP_LOGI(TAG, "========================================");
                         ESP_LOGI(TAG, "✅ STEP: Certificates stored; proceeding to MQTT mTLS connect");
-                        csr_retry_count = 0;
+                        s_csr_retry_count = 0;
                         s_app_state = APP_STATE_MQTT_CONNECTING;
                     } else {
-                        csr_retry_count++;
+                        s_csr_retry_count++;
                         ESP_LOGE(TAG, "========================================");
                         ESP_LOGE(TAG, "✗ CSR submission failed!");
                         ESP_LOGE(TAG, "Error: %s", esp_err_to_name(ret));
-                        ESP_LOGE(TAG, "Retry count: %d/%d", csr_retry_count, MAX_CSR_RETRIES);
+                        ESP_LOGE(TAG, "Retry count: %d/%d", s_csr_retry_count, MAX_CSR_RETRIES);
                         ESP_LOGE(TAG, "========================================");
                         
-                        if (csr_retry_count >= MAX_CSR_RETRIES) {
+                        if (s_csr_retry_count >= MAX_CSR_RETRIES) {
                             ESP_LOGE(TAG, "Maximum retries reached. Moving to error state.");
                             s_app_state = APP_STATE_ERROR;
                         } else {
                             ESP_LOGI(TAG, "Retrying CSR submission in 5 seconds...");
-                            csr_submission_attempted = false; // Allow retry
+                            s_csr_submission_attempted = false; // Allow retry
                             vTaskDelay(pdMS_TO_TICKS(5000));
                         }
                     }
@@ -475,9 +630,32 @@ static void app_state_machine_task(void *pvParameters)
         case APP_STATE_MQTT_CONNECTING:
             ESP_LOGI(TAG, "State: MQTT_CONNECTING");
             {
-                static int mqtt_connect_retries = 0;
                 const int MAX_MQTT_RETRIES = 3;
-                
+
+                if (!s_ota_started) {
+                    char device_id[64] = {0};
+                    char token[16] = {0};
+                    if (get_provisioning_credentials(device_id, sizeof(device_id),
+                                                     token, sizeof(token)) != ESP_OK) {
+#if CONFIG_USE_EMBEDDED_MTLS_CERTS
+                        strncpy(device_id, CONFIG_MTLS_CLIENT_DEVICE_ID, sizeof(device_id) - 1);
+                        device_id[sizeof(device_id) - 1] = '\0';
+                        ESP_LOGI(TAG, "Using embedded mTLS device_id for MQTT: %s", device_id);
+#else
+                        ESP_LOGE(TAG, "No device_id in NVS; cannot start MQTT");
+                        s_app_state = APP_STATE_ERROR;
+                        break;
+#endif
+                    }
+                    mqtt_handler_set_device_id(device_id);
+                    mqtt_handler_set_cmd_callback(ota_handler_on_mqtt_cmd);
+                    mqtt_handler_set_ack_callback(ota_handler_on_mqtt_ack);
+                    mqtt_handler_set_connected_callback(ota_handler_on_mqtt_connected);
+                    (void)ota_handler_init(device_id);
+                    (void)ota_handler_start();
+                    s_ota_started = true;
+                }
+
                 esp_err_t ret = mqtt_handler_start();
                 if (ret == ESP_OK) {
                     ESP_LOGI(TAG, "MQTT handler started, waiting for connection...");
@@ -494,26 +672,26 @@ static void app_state_machine_task(void *pvParameters)
                     
                     if (mqtt_handler_is_connected()) {
                         ESP_LOGI(TAG, "✓ MQTT connected successfully!");
-                        mqtt_connect_retries = 0;
+                        s_mqtt_connect_retries = 0;
                         s_app_state = APP_STATE_MQTT_CONNECTED;
                     } else {
                         ESP_LOGW(TAG, "MQTT connection timeout");
                         mqtt_handler_stop();
-                        mqtt_connect_retries++;
+                        s_mqtt_connect_retries++;
                         
-                        if (mqtt_connect_retries >= MAX_MQTT_RETRIES) {
+                        if (s_mqtt_connect_retries >= MAX_MQTT_RETRIES) {
                             ESP_LOGE(TAG, "MQTT connection failed after %d retries", MAX_MQTT_RETRIES);
                             s_app_state = APP_STATE_ERROR;
                         } else {
-                            ESP_LOGI(TAG, "Retrying MQTT connection... (%d/%d)", mqtt_connect_retries, MAX_MQTT_RETRIES);
+                            ESP_LOGI(TAG, "Retrying MQTT connection... (%d/%d)", s_mqtt_connect_retries, MAX_MQTT_RETRIES);
                             vTaskDelay(pdMS_TO_TICKS(5000));
                         }
                     }
                 } else {
                     ESP_LOGE(TAG, "Failed to start MQTT handler: %s", esp_err_to_name(ret));
-                    mqtt_connect_retries++;
+                    s_mqtt_connect_retries++;
                     
-                    if (mqtt_connect_retries >= MAX_MQTT_RETRIES) {
+                    if (s_mqtt_connect_retries >= MAX_MQTT_RETRIES) {
                         s_app_state = APP_STATE_ERROR;
                     } else {
                         vTaskDelay(pdMS_TO_TICKS(5000));
@@ -524,9 +702,7 @@ static void app_state_machine_task(void *pvParameters)
 
         case APP_STATE_MQTT_CONNECTED:
             {
-                static bool connected_msg_shown = false;
-                
-                if (!connected_msg_shown) {
+                if (!s_mqtt_connected_msg_shown) {
                     ESP_LOGI(TAG, "========================================");
                     ESP_LOGI(TAG, "State: MQTT_CONNECTED");
                     ESP_LOGI(TAG, "========================================");
@@ -534,15 +710,16 @@ static void app_state_machine_task(void *pvParameters)
                     ESP_LOGI(TAG, "✓ mTLS MQTT connection established!");
                     ESP_LOGI(TAG, "✓ Device is fully operational!");
                     ESP_LOGI(TAG, "========================================");
-                    connected_msg_shown = true;
+                    s_mqtt_connected_msg_shown = true;
+
+                    if (ota_handler_pending_verify_active()) {
+                        xTaskCreate(ota_verify_task, "ota_verify", 4096, NULL, 4, NULL);
+                    }
                 }
-                
-                // Check if still connected
+
                 if (!mqtt_handler_is_connected()) {
-                    ESP_LOGW(TAG, "MQTT connection lost, reconnecting...");
-                    connected_msg_shown = false;
-                    mqtt_handler_stop();
-                    s_app_state = APP_STATE_MQTT_CONNECTING;
+                    ESP_LOGW(TAG, "MQTT disconnected — waiting for auto-reconnect");
+                    vTaskDelay(pdMS_TO_TICKS(2000));
                     break;
                 }
                 

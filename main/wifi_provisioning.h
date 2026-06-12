@@ -36,6 +36,14 @@ esp_err_t wifi_provisioning_start(void);
 esp_err_t wifi_provisioning_stop(void);
 
 /**
+ * @brief Save dev WiFi credentials to NVS when unprovisioned (E2E / lab testing)
+ *
+ * Uses CONFIG_DEV_WIFI_SSID / CONFIG_DEV_WIFI_PASSWORD and CONFIG_MTLS_CLIENT_DEVICE_ID.
+ * No-op if DEV_WIFI_SSID is empty or device is already provisioned.
+ */
+esp_err_t wifi_provisioning_seed_dev_wifi_if_configured(void);
+
+/**
  * @brief Check if device is already provisioned
  * 
  * @return true if WiFi credentials exist in NVS, false otherwise
@@ -61,6 +69,15 @@ bool wifi_provisioning_get_status(char *ip_addr, size_t ip_len);
  * @return ESP_OK on success, ESP_ERR_NOT_FOUND if token doesn't exist
  */
 esp_err_t wifi_provisioning_get_bearer_token(char *token, size_t token_len);
+
+/**
+ * @brief Erase provisioning-related keys from NVS only (no WiFi / HTTP changes).
+ *
+ * Use when main must stop STA and restart AP after clearing state machine flags.
+ *
+ * @return ESP_OK on success
+ */
+esp_err_t wifi_provisioning_erase_stored_credentials(void);
 
 /**
  * @brief Clear provisioning credentials and return to AP mode
