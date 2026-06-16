@@ -36,6 +36,23 @@ esp/
 - ✅ Certificate storage in NVS
 - ✅ mTLS MQTT connection to broker
 - ✅ State machine for orchestration
+- ✅ Server-driven OTA via MQTT `ota_update` (no HTTP poll)
+
+## OTA (Server-Driven)
+
+Firmware updates are **pushed by proofmqtt** — the device does not poll `GET /api/v1/ota/check` or handle MQTT `ota_check`.
+
+| Step | Device behavior |
+|------|-----------------|
+| Receive update | Parse `ota_update` on `{MQTT_TOPIC_ROOT}/{deviceId}/cmd` (QoS 2) with full manifest |
+| Download | HTTPS GET to OCI PAR `download_url` (public TLS, not mTLS) |
+| Verify | SHA-256 + Ed25519 signature over manifest |
+| Reboot | ESP-IDF pending-verify; publish `ota_validating` then `ota_success` on `/status` |
+| Catch-up | On MQTT connect, publish `/active` with `appVersion`; server re-pushes if still pending |
+
+Server contract: [proofmqtt/docs/OTA_FIRMWARE_CONTRACT.md](../proofmqtt/docs/OTA_FIRMWARE_CONTRACT.md)
+
+Configure `CONFIG_FIRMWARE_VERSION` and `CONFIG_OTA_ED25519_PUBLIC_KEY_HEX` under **OTA Configuration** in menuconfig. CI sets version from git tags via `.github/workflows/deploy-ota.yml`.
 
 ## Quick Start
 

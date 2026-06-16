@@ -61,15 +61,27 @@ static void mqtt_build_topics(void)
     snprintf(s_device_wildcard_topic, sizeof(s_device_wildcard_topic), "%s/%s/#", CONFIG_MQTT_TOPIC_ROOT, s_device_id);
 }
 
-static esp_err_t mqtt_subscribe_topic(const char *topic)
+static esp_err_t mqtt_subscribe_topic_qos(const char *topic, int qos)
 {
-    esp_err_t err = mqtt_handler_subscribe(topic, 1);
+    esp_err_t err = mqtt_handler_subscribe(topic, qos);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "subscribe %s: OK", topic);
+        ESP_LOGI(TAG, "subscribe %s (qos=%d): OK", topic, qos);
     } else {
-        ESP_LOGE(TAG, "subscribe %s failed", topic);
+        ESP_LOGE(TAG, "subscribe %s (qos=%d) failed", topic, qos);
     }
     return err;
+}
+
+static esp_err_t mqtt_subscribe_topic(const char *topic)
+{
+    return mqtt_subscribe_topic_qos(topic, 1);
+}
+
+static void mqtt_subscribe_cmd_topic(void)
+{
+    if (s_cmd_topic[0] != '\0') {
+        mqtt_subscribe_topic_qos(s_cmd_topic, 2);
+    }
 }
 
 /** Match Node mtlsclient buildSubscribeTopics() in src/mqttClient.js */
@@ -84,6 +96,7 @@ static void mqtt_subscribe_lifecycle_topics(void)
     if (s_device_wildcard_topic[0] != '\0') {
         mqtt_subscribe_topic(s_device_wildcard_topic);
     }
+    mqtt_subscribe_cmd_topic();
     if (s_broadcast_cmd_topic[0] != '\0') {
         mqtt_subscribe_topic(s_broadcast_cmd_topic);
     }
@@ -104,7 +117,11 @@ static void mqtt_subscribe_lifecycle_topics(void)
     char topic[TOPIC_BUF_SIZE];
     for (int i = 0; suffixes[i] != NULL; i++) {
         snprintf(topic, sizeof(topic), "%s/%s/%s", CONFIG_MQTT_TOPIC_ROOT, s_device_id, suffixes[i]);
-        mqtt_subscribe_topic(topic);
+        if (strcmp(suffixes[i], "cmd") == 0) {
+            mqtt_subscribe_topic_qos(topic, 2);
+        } else {
+            mqtt_subscribe_topic(topic);
+        }
     }
     if (s_broadcast_cmd_topic[0] != '\0') {
         mqtt_subscribe_topic(s_broadcast_cmd_topic);

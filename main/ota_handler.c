@@ -12,7 +12,6 @@
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
 #include "esp_system.h"
-#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/task.h"
@@ -28,11 +27,9 @@ static const char *TAG = "ota_handler";
 
 #define OTA_NVS_NAMESPACE "proof_device"
 #define OTA_NVS_LAST_DOWNLOAD "ota_dl_ts"
-#define OTA_COOLDOWN_SEC 3600
 #define OTA_TASK_STACK 8192
 #define OTA_TASK_PRIO 5
 #define OTA_ROLLBACK_ACK_BIT BIT0
-#define OTA_WORK_CHECK BIT0
 #define OTA_WORK_UPDATE BIT1
 
 static char s_device_id[64];
@@ -40,38 +37,10 @@ static bool s_initialized;
 static TaskHandle_t s_ota_task;
 static EventGroupHandle_t s_ota_events;
 static EventGroupHandle_t s_rollback_ack_events;
-static esp_timer_handle_t s_poll_timer;
 static ota_manifest_t s_pending_manifest;
-static bool s_force_download;
 static bool s_pending_verify_mode;
 static char s_pending_version[32];
 static char s_inflight_version[32];
-
-typedef struct {
-    ota_manifest_t manifest;
-    bool force;
-} ota_work_item_t;
-
-static bool cooldown_active(void)
-{
-    nvs_handle_t nvs;
-    if (nvs_open(OTA_NVS_NAMESPACE, NVS_READONLY, &nvs) != ESP_OK) {
-        return false;
-    }
-
-    int64_t last_ts = 0;
-    esp_err_t err = nvs_get_i64(nvs, OTA_NVS_LAST_DOWNLOAD, &last_ts);
-    nvs_close(nvs);
-    if (err != ESP_OK || last_ts <= 0) {
-        return false;
-    }
-
-    time_t now = time(NULL);
-    if (now <= 0) {
-        return false;
-    }
-    return (now - (time_t)last_ts) < OTA_COOLDOWN_SEC;
-}
 
 static esp_err_t record_download_timestamp(void)
 {
@@ -130,36 +99,6 @@ static esp_err_t publish_status_json(cJSON *obj)
     }
     esp_err_t err = mqtt_handler_publish_status_json(json);
     cJSON_free(json);
-    return err;
-}
-
-static esp_err_t ota_handler_check_for_update(ota_manifest_t *manifest_out, bool force)
-{
-    char url[384];
-    snprintf(url, sizeof(url), "%s/api/v1/ota/check?current_version=%s",
-             CONFIG_BACKEND_URL, CONFIG_FIRMWARE_VERSION);
-
-    char response[2048];
-    int status = 0;
-    esp_err_t err = http_mtls_get(url, response, sizeof(response), &status);
-    if (err != ESP_OK) {
-        return err;
-    }
-
-    cJSON *root = cJSON_Parse(response);
-    if (root == NULL) {
-        return ESP_ERR_INVALID_RESPONSE;
-    }
-
-    cJSON *available = cJSON_GetObjectItem(root, "update_available");
-    if (!cJSON_IsTrue(available)) {
-        ESP_LOGI(TAG, "No OTA update available");
-        cJSON_Delete(root);
-        return ESP_ERR_NOT_FOUND;
-    }
-
-    err = parse_manifest_from_json(root, manifest_out);
-    cJSON_Delete(root);
     return err;
 }
 
@@ -266,6 +205,14 @@ static esp_err_t ota_handler_apply_update(const ota_manifest_t *manifest)
         return ESP_ERR_INVALID_RESPONSE;
     }
 
+    if (manifest->size_bytes > 0 && dctx.total_written != manifest->size_bytes) {
+        ESP_LOGE(TAG, "Size mismatch: got %u, expected %u",
+                 (unsigned)dctx.total_written, (unsigned)manifest->size_bytes);
+        esp_ota_abort(ota_handle);
+        mbedtls_sha256_free(&sha_ctx);
+        return ESP_ERR_INVALID_SIZE;
+    }
+
     mbedtls_sha256_finish(&sha_ctx, hash);
     mbedtls_sha256_free(&sha_ctx);
 
@@ -320,46 +267,21 @@ static void ota_publish_progress(const char *version, int percent)
 static void ota_task_worker(void *arg)
 {
     (void)arg;
-    ota_work_item_t work = {0};
 
     while (1) {
-        EventBits_t bits = xEventGroupWaitBits(s_ota_events, OTA_WORK_CHECK | OTA_WORK_UPDATE,
-                                               pdTRUE, pdFALSE, portMAX_DELAY);
+        xEventGroupWaitBits(s_ota_events, OTA_WORK_UPDATE, pdTRUE, pdFALSE, portMAX_DELAY);
         if (s_pending_verify_mode) {
             ESP_LOGW(TAG, "OTA worker idle — pending verify active");
             continue;
         }
-        bool force = s_force_download;
-        s_force_download = false;
 
-        if ((bits & OTA_WORK_UPDATE) && s_pending_manifest.version[0] != '\0') {
-            work.manifest = s_pending_manifest;
-            work.force = force;
-        } else {
-            memset(&work, 0, sizeof(work));
-            work.force = force;
-        }
-
-        if (!work.force && cooldown_active()) {
-            ESP_LOGI(TAG, "OTA download skipped (cooldown active)");
+        if (s_pending_manifest.version[0] == '\0') {
             continue;
         }
 
-        ota_manifest_t manifest = {0};
-        esp_err_t err;
-        if (work.manifest.version[0] != '\0') {
-            manifest = work.manifest;
-            err = ESP_OK;
-        } else {
-            err = ota_handler_check_for_update(&manifest, work.force);
-        }
-
-        if (err != ESP_OK) {
-            continue;
-        }
-
+        ota_manifest_t manifest = s_pending_manifest;
         ota_publish_progress(manifest.version, 0);
-        err = ota_handler_apply_update(&manifest);
+        esp_err_t err = ota_handler_apply_update(&manifest);
         if (err != ESP_OK) {
             ESP_LOGE(TAG, "OTA update failed: %s", esp_err_to_name(err));
             s_inflight_version[0] = '\0';
@@ -374,21 +296,6 @@ static bool version_already_running(const char *version)
     }
     const esp_app_desc_t *app = esp_app_get_description();
     return app != NULL && strcmp(app->version, version) == 0;
-}
-
-static void queue_ota_check(bool force)
-{
-    if (s_ota_events == NULL) {
-        ESP_LOGW(TAG, "OTA check ignored — handler not initialized");
-        return;
-    }
-    if (s_pending_verify_mode) {
-        ESP_LOGW(TAG, "OTA check ignored — pending verify active");
-        return;
-    }
-    s_force_download = force;
-    xEventGroupSetBits(s_ota_events, OTA_WORK_CHECK);
-    ESP_LOGI(TAG, "Queued ota_check (force=%d)", force ? 1 : 0);
 }
 
 static void queue_ota_update(const ota_manifest_t *manifest, bool force)
@@ -413,25 +320,8 @@ static void queue_ota_update(const ota_manifest_t *manifest, bool force)
     strncpy(s_inflight_version, manifest->version, sizeof(s_inflight_version) - 1);
     s_inflight_version[sizeof(s_inflight_version) - 1] = '\0';
     s_pending_manifest = *manifest;
-    s_force_download = force;
     xEventGroupSetBits(s_ota_events, OTA_WORK_UPDATE);
     ESP_LOGI(TAG, "Queued ota_update version=%s force=%d", manifest->version, force ? 1 : 0);
-}
-
-static void poll_timer_cb(void *arg)
-{
-    (void)arg;
-    ESP_LOGI(TAG, "OTA poll timer fired");
-    queue_ota_check(false);
-}
-
-static uint64_t poll_interval_us(void)
-{
-#if CONFIG_OTA_POLL_INTERVAL_SEC > 0
-    return (uint64_t)CONFIG_OTA_POLL_INTERVAL_SEC * 1000000ULL;
-#else
-    return (uint64_t)CONFIG_OTA_POLL_INTERVAL_HOURS * 3600ULL * 1000000ULL;
-#endif
 }
 
 esp_err_t ota_handler_init(const char *device_id)
@@ -482,22 +372,6 @@ esp_err_t ota_handler_start(void)
         }
     }
 
-    if (s_poll_timer == NULL) {
-        const esp_timer_create_args_t timer_args = {
-            .callback = poll_timer_cb,
-            .name = "ota_poll",
-        };
-        esp_err_t err = esp_timer_create(&timer_args, &s_poll_timer);
-        if (err != ESP_OK) {
-            return err;
-        }
-        err = esp_timer_start_periodic(s_poll_timer, poll_interval_us());
-        if (err != ESP_OK) {
-            return err;
-        }
-        ESP_LOGI(TAG, "OTA poll timer started");
-    }
-
     return ESP_OK;
 }
 
@@ -536,14 +410,13 @@ void ota_handler_on_mqtt_cmd(const char *topic, const char *payload, int len)
     ESP_LOGI(TAG, "OTA command: %s", cmd->valuestring);
 
     if (strcmp(cmd->valuestring, "ota_check") == 0) {
-        queue_ota_check(force);
+        ESP_LOGI(TAG, "Ignoring deprecated ota_check — server pushes ota_update");
     } else if (strcmp(cmd->valuestring, "ota_update") == 0) {
         ota_manifest_t manifest = {0};
         if (parse_manifest_from_json(root, &manifest) == ESP_OK) {
             queue_ota_update(&manifest, force);
         } else {
-            ESP_LOGW(TAG, "ota_update missing manifest fields — falling back to ota_check");
-            queue_ota_check(force);
+            ESP_LOGE(TAG, "ota_update missing manifest fields — ignoring cmd");
         }
     } else {
         ESP_LOGD(TAG, "Ignoring non-OTA cmd: %s", cmd->valuestring);

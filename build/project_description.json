@@ -1,12 +1,12 @@
 {
     "version":            "1.2",
     "project_name":       "wifi_ap_project",
-    "project_version":    "84862c5-dirty",
+    "project_version":    "81a0174-dirty",
     "project_path":       "/home/statsnapp/Desktop/statsclient",
     "idf_path":           "/home/statsnapp/Desktop/statsclient/esp-idf",
     "build_dir":          "/home/statsnapp/Desktop/statsclient/build",
     "config_file":        "/home/statsnapp/Desktop/statsclient/sdkconfig",
-    "config_defaults":    "",
+    "config_defaults":    "/home/statsnapp/Desktop/statsclient/sdkconfig.defaults",
     "bootloader_elf":     "/home/statsnapp/Desktop/statsclient/build/bootloader/bootloader.elf",
     "app_elf":            "wifi_ap_project.elf",
     "app_bin":            "wifi_ap_project.bin",
@@ -1506,12 +1506,12 @@
             "type": "LIBRARY",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "espressif__cjson" ],
+            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "mbedtls", "espressif__cjson", "app_update", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "espressif__cjson", "espressif__mqtt" ],
             "file": "/home/statsnapp/Desktop/statsclient/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/statsnapp/Desktop/statsclient/main/main.c", "/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c", "/home/statsnapp/Desktop/statsclient/main/certificate_manager.c", "/home/statsnapp/Desktop/statsclient/main/internet_verification.c", "/home/statsnapp/Desktop/statsclient/main/mqtt_handler.c" ],
-            "include_dirs": [ "." ]
+            "sources": [ "/home/statsnapp/Desktop/statsclient/main/main.c", "/home/statsnapp/Desktop/statsclient/main/wifi_provisioning.c", "/home/statsnapp/Desktop/statsclient/main/certificate_manager.c", "/home/statsnapp/Desktop/statsclient/main/mtls_client_certs.c", "/home/statsnapp/Desktop/statsclient/main/internet_verification.c", "/home/statsnapp/Desktop/statsclient/main/mqtt_handler.c", "/home/statsnapp/Desktop/statsclient/main/prov_token_validate.c", "/home/statsnapp/Desktop/statsclient/main/ota_signing.c", "/home/statsnapp/Desktop/statsclient/main/ota_handler.c", "/home/statsnapp/Desktop/statsclient/main/http_mtls_client.c", "/home/statsnapp/Desktop/statsclient/main/ed25519/verify.c", "/home/statsnapp/Desktop/statsclient/main/ed25519/sha512.c", "/home/statsnapp/Desktop/statsclient/main/ed25519/fe.c", "/home/statsnapp/Desktop/statsclient/main/ed25519/ge.c", "/home/statsnapp/Desktop/statsclient/main/ed25519/sc.c", "/home/statsnapp/Desktop/statsclient/build/client.crt.S", "/home/statsnapp/Desktop/statsclient/build/client.key.S", "/home/statsnapp/Desktop/statsclient/build/ca_root.pem.S" ],
+            "include_dirs": [ ".", "ed25519" ]
         },
         "mbedtls": {
             "alias": "idf::mbedtls",
@@ -3277,10 +3277,10 @@
             "dir": "/home/statsnapp/Desktop/statsclient/main",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "espressif__cjson" ],
+            "priv_reqs": [ "esp_wifi", "nvs_flash", "esp_http_server", "esp_http_client", "esp-tls", "esp_netif", "esp_event", "espressif__mqtt", "mbedtls", "espressif__cjson", "app_update", "esp_timer" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "espressif__cjson", "espressif__mqtt" ],
-            "include_dirs": [ "." ]
+            "include_dirs": [ ".", "ed25519" ]
         },
         "espressif__cjson": {
             "alias": "idf::espressif__cjson",

@@ -85,23 +85,9 @@ menu "OTA Configuration"
 
     config FIRMWARE_VERSION
         string "Firmware version string"
-        default "4.3.0-mvp"
+        default "4.2"
         help
-            Sent as current_version on GET /api/v1/ota/check and in /active registration.
-
-    config OTA_POLL_INTERVAL_HOURS
-        int "OTA poll interval (hours)"
-        default 6
-        range 1 168
-        help
-            Periodic HTTP OTA check interval when OTA_POLL_INTERVAL_SEC is 0.
-
-    config OTA_POLL_INTERVAL_SEC
-        int "OTA poll interval override (seconds, dev/E2E)"
-        default 0
-        range 0 86400
-        help
-            If > 0, overrides OTA_POLL_INTERVAL_HOURS (e.g. 300 for E2E testing).
+            Sent as appVersion in MQTT /active registration; proofmqtt uses it for OTA catch-up.
 
     config OTA_ED25519_PUBLIC_KEY_HEX
         string "OTA Ed25519 public key (64 hex chars)"

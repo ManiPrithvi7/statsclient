@@ -12,7 +12,7 @@
 #define DEVICE_KEYS_H
 
 // Device identifier
-#define DEVICE_ID "device_0070"
+#define DEVICE_ID "DEVICE-17"
 
 // Private Key (PEM format) - RSA-2048
 // WARNING: For testing only. In production, generate on-device!

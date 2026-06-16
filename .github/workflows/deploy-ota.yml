@@ -1,0 +1,112 @@
+name: Compile, Deploy, and Release Proof.io OTA
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-deploy-release:
+    runs-on: ubuntu-latest
+    env:
+      IDF_TARGET: esp32s3
+
+    steps:
+      - name: Checkout firmware
+        uses: actions/checkout@v4
+
+      - name: Extract version and object key
+        id: meta
+        run: |
+          CLEAN_VERSION=$(echo "${GITHUB_REF_NAME}" | sed 's/^v//')
+          SAFE_VERSION=$(echo "$CLEAN_VERSION" | sed 's/[^a-zA-Z0-9._-]/_/g')
+          echo "version=$CLEAN_VERSION" >> "$GITHUB_OUTPUT"
+          echo "object_key=firmware/${SAFE_VERSION}/firmware.bin" >> "$GITHUB_OUTPUT"
+
+      - name: Set CONFIG_FIRMWARE_VERSION for tagged build
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          for f in sdkconfig.defaults sdkconfig; do
+            if [[ -f "$f" ]]; then
+              if grep -q '^CONFIG_FIRMWARE_VERSION=' "$f"; then
+                sed -i "s/^CONFIG_FIRMWARE_VERSION=.*/CONFIG_FIRMWARE_VERSION=\"${VERSION}\"/" "$f"
+              else
+                echo "CONFIG_FIRMWARE_VERSION=\"${VERSION}\"" >> "$f"
+              fi
+            fi
+          done
+
+      - name: Install ESP-IDF
+        uses: espressif/install-esp-idf-action@v1
+        with:
+          esp-idf-version: v5.4
+          target: esp32s3
+
+      - name: Build production firmware
+        run: idf.py build
+
+      - name: Compute SHA-256 and Ed25519 signature
+        id: sign
+        env:
+          OTA_PRIVATE_KEY: ${{ secrets.OTA_ED25519_PRIVATE_KEY }}
+        run: |
+          BIN=build/wifi_ap_project.bin
+          test -f "$BIN"
+          SHA256=$(sha256sum "$BIN" | awk '{print $1}')
+          SIZE=$(stat -c%s "$BIN")
+          printf '%s' "$OTA_PRIVATE_KEY" > /tmp/ota_private.pem
+          chmod 600 /tmp/ota_private.pem
+          SIGNATURE=$(printf '%s' "$SHA256" | openssl pkeyutl -sign -inkey /tmp/ota_private.pem -rawin 2>/dev/null | base64 -w0)
+          rm -f /tmp/ota_private.pem
+          if [[ -z "$SIGNATURE" ]]; then
+            echo "Ed25519 signing failed — verify OTA_ED25519_PRIVATE_KEY GitHub secret" >&2
+            exit 1
+          fi
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+          echo "signature=$SIGNATURE" >> "$GITHUB_OUTPUT"
+          echo "size_bytes=$SIZE" >> "$GITHUB_OUTPUT"
+
+      - name: Set up OCI CLI
+        uses: oracle-actions/setup-oci-cli@v1.3.1
+        with:
+          user: ${{ secrets.OCI_USER_OCID }}
+          tenancy: ${{ secrets.OCI_TENANCY_OCID }}
+          fingerprint: ${{ secrets.OCI_FINGERPRINT }}
+          private_key: ${{ secrets.OCI_PRIVATE_KEY }}
+          region: ${{ vars.OCI_REGION }}
+
+      - name: Upload firmware binary to OCI Object Storage
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          OBJECT_KEY: ${{ steps.meta.outputs.object_key }}
+          SHA256: ${{ steps.sign.outputs.sha256 }}
+        run: |
+          OCI_NAMESPACE=$(oci os ns get --query 'data' --raw-output)
+          oci os object put \
+            --namespace-name "$OCI_NAMESPACE" \
+            --bucket-name "${{ vars.OCI_BUCKET_NAME }}" \
+            --name "$OBJECT_KEY" \
+            --file build/wifi_ap_project.bin \
+            --content-type application/octet-stream \
+            --metadata "{\"firmware-version\":\"$VERSION\",\"sha256\":\"$SHA256\"}" \
+            --force
+
+      - name: Trigger proofmqtt release webhook (per-device push)
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          OBJECT_KEY: ${{ steps.meta.outputs.object_key }}
+          SHA256: ${{ steps.sign.outputs.sha256 }}
+          SIGNATURE: ${{ steps.sign.outputs.signature }}
+          SIZE_BYTES: ${{ steps.sign.outputs.size_bytes }}
+        run: |
+          curl -sfS -X POST "${{ secrets.SERVER_OTA_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.SERVER_WEBHOOK_SECRET }}" \
+            -d "$(jq -n \
+              --arg version "$VERSION" \
+              --arg object_key "$OBJECT_KEY" \
+              --arg sha256 "$SHA256" \
+              --arg signature "$SIGNATURE" \
+              --argjson size_bytes "$SIZE_BYTES" \
+              --arg released_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              '{version: $version, object_key: $object_key, sha256: $sha256, signature: $signature, size_bytes: $size_bytes, released_at: $released_at, broadcast: true}')"
