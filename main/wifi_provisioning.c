@@ -1507,6 +1507,12 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                 // 208 = WIFI_REASON_INVALID_RSN_IE_CAP
                 // 209 = WIFI_REASON_802_1X_AUTH_FAILED
                 if (event->reason == 15 || (event->reason >= 201 && event->reason <= 209)) {
+                    if (wifi_provisioning_dev_wifi_enabled()) {
+                        ESP_LOGW(TAG, "Auth fail (reason %d) in dev WiFi mode — retrying STA, no AP",
+                                 event->reason);
+                        esp_wifi_connect();
+                        break;
+                    }
                     ESP_LOGE(TAG, "========================================");
                     ESP_LOGE(TAG, "✗ WiFi Authentication Failed!");
                     ESP_LOGE(TAG, "✗ Reason Code: %d", event->reason);
@@ -1805,29 +1811,27 @@ esp_err_t wifi_provisioning_stop(void)
 
 esp_err_t wifi_provisioning_seed_dev_wifi_if_configured(void)
 {
-    if (wifi_provisioning_is_provisioned()) {
-        return ESP_ERR_INVALID_STATE;
-    }
-
-    const char *ssid = CONFIG_DEV_WIFI_SSID;
-    const char *password = CONFIG_DEV_WIFI_PASSWORD;
-    if (ssid == NULL || ssid[0] == '\0') {
+    if (!wifi_provisioning_dev_wifi_enabled()) {
         return ESP_ERR_NOT_FOUND;
     }
+    return wifi_provisioning_dev_wifi_sync_nvs();
+}
 
+bool wifi_provisioning_dev_wifi_enabled(void)
+{
+    return CONFIG_DEV_WIFI_SSID[0] != '\0';
+}
+
+esp_err_t wifi_provisioning_dev_wifi_sync_nvs(void)
+{
 #if CONFIG_USE_EMBEDDED_MTLS_CERTS
     const char *device_id = CONFIG_MTLS_CLIENT_DEVICE_ID;
 #else
     const char *device_id = DEVICE_ID;
 #endif
-    const char *prov_token = "dev-embedded";
-
-    ESP_LOGI(TAG, "Auto-provisioning dev WiFi: SSID=%s device_id=%s", ssid, device_id);
-    esp_err_t err = save_wifi_credentials(ssid, password, device_id, prov_token, NULL);
-    if (err == ESP_OK) {
-        ESP_LOGI(TAG, "Dev WiFi credentials saved to NVS");
-    }
-    return err;
+    ESP_LOGI(TAG, "Dev WiFi: SSID=%s device_id=%s", CONFIG_DEV_WIFI_SSID, device_id);
+    return save_wifi_credentials(CONFIG_DEV_WIFI_SSID, CONFIG_DEV_WIFI_PASSWORD,
+                               device_id, "dev-embedded", NULL);
 }
 
 bool wifi_provisioning_is_provisioned(void)

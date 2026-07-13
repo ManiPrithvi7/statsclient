@@ -10,6 +10,7 @@ extern "C" {
 
 typedef void (*mqtt_cmd_callback_t)(const char *topic, const char *payload, int len);
 typedef void (*mqtt_connected_callback_t)(void);
+typedef void (*mqtt_disconnected_callback_t)(void);
 
 esp_err_t mqtt_handler_start(void);
 
@@ -24,6 +25,10 @@ void mqtt_handler_set_cmd_callback(mqtt_cmd_callback_t cb);
 void mqtt_handler_set_ack_callback(mqtt_cmd_callback_t cb);
 
 void mqtt_handler_set_connected_callback(mqtt_connected_callback_t cb);
+
+void mqtt_handler_set_disconnected_callback(mqtt_disconnected_callback_t cb);
+
+void mqtt_handler_set_screen_callback(mqtt_cmd_callback_t cb);
 
 esp_err_t mqtt_handler_publish(const char *topic, const char *data, int data_len, int qos);
 

@@ -81,6 +81,52 @@ menu "MQTT Configuration"
 
 endmenu
 
+menu "DWIN Display Configuration"
+
+    config ENABLE_DWIN_DISPLAY
+        bool "Enable DWIN DGUS display"
+        default y
+        help
+            When enabled, drive the DWIN display over UART with Google/Instagram screen data.
+
+    config DWIN_UART_NUM
+        int "DWIN UART port number"
+        depends on ENABLE_DWIN_DISPLAY
+        default 2
+        range 0 2
+        help
+            UART port used for DGUS display communication.
+
+    config DWIN_UART_TX_PIN
+        int "DWIN UART TX GPIO"
+        depends on ENABLE_DWIN_DISPLAY
+        default 48
+        help
+            GPIO pin for UART TX to the DWIN display.
+
+    config DWIN_UART_RX_PIN
+        int "DWIN UART RX GPIO"
+        depends on ENABLE_DWIN_DISPLAY
+        default 47
+        help
+            GPIO pin for UART RX from the DWIN display.
+
+    config DWIN_UART_BAUD
+        int "DWIN UART baud rate"
+        depends on ENABLE_DWIN_DISPLAY
+        default 460800
+        help
+            Baud rate for DGUS UART communication.
+
+    config DWIN_CAROUSEL_INTERVAL_MS
+        int "Carousel page toggle interval (ms)"
+        depends on ENABLE_DWIN_DISPLAY
+        default 10000
+        help
+            Time between automatic Google/Instagram page toggles.
+
+endmenu
+
 menu "OTA Configuration"
 
     config FIRMWARE_VERSION

@@ -8,6 +8,7 @@
  * 5. Connect to MQTT broker using mTLS
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "freertos/FreeRTOS.h"
@@ -24,6 +25,7 @@
 #include "internet_verification.h"
 #include "mqtt_handler.h"
 #include "ota_handler.h"
+#include "screen_handler.h"
 #include "device_keys.h"
 #include "prov_token_validate.h"
 
@@ -41,7 +43,22 @@ static int s_mqtt_connect_retries;
 static bool s_mqtt_connected_msg_shown;
 static bool s_ota_started;
 static int s_wifi_connect_wait_seconds;
+static bool s_wifi_auth_failed;
 static const int WIFI_CONNECT_TIMEOUT_SECONDS = 50;
+
+/** ponytail: 44 = 11 dBm; lowers USB brownout risk during WiFi assoc */
+#define WIFI_STA_TX_POWER_QUARTER_DBM 44
+
+static void on_mqtt_connected(void)
+{
+    ota_handler_on_mqtt_connected();
+    screen_handler_start();
+}
+
+static void on_mqtt_disconnected(void)
+{
+    screen_handler_stop();
+}
 
 static void main_reset_cycle_for_reprovision(void)
 {
@@ -56,6 +73,76 @@ static void main_reset_cycle_for_reprovision(void)
     s_mqtt_connected_msg_shown = false;
     s_ota_started = false;
     s_wifi_connect_wait_seconds = 0;
+    s_wifi_auth_failed = false;
+}
+
+static bool wifi_sta_is_auth_failure(int reason)
+{
+    return reason == WIFI_REASON_AUTH_FAIL ||
+           (reason >= WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT &&
+            reason <= WIFI_REASON_802_1X_AUTH_FAILED);
+}
+
+static const char *wifi_authmode_name(wifi_auth_mode_t mode)
+{
+    switch (mode) {
+    case WIFI_AUTH_OPEN: return "OPEN";
+    case WIFI_AUTH_WEP: return "WEP";
+    case WIFI_AUTH_WPA_PSK: return "WPA_PSK";
+    case WIFI_AUTH_WPA2_PSK: return "WPA2_PSK";
+    case WIFI_AUTH_WPA_WPA2_PSK: return "WPA_WPA2_PSK";
+    case WIFI_AUTH_WPA2_ENTERPRISE: return "WPA2_ENTERPRISE";
+    case WIFI_AUTH_WPA3_PSK: return "WPA3_PSK";
+    case WIFI_AUTH_WPA2_WPA3_PSK: return "WPA2_WPA3_PSK";
+    default: return "?";
+    }
+}
+
+static void wifi_sta_log_target_ap(const char *ssid)
+{
+    if (ssid == NULL || ssid[0] == '\0') {
+        return;
+    }
+
+    wifi_scan_config_t scan_cfg = {
+        .ssid = (uint8_t *)ssid,
+        .show_hidden = true,
+    };
+    if (esp_wifi_scan_start(&scan_cfg, true) != ESP_OK) {
+        ESP_LOGW(TAG, "Pre-connect scan failed");
+        return;
+    }
+
+    uint16_t ap_count = 0;
+    esp_wifi_scan_get_ap_num(&ap_count);
+    if (ap_count == 0) {
+        ESP_LOGW(TAG, "Scan: '%s' not found (enable 2.4 GHz hotspot)", ssid);
+        return;
+    }
+
+    wifi_ap_record_t *aps = calloc(ap_count, sizeof(wifi_ap_record_t));
+    if (aps == NULL) {
+        return;
+    }
+    esp_wifi_scan_get_ap_records(&ap_count, aps);
+    for (uint16_t i = 0; i < ap_count; i++) {
+        ESP_LOGI(TAG, "Scan: '%s' rssi=%d ch=%u auth=%d (%s)",
+                 (char *)aps[i].ssid, aps[i].rssi, aps[i].primary,
+                 aps[i].authmode, wifi_authmode_name(aps[i].authmode));
+    }
+    free(aps);
+}
+
+static void wifi_sta_fill_config(wifi_config_t *cfg, const char *ssid, const char *password)
+{
+    memset(cfg, 0, sizeof(*cfg));
+    strncpy((char *)cfg->sta.ssid, ssid, sizeof(cfg->sta.ssid) - 1);
+    strncpy((char *)cfg->sta.password, password, sizeof(cfg->sta.password) - 1);
+    cfg->sta.threshold.authmode = WIFI_AUTH_OPEN;
+    cfg->sta.pmf_cfg.capable = true;
+    cfg->sta.pmf_cfg.required = false;
+    cfg->sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
+    cfg->sta.sae_pwe_h2e = WPA3_SAE_PWE_BOTH;
 }
 
 static void ota_verify_task(void *arg)
@@ -212,12 +299,25 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
         ESP_LOGI(TAG, "WiFi STA connected");
         s_wifi_connect_wait_seconds = 0;
+        s_wifi_auth_failed = false;
         s_app_state = APP_STATE_WIFI_CONNECTED;
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         s_wifi_connect_wait_seconds = 0;
+        s_wifi_auth_failed = false;
         s_app_state = APP_STATE_WIFI_CONNECTED;
+    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+        wifi_event_sta_disconnected_t *event = (wifi_event_sta_disconnected_t *)event_data;
+        ESP_LOGW(TAG, "WiFi STA disconnected, reason=%d", event->reason);
+        if (wifi_provisioning_dev_wifi_enabled()) {
+            if (wifi_sta_is_auth_failure(event->reason)) {
+                s_wifi_auth_failed = true;
+                ESP_LOGE(TAG, "WiFi auth failed — verify CONFIG_DEV_WIFI_PASSWORD and hotspot WPA2/2.4GHz");
+            }
+            s_wifi_connect_wait_seconds = 0;
+            esp_wifi_connect();
+        }
     }
 }
 
@@ -250,13 +350,13 @@ static void app_state_machine_task(void *pvParameters)
 
         case APP_STATE_CHECK_PROVISIONING:
             ESP_LOGI(TAG, "State: CHECK_PROVISIONING");
-            if (wifi_provisioning_is_provisioned()) {
-                ESP_LOGI(TAG, "Device is provisioned, connecting to WiFi...");
-                s_app_state = APP_STATE_WIFI_CONNECTING;
-            } else {
-                esp_err_t seed = wifi_provisioning_seed_dev_wifi_if_configured();
-                if (seed == ESP_OK) {
-                    ESP_LOGI(TAG, "Dev WiFi auto-provisioned; connecting to WiFi...");
+            {
+                if (wifi_provisioning_dev_wifi_enabled()) {
+                    (void)wifi_provisioning_dev_wifi_sync_nvs();
+                    ESP_LOGI(TAG, "Dev WiFi: sdkconfig STA-only (no AP)");
+                    s_app_state = APP_STATE_WIFI_CONNECTING;
+                } else if (wifi_provisioning_is_provisioned()) {
+                    ESP_LOGI(TAG, "Device is provisioned, connecting to WiFi...");
                     s_app_state = APP_STATE_WIFI_CONNECTING;
                 } else {
                     ESP_LOGI(TAG, "Device not provisioned, starting AP mode...");
@@ -327,61 +427,73 @@ static void app_state_machine_task(void *pvParameters)
                         ESP_LOGI(TAG, "✅ STEP: WiFi driver initialized for STA");
                     }
 
-                    // Read WiFi credentials from NVS and connect
-                    nvs_handle_t nvs_handle;
-                    if (nvs_open("device_config", NVS_READONLY, &nvs_handle) == ESP_OK) {
-                        char ssid[33] = {0};
-                        char password[65] = {0};
-                        size_t required_size;
+                    // Load credentials: dev mode uses sdkconfig directly (not stale NVS).
+                    char ssid[33] = {0};
+                    char password[65] = {0};
+                    bool have_creds = false;
 
-                        required_size = sizeof(ssid);
-                        if (nvs_get_str(nvs_handle, "wifi_ssid", ssid, &required_size) == ESP_OK) {
-                            required_size = sizeof(password);
-                            nvs_get_str(nvs_handle, "wifi_pass", password, &required_size);
-
-                            // Trim accidental spaces copied from UI or paste.
-                            trim_spaces_in_place(ssid);
-                            trim_spaces_in_place(password);
-
-                            wifi_config_t wifi_config = {0};
-                            strncpy((char*)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
-                            strncpy((char*)wifi_config.sta.password, password, sizeof(wifi_config.sta.password) - 1);
-
-                            ESP_LOGI(TAG, "Connecting to WiFi: %s", ssid);
-                            ESP_LOGI(TAG, "✅ STEP: WiFi credentials loaded; attempting STA connection");
-
-                            esp_err_t err = esp_wifi_set_mode(WIFI_MODE_STA);
-                            if (err != ESP_OK) {
-                                ESP_LOGE(TAG, "esp_wifi_set_mode failed: %s", esp_err_to_name(err));
-                                vTaskDelay(pdMS_TO_TICKS(2000));
-                                nvs_close(nvs_handle);
-                                break;
+                    if (wifi_provisioning_dev_wifi_enabled()) {
+                        strncpy(ssid, CONFIG_DEV_WIFI_SSID, sizeof(ssid) - 1);
+                        strncpy(password, CONFIG_DEV_WIFI_PASSWORD, sizeof(password) - 1);
+                        have_creds = ssid[0] != '\0';
+                    } else {
+                        nvs_handle_t nvs_handle;
+                        if (nvs_open("device_config", NVS_READONLY, &nvs_handle) == ESP_OK) {
+                            size_t required_size = sizeof(ssid);
+                            if (nvs_get_str(nvs_handle, "wifi_ssid", ssid, &required_size) == ESP_OK) {
+                                required_size = sizeof(password);
+                                nvs_get_str(nvs_handle, "wifi_pass", password, &required_size);
+                                have_creds = true;
                             }
-                            err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-                            if (err != ESP_OK) {
-                                ESP_LOGE(TAG, "esp_wifi_set_config failed: %s", esp_err_to_name(err));
-                                vTaskDelay(pdMS_TO_TICKS(2000));
-                                nvs_close(nvs_handle);
-                                break;
-                            }
-                            err = esp_wifi_start();
-                            if (err != ESP_OK) {
-                                ESP_LOGE(TAG, "esp_wifi_start failed: %s", esp_err_to_name(err));
-                                vTaskDelay(pdMS_TO_TICKS(2000));
-                                nvs_close(nvs_handle);
-                                break;
-                            }
-                            err = esp_wifi_connect();
-                            if (err != ESP_OK) {
-                                ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
-                                vTaskDelay(pdMS_TO_TICKS(2000));
-                                nvs_close(nvs_handle);
-                                break;
-                            }
-
-                            s_wifi_connection_attempted = true;
+                            nvs_close(nvs_handle);
                         }
-                        nvs_close(nvs_handle);
+                    }
+
+                    if (have_creds) {
+                        trim_spaces_in_place(ssid);
+                        trim_spaces_in_place(password);
+
+                        wifi_config_t wifi_config;
+                        wifi_sta_fill_config(&wifi_config, ssid, password);
+
+                        ESP_LOGI(TAG, "Connecting to WiFi: %s", ssid);
+                        ESP_LOGI(TAG, "✅ STEP: WiFi credentials loaded; attempting STA connection");
+
+                        esp_err_t err = esp_wifi_set_mode(WIFI_MODE_STA);
+                        if (err != ESP_OK) {
+                            ESP_LOGE(TAG, "esp_wifi_set_mode failed: %s", esp_err_to_name(err));
+                            vTaskDelay(pdMS_TO_TICKS(2000));
+                            break;
+                        }
+                        err = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
+                        if (err != ESP_OK) {
+                            ESP_LOGE(TAG, "esp_wifi_set_config failed: %s", esp_err_to_name(err));
+                            vTaskDelay(pdMS_TO_TICKS(2000));
+                            break;
+                        }
+                        err = esp_wifi_start();
+                        if (err != ESP_OK) {
+                            ESP_LOGE(TAG, "esp_wifi_start failed: %s", esp_err_to_name(err));
+                            vTaskDelay(pdMS_TO_TICKS(2000));
+                            break;
+                        }
+                        (void)esp_wifi_set_max_tx_power(WIFI_STA_TX_POWER_QUARTER_DBM);
+                        wifi_sta_log_target_ap(ssid);
+                        err = esp_wifi_connect();
+                        if (err != ESP_OK) {
+                            ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
+                            vTaskDelay(pdMS_TO_TICKS(2000));
+                            break;
+                        }
+
+                        s_wifi_connection_attempted = true;
+                    } else {
+                        ESP_LOGE(TAG, "No WiFi credentials available");
+                        if (wifi_provisioning_dev_wifi_enabled()) {
+                            vTaskDelay(pdMS_TO_TICKS(5000));
+                        } else {
+                            s_app_state = APP_STATE_AP_MODE;
+                        }
                     }
                 } else {
                     s_wifi_connect_wait_seconds++;
@@ -395,15 +507,25 @@ static void app_state_machine_task(void *pvParameters)
                         }
                     }
                     if (s_wifi_connect_wait_seconds >= WIFI_CONNECT_TIMEOUT_SECONDS) {
-                        ESP_LOGW(TAG, "WiFi connect timeout (%d s). Restarting AP provisioning for new credentials.",
-                                 WIFI_CONNECT_TIMEOUT_SECONDS);
-                        main_reset_cycle_for_reprovision();
-                        esp_err_t prov_ret = wifi_provisioning_clear_and_restart();
-                        if (prov_ret != ESP_OK) {
-                            ESP_LOGE(TAG, "Failed to restart provisioning AP: %s", esp_err_to_name(prov_ret));
-                            s_app_state = APP_STATE_ERROR;
+                        if (wifi_provisioning_dev_wifi_enabled()) {
+                            ESP_LOGW(TAG, "WiFi connect timeout (%d s) — dev mode, retrying STA",
+                                     WIFI_CONNECT_TIMEOUT_SECONDS);
+                            s_wifi_connection_attempted = false;
+                            s_wifi_connect_wait_seconds = 0;
+                            esp_wifi_disconnect();
+                            esp_wifi_stop();
+                            vTaskDelay(pdMS_TO_TICKS(1000));
                         } else {
-                            s_app_state = APP_STATE_AP_MODE;
+                            ESP_LOGW(TAG, "WiFi connect timeout (%d s). Restarting AP provisioning for new credentials.",
+                                     WIFI_CONNECT_TIMEOUT_SECONDS);
+                            main_reset_cycle_for_reprovision();
+                            esp_err_t prov_ret = wifi_provisioning_clear_and_restart();
+                            if (prov_ret != ESP_OK) {
+                                ESP_LOGE(TAG, "Failed to restart provisioning AP: %s", esp_err_to_name(prov_ret));
+                                s_app_state = APP_STATE_ERROR;
+                            } else {
+                                s_app_state = APP_STATE_AP_MODE;
+                            }
                         }
                         break;
                     }
@@ -422,7 +544,7 @@ static void app_state_machine_task(void *pvParameters)
                 const int MAX_VERIFICATION_RETRIES = 2; // Try 2 times before giving up
 
                 // Reset verification state if we're not provisioned (means we returned to AP mode)
-                if (!wifi_provisioning_is_provisioned()) {
+                if (!wifi_provisioning_is_provisioned() && !wifi_provisioning_dev_wifi_enabled()) {
                     ESP_LOGW(TAG, "Device not provisioned, resetting to AP mode");
                     main_reset_cycle_for_reprovision();
                     s_app_state = APP_STATE_AP_MODE;
@@ -650,7 +772,10 @@ static void app_state_machine_task(void *pvParameters)
                     mqtt_handler_set_device_id(device_id);
                     mqtt_handler_set_cmd_callback(ota_handler_on_mqtt_cmd);
                     mqtt_handler_set_ack_callback(ota_handler_on_mqtt_ack);
-                    mqtt_handler_set_connected_callback(ota_handler_on_mqtt_connected);
+                    mqtt_handler_set_connected_callback(on_mqtt_connected);
+                    mqtt_handler_set_disconnected_callback(on_mqtt_disconnected);
+                    mqtt_handler_set_screen_callback(screen_handler_on_mqtt);
+                    (void)screen_handler_init();
                     (void)ota_handler_init(device_id);
                     (void)ota_handler_start();
                     s_ota_started = true;
@@ -801,6 +926,17 @@ void app_main(void)
                                                         NULL,
                                                         NULL));
     ESP_LOGI(TAG, "Event handlers registered");
+
+#if CONFIG_ENABLE_DWIN_DISPLAY
+    {
+        esp_err_t screen_err = screen_handler_init();
+        if (screen_err == ESP_OK) {
+            ESP_LOGI(TAG, "DWIN UART initialized at boot");
+        } else {
+            ESP_LOGW(TAG, "DWIN init at boot failed: %s", esp_err_to_name(screen_err));
+        }
+    }
+#endif
 
     // Start state machine task
     xTaskCreate(app_state_machine_task, "app_state_machine", 8192, NULL, 5, NULL);

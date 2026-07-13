@@ -43,10 +43,7 @@ $<TARGET_FILE:__idf_esp_hal_wdt>
 $<TARGET_FILE:idf::vfs>
 $<TARGET_FILE:__idf_esp_driver_usb_serial_jtag>
 $<TARGET_FILE:__idf_esp_hal_i2c>
-$<TARGET_FILE:__idf_esp_hal_i2s>
 $<TARGET_FILE:__idf_esp_hal_lcd>
-$<TARGET_FILE:__idf_esp_hal_mcpwm>
-$<TARGET_FILE:__idf_esp_hal_pcnt>
 $<TARGET_FILE:__idf_esp_gdbstub>
 $<TARGET_FILE:__idf_esp_adc>
 $<TARGET_FILE:__idf_esp_driver_i2s>
@@ -73,7 +70,6 @@ $<TARGET_FILE:esp_wifi_smartconfig>
 $<TARGET_FILE:esp_wifi_wapi>
 $<TARGET_FILE:__idf_esp_https_ota>
 $<TARGET_FILE:__idf_esp_hal_dma>
-$<TARGET_FILE:__idf_esp_hal_usb>
 $<TARGET_FILE:__idf_pthread>
 $<TARGET_FILE:idf::esp_stdio>
 $<TARGET_FILE:idf::esp_hal_mspi>
@@ -89,10 +85,7 @@ $<TARGET_FILE:idf::esp_hal_wdt>
 $<TARGET_FILE:idf::bootloader_support>
 $<TARGET_FILE:idf::spi_flash>
 $<TARGET_FILE:idf::esp_hal_i2c>
-$<TARGET_FILE:idf::esp_hal_i2s>
 $<TARGET_FILE:idf::esp_hal_lcd>
-$<TARGET_FILE:idf::esp_hal_mcpwm>
-$<TARGET_FILE:idf::esp_hal_pcnt>
 $<TARGET_FILE:idf::esp_system>
 $<TARGET_FILE:idf::esp_common>
 $<TARGET_FILE:idf::esp_rom>
@@ -101,7 +94,6 @@ $<TARGET_FILE:idf::log>
 $<TARGET_FILE:idf::heap>
 $<TARGET_FILE:idf::soc>
 $<TARGET_FILE:idf::esp_hal_dma>
-$<TARGET_FILE:idf::esp_hal_usb>
 $<TARGET_FILE:idf::esp_hw_support>
 $<TARGET_FILE:idf::freertos>
 $<TARGET_FILE:idf::esp_libc>

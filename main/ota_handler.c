@@ -110,6 +110,7 @@ typedef struct {
     bool header_ok;
     bool wrote_bytes;
     size_t total_written;
+    uint8_t last_logged_pct;
 } ota_download_ctx_t;
 
 static bool ota_header_gate_cb(const char *name, const char *value, void *ctx)
@@ -120,13 +121,19 @@ static bool ota_header_gate_cb(const char *name, const char *value, void *ctx)
     }
 
     if (strcasecmp(name, "X-Firmware-Version") == 0 ||
-        strcasecmp(name, "x-amz-meta-firmware-version") == 0) {
+        strcasecmp(name, "x-amz-meta-firmware-version") == 0 ||
+        strcasecmp(name, "opc-meta-firmware-version") == 0) {
         if (strcmp(value, dctx->manifest->version) != 0) {
             ESP_LOGE(TAG, "Header version mismatch: got '%s', expected '%s'", value, dctx->manifest->version);
             dctx->header_ok = false;
             return false;
         }
         dctx->header_ok = true;
+        ESP_LOGI(TAG, "[OTA 5/10] Header OK: %s=%s", name, value);
+    } else if (strcasecmp(name, "opc-meta-sha256") == 0 && dctx->manifest->sha256[0] != '\0') {
+        if (strcasecmp(value, dctx->manifest->sha256) != 0) {
+            ESP_LOGW(TAG, "opc-meta-sha256 mismatch: got '%s', expected '%s'", value, dctx->manifest->sha256);
+        }
     }
     return true;
 }
@@ -152,6 +159,25 @@ static esp_err_t ota_body_chunk_cb(const uint8_t *data, size_t len, void *ctx)
         return err;
     }
     dctx->total_written += len;
+
+    if (dctx->manifest != NULL && dctx->manifest->size_bytes > 0) {
+        uint32_t total = dctx->manifest->size_bytes;
+        uint8_t pct = (uint8_t)((dctx->total_written * 100) / total);
+        if (pct >= 100) {
+            pct = 100;
+        }
+        uint8_t milestone = (pct / 25) * 25;
+        if (milestone > 0 && milestone > dctx->last_logged_pct) {
+            dctx->last_logged_pct = milestone;
+            ESP_LOGI(TAG, "[OTA 6/10] Downloaded %u / %u bytes (%u%%)",
+                     (unsigned)dctx->total_written, total, milestone);
+        } else if (pct == 100 && dctx->last_logged_pct < 100) {
+            dctx->last_logged_pct = 100;
+            ESP_LOGI(TAG, "[OTA 6/10] Downloaded %u / %u bytes (100%%)",
+                     (unsigned)dctx->total_written, total);
+        }
+    }
+
     return ESP_OK;
 }
 
@@ -168,6 +194,9 @@ static esp_err_t ota_handler_apply_update(const ota_manifest_t *manifest)
         ESP_LOGE(TAG, "No OTA update partition");
         return ESP_ERR_NOT_FOUND;
     }
+
+    ESP_LOGI(TAG, "[OTA 3/10] Target partition=%s size=%u",
+             update_part->label, (unsigned)update_part->size);
 
     esp_ota_handle_t ota_handle = 0;
     esp_err_t err = esp_ota_begin(update_part, OTA_SIZE_UNKNOWN, &ota_handle);
@@ -189,6 +218,8 @@ static esp_err_t ota_handler_apply_update(const ota_manifest_t *manifest)
         .part = update_part,
         .header_ok = false,
     };
+
+    ESP_LOGI(TAG, "[OTA 4/10] HTTP GET %s", manifest->download_url);
 
     int status = 0;
     err = http_download_stream(manifest->download_url, ota_header_gate_cb, ota_body_chunk_cb, &dctx, &status);
@@ -227,6 +258,8 @@ static esp_err_t ota_handler_apply_update(const ota_manifest_t *manifest)
         return ESP_ERR_INVALID_CRC;
     }
 
+    ESP_LOGI(TAG, "[OTA 7/10] SHA-256 match OK");
+
     err = ota_signing_verify(manifest->sha256, manifest->signature);
     if (err != ESP_OK) {
         esp_ota_abort(ota_handle);
@@ -239,12 +272,15 @@ static esp_err_t ota_handler_apply_update(const ota_manifest_t *manifest)
         return err;
     }
 
+    ESP_LOGI(TAG, "[OTA 8/10] Flash complete, setting boot partition=%s", update_part->label);
+
     err = esp_ota_set_boot_partition(update_part);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed: %s", esp_err_to_name(err));
         return err;
     }
 
+    ESP_LOGI(TAG, "[OTA 9/10] Rebooting for pending-verify...");
     ESP_LOGI(TAG, "OTA install complete (%u bytes), rebooting...", (unsigned)dctx.total_written);
     mqtt_handler_clear_retained_cmd();
     esp_restart();
@@ -294,6 +330,11 @@ static bool version_already_running(const char *version)
     if (version == NULL || version[0] == '\0') {
         return false;
     }
+#ifdef CONFIG_FIRMWARE_VERSION
+    if (strcmp(CONFIG_FIRMWARE_VERSION, version) == 0) {
+        return true;
+    }
+#endif
     const esp_app_desc_t *app = esp_app_get_description();
     return app != NULL && strcmp(app->version, version) == 0;
 }
@@ -321,7 +362,7 @@ static void queue_ota_update(const ota_manifest_t *manifest, bool force)
     s_inflight_version[sizeof(s_inflight_version) - 1] = '\0';
     s_pending_manifest = *manifest;
     xEventGroupSetBits(s_ota_events, OTA_WORK_UPDATE);
-    ESP_LOGI(TAG, "Queued ota_update version=%s force=%d", manifest->version, force ? 1 : 0);
+    ESP_LOGI(TAG, "[OTA 2/10] Queued ota_update version=%s force=%d", manifest->version, force ? 1 : 0);
 }
 
 esp_err_t ota_handler_init(const char *device_id)
@@ -412,6 +453,7 @@ void ota_handler_on_mqtt_cmd(const char *topic, const char *payload, int len)
     if (strcmp(cmd->valuestring, "ota_check") == 0) {
         ESP_LOGI(TAG, "Ignoring deprecated ota_check — server pushes ota_update");
     } else if (strcmp(cmd->valuestring, "ota_update") == 0) {
+        ESP_LOGI(TAG, "[OTA 1/10] MQTT cmd received on %s", topic ? topic : "?");
         ota_manifest_t manifest = {0};
         if (parse_manifest_from_json(root, &manifest) == ESP_OK) {
             queue_ota_update(&manifest, force);
@@ -517,7 +559,7 @@ void ota_handler_notify_wifi_mqtt_ready(void)
         publish_status_json(obj);
         cJSON_Delete(obj);
     }
-    ESP_LOGI(TAG, "OTA pending verify succeeded for version %s", s_pending_version);
+    ESP_LOGI(TAG, "[OTA 10/10] Pending verify succeeded for version %s", s_pending_version);
 }
 
 esp_err_t ota_handler_run_pending_verify(void)

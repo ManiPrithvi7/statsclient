@@ -1,13 +1,13 @@
 # Target labels
  bootloader
 # Source files and their labels
-/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader
-/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader.rule
-/home/statsnapp/Desktop/statsclient/build/CMakeFiles/bootloader-complete.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
-/home/statsnapp/Desktop/statsclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
+/home/maniprithvi/Desktop/mqttclient/build/CMakeFiles/bootloader
+/home/maniprithvi/Desktop/mqttclient/build/CMakeFiles/bootloader.rule
+/home/maniprithvi/Desktop/mqttclient/build/CMakeFiles/bootloader-complete.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/maniprithvi/Desktop/mqttclient/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

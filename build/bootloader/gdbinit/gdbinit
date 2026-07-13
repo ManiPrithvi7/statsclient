@@ -1,2 +1,2 @@
-source /home/statsnapp/Desktop/statsclient/build/bootloader/gdbinit/symbols
-source /home/statsnapp/Desktop/statsclient/build/bootloader/gdbinit/connect
+source /home/maniprithvi/Desktop/mqttclient/build/bootloader/gdbinit/symbols
+source /home/maniprithvi/Desktop/mqttclient/build/bootloader/gdbinit/connect

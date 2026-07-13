@@ -39,8 +39,10 @@ esp_err_t wifi_provisioning_stop(void);
  * @brief Save dev WiFi credentials to NVS when unprovisioned (E2E / lab testing)
  *
  * Uses CONFIG_DEV_WIFI_SSID / CONFIG_DEV_WIFI_PASSWORD and CONFIG_MTLS_CLIENT_DEVICE_ID.
- * No-op if DEV_WIFI_SSID is empty or device is already provisioned.
+ * When DEV_WIFI_SSID is set, always writes NVS and bypasses AP provisioning (dev/E2E).
  */
+bool wifi_provisioning_dev_wifi_enabled(void);
+esp_err_t wifi_provisioning_dev_wifi_sync_nvs(void);
 esp_err_t wifi_provisioning_seed_dev_wifi_if_configured(void);
 
 /**

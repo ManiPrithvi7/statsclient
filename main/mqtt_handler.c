@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include "mqtt_handler.h"
 #include "certificate_manager.h"
 #include "esp_log.h"
@@ -18,8 +19,10 @@ static const char *TAG = "mqtt_handler";
 
 #define MQTT_BROKER_URI CONFIG_MQTT_BROKER_URI
 #define CERT_BUFFER_SIZE 4096
+#define MQTT_RX_BUF_SIZE 4096
 #define TOPIC_BUF_SIZE 160
 #define DEVICE_ID_BUF_SIZE 64
+#define LWT_MSG_BUF_SIZE 192
 
 static esp_mqtt_client_handle_t s_mqtt_client = NULL;
 static bool s_mqtt_connected = false;
@@ -31,10 +34,20 @@ static char s_ack_topic[TOPIC_BUF_SIZE] = {0};
 static char s_status_topic[TOPIC_BUF_SIZE] = {0};
 static char s_broadcast_cmd_topic[TOPIC_BUF_SIZE] = {0};
 static char s_device_wildcard_topic[TOPIC_BUF_SIZE] = {0};
+static char s_lwt_topic[TOPIC_BUF_SIZE] = {0};
+static char s_lwt_msg[LWT_MSG_BUF_SIZE] = {0};
 
 static mqtt_cmd_callback_t s_cmd_callback;
 static mqtt_cmd_callback_t s_ack_callback;
+static mqtt_cmd_callback_t s_screen_callback;
 static mqtt_connected_callback_t s_connected_callback;
+static mqtt_disconnected_callback_t s_disconnected_callback;
+
+static char s_rx_topic[TOPIC_BUF_SIZE];
+static char s_rx_buf[MQTT_RX_BUF_SIZE];
+static int s_rx_msg_id = -1;
+static int s_rx_total_len = 0;
+static int s_rx_received_len = 0;
 
 static esp_err_t load_device_id_from_nvs(char *device_id, size_t len)
 {
@@ -59,6 +72,23 @@ static void mqtt_build_topics(void)
     snprintf(s_status_topic, sizeof(s_status_topic), "%s/%s/status", CONFIG_MQTT_TOPIC_ROOT, s_device_id);
     snprintf(s_broadcast_cmd_topic, sizeof(s_broadcast_cmd_topic), "%s/broadcast/cmd", CONFIG_MQTT_TOPIC_ROOT);
     snprintf(s_device_wildcard_topic, sizeof(s_device_wildcard_topic), "%s/%s/#", CONFIG_MQTT_TOPIC_ROOT, s_device_id);
+    snprintf(s_lwt_topic, sizeof(s_lwt_topic), "%s/%s/lwt", CONFIG_MQTT_TOPIC_ROOT, s_device_id);
+}
+
+/** Match Node mqttClient.js will payload at CONNECT time. */
+static void mqtt_build_lwt_message(void)
+{
+    char ts[32] = "";
+    time_t now = time(NULL);
+    if (now > 1577836800) {
+        struct tm tm_utc;
+        gmtime_r(&now, &tm_utc);
+        strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%S.000Z", &tm_utc);
+    }
+
+    snprintf(s_lwt_msg, sizeof(s_lwt_msg),
+             "{\"type\":\"un_registration\",\"clientId\":\"%s\",\"timestamp\":\"%s\"}",
+             s_device_id, ts);
 }
 
 static esp_err_t mqtt_subscribe_topic_qos(const char *topic, int qos)
@@ -153,6 +183,127 @@ static bool topic_is_ack_channel(const char *topic)
     return len >= 4 && strcmp(topic + len - 4, "/ack") == 0;
 }
 
+static const char *topic_last_segment(const char *topic)
+{
+    if (topic == NULL) {
+        return "";
+    }
+    const char *slash = strrchr(topic, '/');
+    return slash ? slash + 1 : topic;
+}
+
+static bool topic_is_screen_channel(const char *topic)
+{
+    if (topic == NULL || s_device_id[0] == '\0') {
+        return false;
+    }
+
+    char prefix[TOPIC_BUF_SIZE];
+    snprintf(prefix, sizeof(prefix), "%s/%s/", CONFIG_MQTT_TOPIC_ROOT, s_device_id);
+    if (strncmp(topic, prefix, strlen(prefix)) != 0) {
+        return false;
+    }
+
+    if (topic_is_cmd_channel(topic) || topic_is_ack_channel(topic)) {
+        return false;
+    }
+
+    size_t len = strlen(topic);
+    if (len >= 7 && strcmp(topic + len - 7, "/status") == 0) {
+        return false;
+    }
+    if (len >= 7 && strcmp(topic + len - 7, "/active") == 0) {
+        return false;
+    }
+
+    const char *leaf = topic_last_segment(topic);
+    return strcmp(leaf, "test-gmb") == 0 ||
+           strcmp(leaf, "gmb") == 0 ||
+           strcmp(leaf, "instagram") == 0;
+}
+
+static void mqtt_rx_reset(void)
+{
+    s_rx_msg_id = -1;
+    s_rx_total_len = 0;
+    s_rx_received_len = 0;
+    s_rx_topic[0] = '\0';
+}
+
+static void mqtt_dispatch_message(const char *topic, const char *payload, int len)
+{
+    if (topic == NULL || payload == NULL || len <= 0) {
+        return;
+    }
+
+    if (s_cmd_callback != NULL && topic_is_cmd_channel(topic)) {
+        s_cmd_callback(topic, payload, len);
+    } else if (s_ack_callback != NULL && topic_is_ack_channel(topic)) {
+        s_ack_callback(topic, payload, len);
+    } else if (s_screen_callback != NULL && topic_is_screen_channel(topic)) {
+        s_screen_callback(topic, payload, len);
+    }
+}
+
+static void mqtt_handle_data_event(esp_mqtt_event_handle_t event)
+{
+    if (event == NULL || event->data_len <= 0) {
+        return;
+    }
+
+    if (event->total_data_len <= 0 ||
+        event->current_data_offset < 0 ||
+        event->current_data_offset + event->data_len > event->total_data_len) {
+        ESP_LOGW(TAG, "invalid MQTT data event: total=%d offset=%d len=%d",
+                 event->total_data_len, event->current_data_offset, event->data_len);
+        mqtt_rx_reset();
+        return;
+    }
+
+    if (event->total_data_len > MQTT_RX_BUF_SIZE) {
+        ESP_LOGW(TAG, "MQTT payload too large (%d > %d), dropping", event->total_data_len, MQTT_RX_BUF_SIZE);
+        mqtt_rx_reset();
+        return;
+    }
+
+    if (event->current_data_offset == 0) {
+        mqtt_rx_reset();
+        s_rx_msg_id = event->msg_id;
+        s_rx_total_len = event->total_data_len;
+        if (event->topic != NULL && event->topic_len > 0) {
+            int tlen = event->topic_len;
+            if (tlen >= (int)sizeof(s_rx_topic)) {
+                tlen = (int)sizeof(s_rx_topic) - 1;
+            }
+            memcpy(s_rx_topic, event->topic, tlen);
+            s_rx_topic[tlen] = '\0';
+        }
+    } else if (s_rx_msg_id != event->msg_id || s_rx_total_len != event->total_data_len) {
+        ESP_LOGW(TAG, "MQTT chunk mismatch (msg_id/total), resetting reassembly");
+        mqtt_rx_reset();
+        return;
+    }
+
+    memcpy(s_rx_buf + event->current_data_offset, event->data, event->data_len);
+    s_rx_received_len = event->current_data_offset + event->data_len;
+
+    if (s_rx_received_len < s_rx_total_len) {
+        ESP_LOGD(TAG, "MQTT chunk topic=%s received=%d/%d", s_rx_topic, s_rx_received_len, s_rx_total_len);
+        return;
+    }
+
+    if (s_rx_total_len >= MQTT_RX_BUF_SIZE) {
+        ESP_LOGW(TAG, "MQTT payload too large to null-terminate (%d), dropping", s_rx_total_len);
+        mqtt_rx_reset();
+        return;
+    }
+    s_rx_buf[s_rx_total_len] = '\0';
+
+    ESP_LOGI(TAG, "message topic=%s len=%d", s_rx_topic, s_rx_total_len);
+    mqtt_dispatch_message(s_rx_topic, s_rx_buf, s_rx_total_len);
+    mqtt_rx_reset();
+}
+
 static void mqtt_publish_active(void)
 {
     cJSON *obj = cJSON_CreateObject();
@@ -194,30 +345,19 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base,
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGW(TAG, "MQTT_EVENT_DISCONNECTED");
         s_mqtt_connected = false;
+        mqtt_rx_reset();
+        if (s_disconnected_callback != NULL) {
+            s_disconnected_callback();
+        }
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
         break;
 
-    case MQTT_EVENT_DATA: {
-        char topic[TOPIC_BUF_SIZE];
-        int tlen = event->topic_len;
-        if (tlen >= (int)sizeof(topic)) {
-            tlen = (int)sizeof(topic) - 1;
-        }
-        memcpy(topic, event->topic, tlen);
-        topic[tlen] = '\0';
-
-        ESP_LOGI(TAG, "message topic=%s len=%d", topic, event->data_len);
-
-        if (s_cmd_callback != NULL && topic_is_cmd_channel(topic)) {
-            s_cmd_callback(topic, event->data, event->data_len);
-        } else if (s_ack_callback != NULL && topic_is_ack_channel(topic)) {
-            s_ack_callback(topic, event->data, event->data_len);
-        }
+    case MQTT_EVENT_DATA:
+        mqtt_handle_data_event(event);
         break;
-    }
 
     case MQTT_EVENT_ERROR:
         ESP_LOGE(TAG, "MQTT_EVENT_ERROR");
@@ -254,6 +394,16 @@ void mqtt_handler_set_ack_callback(mqtt_cmd_callback_t cb)
 void mqtt_handler_set_connected_callback(mqtt_connected_callback_t cb)
 {
     s_connected_callback = cb;
+}
+
+void mqtt_handler_set_disconnected_callback(mqtt_disconnected_callback_t cb)
+{
+    s_disconnected_callback = cb;
+}
+
+void mqtt_handler_set_screen_callback(mqtt_cmd_callback_t cb)
+{
+    s_screen_callback = cb;
 }
 
 esp_err_t mqtt_handler_start(void)
@@ -296,6 +446,8 @@ esp_err_t mqtt_handler_start(void)
         return ESP_ERR_NOT_FOUND;
     }
 
+    mqtt_build_lwt_message();
+
     esp_mqtt_client_config_t mqtt_cfg = {
         .broker = {
             .address = {
@@ -315,14 +467,28 @@ esp_err_t mqtt_handler_start(void)
         .session = {
             .keepalive = 120,
             .disable_clean_session = true,
+            .last_will = {
+                .topic = s_lwt_topic,
+                .msg = s_lwt_msg,
+                .msg_len = (int)strlen(s_lwt_msg),
+                .qos = 1,
+                .retain = 0,
+            },
         },
         .network = {
             .reconnect_timeout_ms = 10000,
             .timeout_ms = 20000,
         },
+        .buffer = {
+            .size = MQTT_RX_BUF_SIZE,
+        },
+        .task = {
+            .stack_size = 8192,
+        },
     };
 
-    ESP_LOGI(TAG, "Connecting to MQTT broker: %s", MQTT_BROKER_URI);
+    ESP_LOGI(TAG, "Connecting to MQTT broker: %s (rx_buf=%d)", MQTT_BROKER_URI, MQTT_RX_BUF_SIZE);
+    ESP_LOGI(TAG, "LWT topic=%s payload=%s", s_lwt_topic, s_lwt_msg);
     s_mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
     if (s_mqtt_client == NULL) {
         return ESP_ERR_NO_MEM;
@@ -344,10 +510,14 @@ void mqtt_handler_stop(void)
     if (s_mqtt_client == NULL) {
         return;
     }
+    if (s_mqtt_connected) {
+        esp_mqtt_client_disconnect(s_mqtt_client);
+    }
     esp_mqtt_client_stop(s_mqtt_client);
     esp_mqtt_client_destroy(s_mqtt_client);
     s_mqtt_client = NULL;
     s_mqtt_connected = false;
+    mqtt_rx_reset();
 }
 
 bool mqtt_handler_is_connected(void)
